@@ -49,6 +49,7 @@ public class UrlShortener {
         return url.toString();
     }
 
+    // FIXME will fail at runtime with Index Out of Bounds if we exhaust all short urls
     private void nextUrl() {
         int index = 0;
         int carry = 1;
