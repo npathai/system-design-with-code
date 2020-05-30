@@ -6,10 +6,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,10 +40,13 @@ class UrlShortenerTest {
 
     @Test
     public void returnsUniqueUrl() {
-        Set<String> shortUrls = IntStream.range(0, 1000)
-                .mapToObj((i) -> shortener.toShort(LONG_URL))
-                .collect(Collectors.toSet());
+        Set<String> shortUrls = new LinkedHashSet<>();
+        for (int i = 0; i < 1000; i++) {
+            String s = shortener.toShort(LONG_URL);
+            shortUrls.add(s);
+        }
 
+        System.out.println(shortUrls);
         assertThat(shortUrls).hasSize(1000);
     }
 
