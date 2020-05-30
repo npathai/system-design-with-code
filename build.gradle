@@ -5,7 +5,7 @@ plugins {
 group 'org.npathai'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
@@ -17,6 +17,10 @@ test {
 
 dependencies {
     compile "com.sparkjava:spark-core:2.8.0"
+    // https://mvnrepository.com/artifact/com.eclipsesource.minimal-json/minimal-json
+    compile group: 'com.eclipsesource.minimal-json', name: 'minimal-json', version: '0.9.5'
+
+
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.0")
@@ -33,6 +37,9 @@ dependencies {
     // https://mvnrepository.com/artifact/io.rest-assured/rest-assured
     testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.0'
     implementation 'junit:junit:4.12'
+    // https://mvnrepository.com/artifact/pl.pragmatists/JUnitParams
+    testCompile group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
+
 
 
     // https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
