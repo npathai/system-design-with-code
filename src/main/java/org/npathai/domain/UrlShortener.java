@@ -31,14 +31,14 @@ public class UrlShortener {
     // in reverse. So reverse to get normal order
     private int[] current = {0, 0, 0, 0, 0};
 
-    public String toShort(String longUrl) {
-        String shortUrl;
+    public String shorten(String longUrl) {
+        String id;
         synchronized (this) {
-            shortUrl = "http://localhost/" + translate(current);
+            id = translate(current);
             nextUrl();
         }
-        dao.save(shortUrl, longUrl);
-        return shortUrl;
+        dao.save(id, longUrl);
+        return id;
     }
 
     private String translate(int[] current) {
@@ -60,8 +60,8 @@ public class UrlShortener {
         }
     }
 
-    public String toLong(String shortUrl) {
-        return dao.get(shortUrl);
+    public String toLong(String id) {
+        return dao.get(id);
     }
 
 }

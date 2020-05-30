@@ -4,13 +4,11 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.runner.RunWith;
 import org.npathai.dao.InMemoryUrlDao;
 import org.npathai.domain.UrlShortener;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,25 +26,23 @@ public class UrlShortenerTest {
 
     @Test
     public void validateShortenedUrlFormat() {
-        String shortUrl = shortener.toShort("http://google.com");
-        assertThat(shortUrl).isNotNull()
-                .startsWith("http://localhost/");
-        String key = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
-        assertThat(key).hasSize(5);
+        String shortUrlId = shortener.shorten("http://google.com");
+        assertThat(shortUrlId).isNotNull();
+        assertThat(shortUrlId).hasSize(5);
     }
 
     @Parameters(method = "longUrls")
     @Test
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) {
-        String shortUrl = shortener.toShort(originalLongUrl);
-        assertThat(shortener.toLong(shortUrl)).isEqualTo(originalLongUrl);
+        String shortUrlId = shortener.shorten(originalLongUrl);
+        assertThat(shortener.toLong(shortUrlId)).isEqualTo(originalLongUrl);
     }
 
     @Test
     public void returnsUniqueUrl() {
         Set<String> shortUrls = new LinkedHashSet<>();
         for (int i = 0; i < 1000; i++) {
-            String s = shortener.toShort(LONG_URL);
+            String s = shortener.shorten(LONG_URL);
             shortUrls.add(s);
         }
 

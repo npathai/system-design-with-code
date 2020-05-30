@@ -1,6 +1,6 @@
 package org.npathai.dao;
 
 public interface UrlDao {
-    void save(String shortUrl, String longUrl);
-    String get(String shortUrl);
+    void save(String id, String longUrl);
+    String get(String id);
 }

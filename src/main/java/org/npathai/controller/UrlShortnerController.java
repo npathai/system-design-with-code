@@ -15,18 +15,19 @@ public class UrlShortnerController {
 
     public String shorten(Request req, Response res) {
         ShortenUrlRequest shortenUrlRequest = formShortenRequest(req);
-        String shortUrl = shortener.toShort(shortenUrlRequest.longUrl());
-        return prepareOkResponse(res, shortUrl);
+        String shortUrlId = shortener.shorten(shortenUrlRequest.longUrl());
+        return prepareOkResponse(shortenUrlRequest, res, shortUrlId);
     }
 
-    private String prepareOkResponse(Response res, String shortUrl) {
+    private String prepareOkResponse(ShortenUrlRequest shortenUrlRequest, Response res, String shortUrl) {
         res.type("application/json");
-        return jsonFor(shortUrl);
+        return jsonFor(shortenUrlRequest, shortUrl);
     }
 
-    private String jsonFor(String shortUrl) {
+    private String jsonFor(ShortenUrlRequest shortenUrlRequest, String shortUrl) {
         return new JsonObject()
-                .add("shortUrl", shortUrl)
+                .add("id", shortUrl)
+                .add("longUrl", shortenUrlRequest.longUrl())
                 .toString();
     }
 
