@@ -3,31 +3,33 @@ package org.npathai.controller;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import org.npathai.domain.UrlShortener;
+import org.npathai.model.ShortUrl;
 import spark.Request;
 import spark.Response;
 
-public class UrlShortnerController {
+public class UrlShortenerAPI {
     private final UrlShortener shortener;
 
-    public UrlShortnerController(UrlShortener shortener) {
+    public UrlShortenerAPI(UrlShortener shortener) {
         this.shortener = shortener;
     }
 
     public String shorten(Request req, Response res) {
         ShortenUrlRequest shortenUrlRequest = formShortenRequest(req);
-        String shortUrlId = shortener.shorten(shortenUrlRequest.longUrl());
-        return prepareOkResponse(shortenUrlRequest, res, shortUrlId);
+        ShortUrl shortUrl = shortener.shorten(shortenUrlRequest.longUrl());
+        return prepareOkResponse(res, shortUrl);
     }
 
-    private String prepareOkResponse(ShortenUrlRequest shortenUrlRequest, Response res, String shortUrl) {
+    private String prepareOkResponse(Response res, ShortUrl shortUrl) {
         res.type("application/json");
-        return jsonFor(shortenUrlRequest, shortUrl);
+        return jsonFor(shortUrl);
     }
 
-    private String jsonFor(ShortenUrlRequest shortenUrlRequest, String shortUrl) {
+    private String jsonFor(ShortUrl shortUrl) {
         return new JsonObject()
-                .add("id", shortUrl)
-                .add("longUrl", shortenUrlRequest.longUrl())
+                .add("id", shortUrl.id())
+                .add("longUrl", shortUrl.longUrl())
+                .add("createdAt", shortUrl.createdAt())
                 .toString();
     }
 

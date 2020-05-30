@@ -1,68 +1,27 @@
 package org.npathai.domain;
 
 import org.npathai.dao.UrlDao;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.npathai.model.ShortUrl;
 
 public class UrlShortener {
 
-    private static final Map<Integer, Character> charSet = initDictionary();
+    private final ShortUrlGenerator shortUrlGenerator = new ShortUrlGenerator();
+
     private UrlDao dao;
 
     public UrlShortener(UrlDao dao) {
         this.dao = dao;
     }
 
-    private static Map<Integer, Character> initDictionary() {
-        Map<Integer, Character> charSet = new HashMap<>();
-        int i = 0;
-        for (char ch = 'A'; ch <= 'Z'; ch++) {
-            charSet.put(i++, ch);
-        }
-
-        for (char ch = 'a'; ch <= 'z'; ch++) {
-            charSet.put(i++, ch);
-        }
-        return charSet;
+    public ShortUrl shorten(String longUrl) {
+        String id = shortUrlGenerator.generate();
+        ShortUrl shortUrl = new ShortUrl(id, longUrl);
+        dao.save(shortUrl);
+        return shortUrl;
     }
 
-    // in reverse. So reverse to get normal order
-    private int[] current = {0, 0, 0, 0, 0};
-
-    public String shorten(String longUrl) {
-        String id;
-        synchronized (this) {
-            id = translate(current);
-            nextUrl();
-        }
-        dao.save(id, longUrl);
-        return id;
-    }
-
-    private String translate(int[] current) {
-        StringBuilder url = new StringBuilder();
-        for (int i = current.length - 1; i >= 0; i--) {
-            url.append(charSet.get(current[i]));
-        }
-        return url.toString();
-    }
-
-    // FIXME will fail at runtime with Index Out of Bounds if we exhaust all short urls
-    private void nextUrl() {
-        int index = 0;
-        int carry = 1;
-        while (carry > 0) {
-            int sum = current[index] + carry;
-            current[index] = sum % 52;
-            carry = sum / 52;
-            index++;
-        }
-    }
-
-    public String toLong(String id) {
-        return dao.get(id);
+    public String expand(String id) {
+        return dao.getById(id);
     }
 
 }

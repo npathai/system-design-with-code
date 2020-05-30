@@ -1,18 +1,20 @@
 package org.npathai.dao;
 
+import org.npathai.model.ShortUrl;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryUrlDao implements UrlDao {
-    private Map<String, String> shortToLong = new ConcurrentHashMap<>();
+    private Map<String, ShortUrl> shortToLong = new ConcurrentHashMap<>();
 
     @Override
-    public void save(String id, String longUrl) {
-        shortToLong.put(id, longUrl);
+    public void save(ShortUrl shortUrl) {
+        shortToLong.put(shortUrl.id(), shortUrl);
     }
 
     @Override
-    public String get(String id) {
-        return shortToLong.get(id);
+    public String getById(String id) {
+        return shortToLong.get(id).longUrl();
     }
 }

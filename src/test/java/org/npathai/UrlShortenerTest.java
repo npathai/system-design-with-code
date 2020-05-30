@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.npathai.dao.InMemoryUrlDao;
 import org.npathai.domain.UrlShortener;
+import org.npathai.model.ShortUrl;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -26,27 +27,26 @@ public class UrlShortenerTest {
 
     @Test
     public void validateShortenedUrlFormat() {
-        String shortUrlId = shortener.shorten("http://google.com");
-        assertThat(shortUrlId).isNotNull();
-        assertThat(shortUrlId).hasSize(5);
+        ShortUrl shortUrl = shortener.shorten("http://google.com");
+        assertThat(shortUrl).isNotNull();
+        assertThat(shortUrl.id()).hasSize(5);
     }
 
     @Parameters(method = "longUrls")
     @Test
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) {
-        String shortUrlId = shortener.shorten(originalLongUrl);
-        assertThat(shortener.toLong(shortUrlId)).isEqualTo(originalLongUrl);
+        ShortUrl shortUrl = shortener.shorten(originalLongUrl);
+        assertThat(shortener.expand(shortUrl.id())).isEqualTo(originalLongUrl);
     }
 
     @Test
     public void returnsUniqueUrl() {
-        Set<String> shortUrls = new LinkedHashSet<>();
+        Set<ShortUrl> shortUrls = new LinkedHashSet<>();
         for (int i = 0; i < 1000; i++) {
-            String s = shortener.shorten(LONG_URL);
+            ShortUrl s = shortener.shorten(LONG_URL);
             shortUrls.add(s);
         }
 
-        System.out.println(shortUrls);
         assertThat(shortUrls).hasSize(1000);
     }
 

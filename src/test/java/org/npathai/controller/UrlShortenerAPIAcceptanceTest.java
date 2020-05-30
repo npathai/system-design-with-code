@@ -5,34 +5,42 @@ import com.eclipsesource.json.JsonObject;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Offset;
 import org.junit.Test;
 import org.npathai.AcceptanceTests;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class UrlShortnerControllerAcceptanceTest {
+public class UrlShortenerAPIAcceptanceTest {
+
+    public static final String LONG_URL = "http://google.com";
 
     @Test
     public void returnsShortenedUrl() {
         String url = AcceptanceTests.BASEURL + "/shorten";
         System.out.println(url);
         Response response = given()
-                .body(withJsonContaining("http://google.com"))
+                .body(withJsonContaining(LONG_URL))
                 .when()
                 .post(url);
 
         JsonObject jsonObject = Json.parse(response.getBody().asString()).asObject();
         String id = jsonObject.get("id").asString();
-        Assertions.assertThat(id).hasSize(5);
+        assertThat(id).hasSize(5);
+
         String longUrl = jsonObject.get("longUrl").asString();
-        Assertions.assertThat(longUrl).isEqualTo("http://google.com");
+        assertThat(longUrl).isEqualTo(LONG_URL);
+
+        long createdAt = jsonObject.get("createdAt").asLong();
+        assertThat(createdAt).isCloseTo(System.currentTimeMillis(), Offset.offset(1000L));
     }
 
     @Test
     public void returnsExpandedUrlForId() {
         String shortenUrl = AcceptanceTests.BASEURL + "/shorten";
         Response shortenedResponse = given()
-                .body(withJsonContaining("http://google.com"))
+                .body(withJsonContaining(LONG_URL))
                 .when()
                 .post(shortenUrl);
 
@@ -46,8 +54,8 @@ public class UrlShortnerControllerAcceptanceTest {
         JsonObject jsonObject1 = Json.parse(response.getBody().asString()).asObject();
         String longUrl = jsonObject1.get("longUrl").asString();
         String responseId = jsonObject.get("id").asString();
-        Assertions.assertThat(responseId).isEqualTo(id);
-        Assertions.assertThat(longUrl).isEqualTo("http://google.com");
+        assertThat(responseId).isEqualTo(id);
+        assertThat(longUrl).isEqualTo(LONG_URL);
     }
 
     private String withJsonContaining(String longUrl) {

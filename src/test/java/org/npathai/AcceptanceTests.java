@@ -4,11 +4,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.npathai.controller.UrlShortnerControllerAcceptanceTest;
+import org.npathai.controller.UrlShortenerAPIAcceptanceTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        UrlShortnerControllerAcceptanceTest.class
+        UrlShortenerAPIAcceptanceTest.class
 })
 public class AcceptanceTests {
 

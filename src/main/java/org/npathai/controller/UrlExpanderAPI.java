@@ -5,17 +5,17 @@ import org.npathai.domain.UrlShortener;
 import spark.Request;
 import spark.Response;
 
-public class UrlExpanderController {
+public class UrlExpanderAPI {
 
     private final UrlShortener urlShortener;
 
-    public UrlExpanderController(UrlShortener urlShortener) {
+    public UrlExpanderAPI(UrlShortener urlShortener) {
         this.urlShortener = urlShortener;
     }
 
     public String expand(Request req, Response res) {
         String id = req.params("id");
-        String longUrl = urlShortener.toLong(id);
+        String longUrl = urlShortener.expand(id);
         return prepareOkResponse(res, id, longUrl);
     }
 
