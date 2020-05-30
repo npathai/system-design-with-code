@@ -13,6 +13,6 @@ public class UrlShortnerController {
     }
 
     public String shorten(Request req, Response res) {
-        return "Hello world!";
+        return "Hello World!";
     }
 }

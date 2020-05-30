@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.npathai.AcceptanceTests;
 import org.npathai.domain.UrlShortener;
 
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 
 public class UrlShortnerControllerAcceptanceTest {
@@ -21,7 +22,8 @@ public class UrlShortnerControllerAcceptanceTest {
     public void returnsShortenedUrl() {
         String url = AcceptanceTests.BASEURL + "/shorten";
         System.out.println(url);
-        RestAssured.when().post()
+        when()
+                .post(url)
                 .then()
                     .body(equalTo("Hello World!"));
     }
