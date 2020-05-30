@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'org.npathai'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.0")
+
+    testRuntime("org.junit.platform:junit-platform-launcher:1.6.0")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
+}
