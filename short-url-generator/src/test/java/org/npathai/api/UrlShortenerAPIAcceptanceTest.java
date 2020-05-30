@@ -1,10 +1,9 @@
-package org.npathai.controller;
+package org.npathai.api;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
 import org.junit.Test;
 import org.npathai.AcceptanceTests;

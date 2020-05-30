@@ -1,8 +1,8 @@
 package org.npathai;
 
 import org.npathai.controller.RootController;
-import org.npathai.controller.UrlExpanderAPI;
-import org.npathai.controller.UrlShortenerAPI;
+import org.npathai.api.UrlExpanderAPI;
+import org.npathai.api.UrlShortenerAPI;
 import org.npathai.dao.InMemoryUrlDao;
 import org.npathai.domain.UrlShortener;
 import spark.Spark;

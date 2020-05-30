@@ -1,4 +1,4 @@
-package org.npathai.controller;
+package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
 import org.npathai.domain.UrlShortener;

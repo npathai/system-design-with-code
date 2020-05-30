@@ -15,4 +15,5 @@ System design not just on whiteboard, but with code.
     - [ ] Basic authentication or OpenId Connect
     - [ ] Authenticated User will get Analytics and Tracking
     - [ ] Without authentication create url with default expiry maybe a week
+    - [ ] Delete url
     

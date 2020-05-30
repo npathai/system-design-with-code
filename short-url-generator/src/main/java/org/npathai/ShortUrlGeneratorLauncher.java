@@ -2,20 +2,16 @@ package org.npathai;
 
 import spark.Spark;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static spark.Spark.before;
 
-public class Main {
+public class ShortUrlGeneratorLauncher {
 
     public static final int PORT = 4321;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public static void main(String[] args) throws InterruptedException {
-        Main main = new Main();
-        main.start();
-        main.awaitInitialization();
+        ShortUrlGeneratorLauncher shortUrlGeneratorLauncher = new ShortUrlGeneratorLauncher();
+        shortUrlGeneratorLauncher.start();
+        shortUrlGeneratorLauncher.awaitInitialization();
         Thread.currentThread().join();
     }
 
