@@ -23,6 +23,22 @@ dependencies {
 
     testRuntime("org.junit.platform:junit-platform-launcher:1.6.0")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.0")
+// https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine
+    testRuntime group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.6.0'
+
+    // https://mvnrepository.com/artifact/junit/junit
+    testCompile group: 'junit', name: 'junit', version: '4.13'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
+    // https://mvnrepository.com/artifact/io.rest-assured/rest-assured
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.0'
+    implementation 'junit:junit:4.12'
+
+
+    // https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
+    compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
+// https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+    compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
+
+
 }
