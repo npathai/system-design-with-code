@@ -1,5 +1,7 @@
 package org.npathai.domain;
 
+import org.npathai.dao.UrlDao;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,6 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UrlShortener {
 
     private static final Map<Integer, Character> charSet = initDictionary();
+    private UrlDao dao;
+
+    public UrlShortener(UrlDao dao) {
+        this.dao = dao;
+    }
 
     private static Map<Integer, Character> initDictionary() {
         Map<Integer, Character> charSet = new HashMap<>();
@@ -21,7 +28,6 @@ public class UrlShortener {
         return charSet;
     }
 
-    private Map<String, String> shortToLong = new ConcurrentHashMap<>();
     // in reverse. So reverse to get normal order
     private int[] current = {0, 0, 0, 0, 0};
 
@@ -31,7 +37,7 @@ public class UrlShortener {
             shortUrl = "http://localhost/" + translate(current);
             nextUrl();
         }
-        shortToLong.put(shortUrl, longUrl);
+        dao.save(shortUrl, longUrl);
         return shortUrl;
     }
 
@@ -55,6 +61,7 @@ public class UrlShortener {
     }
 
     public String toLong(String shortUrl) {
-        return shortToLong.get(shortUrl);
+        return dao.get(shortUrl);
     }
+
 }

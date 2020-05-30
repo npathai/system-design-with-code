@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.runner.RunWith;
+import org.npathai.dao.InMemoryUrlDao;
 import org.npathai.domain.UrlShortener;
 
 import java.util.LinkedHashSet;
@@ -22,7 +23,7 @@ public class UrlShortenerTest {
 
     @Before
     public void initialize() {
-        shortener = new UrlShortener();
+        shortener = new UrlShortener(new InMemoryUrlDao());
     }
 
     @Test
