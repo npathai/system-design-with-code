@@ -2,6 +2,7 @@ package org.npathai;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UrlShortener {
 
@@ -20,13 +21,16 @@ public class UrlShortener {
         return charSet;
     }
 
-    private Map<String, String> shortToLong = new HashMap<>();
+    private Map<String, String> shortToLong = new ConcurrentHashMap<>();
     // in reverse. So reverse to get normal order
     private int[] current = {0, 0, 0, 0, 0};
 
     public String toShort(String longUrl) {
-        String shortUrl = "http://localhost/" + translate(current);
-        nextUrl();
+        String shortUrl;
+        synchronized (this) {
+            shortUrl = "http://localhost/" + translate(current);
+            nextUrl();
+        }
         shortToLong.put(shortUrl, longUrl);
         return shortUrl;
     }
