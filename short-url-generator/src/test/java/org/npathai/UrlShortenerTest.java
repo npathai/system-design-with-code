@@ -5,9 +5,13 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.npathai.dao.InMemoryUrlDao;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.ShortUrl;
+import org.npathai.service.IdGenerationService;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,18 +22,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UrlShortenerTest {
 
     public static final String LONG_URL = "http://google.com";
+    public static final String ID = "AAAAA";
+
+    @Mock
+    private IdGenerationService idGenerationService;
+
     private UrlShortener shortener;
 
     @Before
     public void initialize() {
-        shortener = new UrlShortener(new InMemoryUrlDao());
+        MockitoAnnotations.initMocks(this);
+        shortener = new UrlShortener(idGenerationService, new InMemoryUrlDao());
+        Mockito.when(idGenerationService.getId()).thenReturn(ID);
     }
 
+    @Parameters(method = "longUrls")
     @Test
-    public void validateShortenedUrlFormat() {
-        ShortUrl shortUrl = shortener.shorten("http://google.com");
+    public void validateShortenedUrlFormat(String longUrl) {
+        ShortUrl shortUrl = shortener.shorten(longUrl);
+
         assertThat(shortUrl).isNotNull();
-        assertThat(shortUrl.id()).hasSize(5);
+        Mockito.verify(idGenerationService).getId();
+        assertThat(shortUrl.longUrl()).isEqualTo(longUrl);
+        assertThat(shortUrl.id()).isEqualTo(ID);
     }
 
     @Parameters(method = "longUrls")
@@ -37,17 +52,6 @@ public class UrlShortenerTest {
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) {
         ShortUrl shortUrl = shortener.shorten(originalLongUrl);
         assertThat(shortener.expand(shortUrl.id())).isEqualTo(originalLongUrl);
-    }
-
-    @Test
-    public void returnsUniqueUrl() {
-        Set<ShortUrl> shortUrls = new LinkedHashSet<>();
-        for (int i = 0; i < 1000; i++) {
-            ShortUrl s = shortener.shorten(LONG_URL);
-            shortUrls.add(s);
-        }
-
-        assertThat(shortUrls).hasSize(1000);
     }
 
     @SuppressWarnings("unused")
