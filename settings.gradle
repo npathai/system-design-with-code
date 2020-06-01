@@ -1,1 +1,1 @@
-include 'short-url-generator', 'key-gen-service'
+include 'short-url-generator', 'key-gen-service', 'common-goodies'

@@ -1,6 +1,7 @@
-package org.npathai;
+package org.npathai.zookeeper;
 
 import org.apache.zookeeper.data.Stat;
+import org.npathai.util.thread.ThrowingRunnable;
 
 public interface ZkManager {
     Stat createIfAbsent(String path) throws Exception;

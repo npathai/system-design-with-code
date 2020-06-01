@@ -1,4 +1,4 @@
-package org.npathai;
+package org.npathai.zookeeper;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

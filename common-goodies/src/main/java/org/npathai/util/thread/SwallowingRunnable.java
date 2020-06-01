@@ -1,4 +1,4 @@
-package org.npathai;
+package org.npathai.util.thread;
 
 public class SwallowingRunnable implements Runnable{
 

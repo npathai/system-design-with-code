@@ -1,16 +1,12 @@
 package org.npathai.domain;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.npathai.DefaultZkManager;
-import org.npathai.DefaultZkManagerFactory;
-import org.npathai.ThrowingRunnable;
-import org.npathai.ZkManager;
+import org.npathai.util.thread.ThrowingRunnable;
+import org.npathai.zookeeper.ZkManager;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class IdProviderService {
 
@@ -65,16 +61,5 @@ public class IdProviderService {
             System.out.println("Saved next id value in zookeeper as: " + batch.nextId().encode());
             System.out.println("Batch Id generation ended");
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        DefaultZkManagerFactory defaultZkManagerFactory = new DefaultZkManagerFactory();
-        DefaultZkManager manager = defaultZkManagerFactory.createConnectedManager("0.0.0.0:2181");
-
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        IdProviderService providerService = new IdProviderService(manager, scheduledExecutorService);
-
-        scheduledExecutorService.shutdown();
-        scheduledExecutorService.awaitTermination(1, TimeUnit.MINUTES);
     }
 }

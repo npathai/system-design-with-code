@@ -4,6 +4,8 @@ import org.npathai.api.IdGeneratorAPI;
 import org.npathai.domain.BatchedIdGenerator;
 import org.npathai.domain.Id;
 import org.npathai.domain.IdProviderService;
+import org.npathai.zookeeper.DefaultZkManager;
+import org.npathai.zookeeper.DefaultZkManagerFactory;
 import spark.Spark;
 
 import java.util.concurrent.Executors;

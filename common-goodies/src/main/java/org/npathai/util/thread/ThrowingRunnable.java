@@ -1,4 +1,4 @@
-package org.npathai;
+package org.npathai.util.thread;
 
 public interface ThrowingRunnable {
     void run() throws Exception;
