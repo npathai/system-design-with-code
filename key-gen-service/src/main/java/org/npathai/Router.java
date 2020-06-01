@@ -19,7 +19,6 @@ public class Router {
     private ScheduledExecutorService scheduledExecutor;
 
     public Router() {
-
     }
 
     public void initRoutes() throws Exception {
