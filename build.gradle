@@ -55,6 +55,14 @@ subprojects {
 // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
         compile group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
+        // For distributed locking, consensus
+        // https://mvnrepository.com/artifact/org.apache.curator/curator-recipes
+        compile group: 'org.apache.curator', name: 'curator-recipes', version: '5.0.0'
 
+        // https://mvnrepository.com/artifact/org.apache.curator/curator-framework
+        compile group: 'org.apache.curator', name: 'curator-framework', version: '5.0.0'
+
+        // https://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14
+        compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
     }
 }

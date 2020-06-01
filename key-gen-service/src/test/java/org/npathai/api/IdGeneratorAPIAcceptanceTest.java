@@ -3,7 +3,6 @@ package org.npathai.api;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import io.restassured.response.Response;
-import org.assertj.core.data.Offset;
 import org.junit.Test;
 import org.npathai.AcceptanceTests;
 

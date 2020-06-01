@@ -7,8 +7,9 @@ import static spark.Spark.before;
 public class KeyGenServiceLauncher {
 
     public static final int PORT = 4322;
+    private Router router;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         KeyGenServiceLauncher shortUrlGeneratorLauncher = new KeyGenServiceLauncher();
         shortUrlGeneratorLauncher.start();
         shortUrlGeneratorLauncher.awaitInitialization();
@@ -24,9 +25,10 @@ public class KeyGenServiceLauncher {
         });
     }
 
-    public void start() {
+    public void start() throws Exception {
         setupSpark();
-        Router.initRoutes();
+        router = new Router();
+        router.initRoutes();
     }
 
 
@@ -34,7 +36,8 @@ public class KeyGenServiceLauncher {
         Spark.awaitInitialization();
     }
 
-    public void stop() {
+    public void stop() throws InterruptedException {
         Spark.stop();
+        router.stop();
     }
 }

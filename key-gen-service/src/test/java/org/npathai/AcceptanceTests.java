@@ -16,14 +16,14 @@ public class AcceptanceTests {
     static KeyGenServiceLauncher keyGenServiceLauncher;
 
     @BeforeClass
-    public static void createMain() {
+    public static void createLauncher() throws Exception {
         keyGenServiceLauncher = new KeyGenServiceLauncher();
         keyGenServiceLauncher.start();
         keyGenServiceLauncher.awaitInitialization();
     }
 
     @AfterClass
-    public static void stop() {
+    public static void stop() throws InterruptedException {
         keyGenServiceLauncher.stop();
     }
 }
