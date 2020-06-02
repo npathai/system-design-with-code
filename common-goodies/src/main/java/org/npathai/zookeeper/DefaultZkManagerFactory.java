@@ -6,7 +6,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 
 public class DefaultZkManagerFactory {
 
-    public DefaultZkManager createConnectedManager(String connectionString) throws InterruptedException {
+    public DefaultZkManager createConnected(String connectionString) throws InterruptedException {
         CuratorFramework client = CuratorFrameworkFactory.newClient(connectionString,
                 new ExponentialBackoffRetry(1000, 3));
         System.out.println("Connecting to Zookeeper");

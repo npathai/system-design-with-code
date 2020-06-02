@@ -45,7 +45,7 @@ public class KeyGenServiceLauncher {
 
     public void start() throws Exception {
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
-        manager = zkManagerFactory.createConnectedManager("0.0.0.0:2181");
+        manager = zkManagerFactory.createConnected("0.0.0.0:2181");
 
         setupSpark();
         router = new Router(manager);

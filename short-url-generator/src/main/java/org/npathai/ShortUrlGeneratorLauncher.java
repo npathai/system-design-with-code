@@ -4,8 +4,6 @@ import org.npathai.zookeeper.DefaultZkManager;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
 import spark.Spark;
 
-import java.io.IOException;
-
 import static spark.Spark.before;
 
 public class ShortUrlGeneratorLauncher {
@@ -34,7 +32,7 @@ public class ShortUrlGeneratorLauncher {
 
     public void start() throws Exception {
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
-        zkManager = zkManagerFactory.createConnectedManager("0.0.0.0:2181");
+        zkManager = zkManagerFactory.createConnected("0.0.0.0:2181");
 
         setupSpark();
 
