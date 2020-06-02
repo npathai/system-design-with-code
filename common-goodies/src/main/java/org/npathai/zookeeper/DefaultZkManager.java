@@ -55,4 +55,9 @@ public class DefaultZkManager implements ZkManager {
     public void stop() {
         client.close();
     }
+
+    @Override
+    public CuratorFramework client() {
+        return client;
+    }
 }

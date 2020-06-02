@@ -6,12 +6,24 @@ import org.npathai.api.UrlShortenerAPI;
 import org.npathai.dao.InMemoryUrlDao;
 import org.npathai.domain.UrlShortener;
 import org.npathai.service.IdGenerationService;
+import org.npathai.util.Stoppable;
+import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
-public class Router {
+import java.io.Closeable;
+import java.io.IOException;
 
-    public static void initRoutes() {
-        IdGenerationService idGenerationService = new IdGenerationService();
+public class Router implements Stoppable {
+
+    private final ZkManager zkManager;
+    private IdGenerationService idGenerationService;
+
+    public Router(ZkManager zkManager) {
+        this.zkManager = zkManager;
+    }
+
+    public void initRoutes() throws Exception {
+        idGenerationService = new IdGenerationService(zkManager);
         UrlShortener urlShortener = new UrlShortener(idGenerationService, new InMemoryUrlDao());
         UrlShortenerAPI urlShortenerController =
                 new UrlShortenerAPI(urlShortener);
@@ -25,5 +37,10 @@ public class Router {
 
         // Unprotected paths
         Spark.get("/:id", (req, res) -> rootController.handle(req, res));
+    }
+
+    @Override
+    public void stop() throws Exception {
+        idGenerationService.stop();
     }
 }

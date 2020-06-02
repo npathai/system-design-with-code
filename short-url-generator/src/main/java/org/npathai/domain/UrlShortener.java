@@ -14,7 +14,7 @@ public class UrlShortener {
         this.dao = dao;
     }
 
-    public ShortUrl shorten(String longUrl) {
+    public ShortUrl shorten(String longUrl) throws Exception {
         // Remote call
         String id = idGenerationService.getId();
         ShortUrl shortUrl = new ShortUrl(id, longUrl);

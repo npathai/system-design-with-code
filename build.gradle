@@ -62,6 +62,9 @@ subprojects {
         // https://mvnrepository.com/artifact/org.apache.curator/curator-framework
         compile group: 'org.apache.curator', name: 'curator-framework', version: '5.0.0'
 
+        // https://mvnrepository.com/artifact/org.apache.curator/curator-x-discovery
+        compile group: 'org.apache.curator', name: 'curator-x-discovery', version: '5.0.0'
+
         // https://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14
         compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
     }

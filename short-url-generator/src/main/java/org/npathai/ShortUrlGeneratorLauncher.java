@@ -1,18 +1,26 @@
 package org.npathai;
 
+import org.npathai.zookeeper.DefaultZkManager;
+import org.npathai.zookeeper.DefaultZkManagerFactory;
 import spark.Spark;
+
+import java.io.IOException;
 
 import static spark.Spark.before;
 
 public class ShortUrlGeneratorLauncher {
 
     public static final int PORT = 4321;
+    private Router router;
+    private DefaultZkManager zkManager;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         ShortUrlGeneratorLauncher shortUrlGeneratorLauncher = new ShortUrlGeneratorLauncher();
         shortUrlGeneratorLauncher.start();
         shortUrlGeneratorLauncher.awaitInitialization();
-        Thread.currentThread().join();
+        System.out.println("Press any key to exit..");
+        System.in.read();
+        shortUrlGeneratorLauncher.stop();
     }
 
     private void setupSpark() {
@@ -24,9 +32,14 @@ public class ShortUrlGeneratorLauncher {
         });
     }
 
-    public void start() {
+    public void start() throws Exception {
+        DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
+        zkManager = zkManagerFactory.createConnectedManager("0.0.0.0:2181");
+
         setupSpark();
-        Router.initRoutes();
+
+        router = new Router(zkManager);
+        router.initRoutes();
     }
 
 
@@ -34,7 +47,9 @@ public class ShortUrlGeneratorLauncher {
         Spark.awaitInitialization();
     }
 
-    public void stop() {
+    public void stop() throws Exception {
         Spark.stop();
+        router.stop();
+        zkManager.stop();
     }
 }

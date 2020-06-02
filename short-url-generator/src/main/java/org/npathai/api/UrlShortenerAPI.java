@@ -16,8 +16,18 @@ public class UrlShortenerAPI {
 
     public String shorten(Request req, Response res) {
         ShortenUrlRequest shortenUrlRequest = formShortenRequest(req);
-        ShortUrl shortUrl = shortener.shorten(shortenUrlRequest.longUrl());
-        return prepareOkResponse(res, shortUrl);
+        ShortUrl shortUrl = null;
+        try {
+            shortUrl = shortener.shorten(shortenUrlRequest.longUrl());
+            return prepareOkResponse(res, shortUrl);
+        } catch (Exception e) {
+            return prepareUnavailableResponse(res);
+        }
+    }
+
+    private String prepareUnavailableResponse(Response res) {
+        res.status(503);
+        return null;
     }
 
     private String prepareOkResponse(Response res, ShortUrl shortUrl) {
