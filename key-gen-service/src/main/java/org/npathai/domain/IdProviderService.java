@@ -6,6 +6,7 @@ import org.npathai.zookeeper.ZkManager;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class IdProviderService {
@@ -13,7 +14,7 @@ public class IdProviderService {
     public static final String NEXT_ID_ZNODE_NAME = "/next-id";
     private final ZkManager manager;
     private final ScheduledExecutorService scheduledExecutorService;
-    private Set<String> cachedIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private ConcurrentLinkedQueue<String> cachedIds = new ConcurrentLinkedQueue<>();
 
     public IdProviderService(ZkManager manager, ScheduledExecutorService scheduledExecutorService) throws Exception {
         this.manager = manager;
@@ -26,7 +27,7 @@ public class IdProviderService {
         if (cachedIds.size() < 5) {
             triggerHydration();
         }
-        return cachedIds.stream().findAny().orElseThrow();
+        return cachedIds.poll();
     }
 
     private void triggerHydration() {
