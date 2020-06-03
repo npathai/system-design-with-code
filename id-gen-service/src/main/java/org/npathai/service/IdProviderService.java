@@ -1,5 +1,8 @@
-package org.npathai.domain;
+package org.npathai.service;
 
+import org.npathai.domain.Batch;
+import org.npathai.domain.BatchedIdGenerator;
+import org.npathai.domain.Id;
 import org.npathai.util.thread.ThrowingRunnable;
 import org.npathai.zookeeper.ZkManager;
 

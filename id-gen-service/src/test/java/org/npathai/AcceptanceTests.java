@@ -14,18 +14,18 @@ import java.io.IOException;
 })
 public class AcceptanceTests {
 
-    public static final String BASEURL = "http://localhost:" + KeyGenServiceLauncher.PORT;
-    static KeyGenServiceLauncher keyGenServiceLauncher;
+    public static final String BASEURL = "http://localhost:" + IdGenServiceLauncher.PORT;
+    static IdGenServiceLauncher idGenServiceLauncher;
 
     @BeforeClass
     public static void createLauncher() throws Exception {
-        keyGenServiceLauncher = new KeyGenServiceLauncher();
-        keyGenServiceLauncher.start();
-        keyGenServiceLauncher.awaitInitialization();
+        idGenServiceLauncher = new IdGenServiceLauncher();
+        idGenServiceLauncher.start();
+        idGenServiceLauncher.awaitInitialization();
     }
 
     @AfterClass
     public static void stop() throws InterruptedException, IOException {
-        keyGenServiceLauncher.stop();
+        idGenServiceLauncher.stop();
     }
 }

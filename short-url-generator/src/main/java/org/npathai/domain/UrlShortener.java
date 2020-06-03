@@ -2,21 +2,21 @@ package org.npathai.domain;
 
 import org.npathai.dao.UrlDao;
 import org.npathai.model.ShortUrl;
-import org.npathai.service.IdGenerationService;
+import org.npathai.client.IdGenerationServiceClient;
 
 public class UrlShortener {
 
-    private final IdGenerationService idGenerationService;
+    private final IdGenerationServiceClient idGenerationServiceClient;
     private UrlDao dao;
 
-    public UrlShortener(IdGenerationService idGenerationService, UrlDao dao) {
-        this.idGenerationService = idGenerationService;
+    public UrlShortener(IdGenerationServiceClient idGenerationServiceClient, UrlDao dao) {
+        this.idGenerationServiceClient = idGenerationServiceClient;
         this.dao = dao;
     }
 
     public ShortUrl shorten(String longUrl) throws Exception {
         // Remote call
-        String id = idGenerationService.getId();
+        String id = idGenerationServiceClient.getId();
         ShortUrl shortUrl = new ShortUrl(id, longUrl);
         dao.save(shortUrl);
         return shortUrl;

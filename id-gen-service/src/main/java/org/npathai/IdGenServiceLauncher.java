@@ -10,7 +10,7 @@ import java.util.Random;
 
 import static spark.Spark.before;
 
-public class KeyGenServiceLauncher {
+public class IdGenServiceLauncher {
 
     public static final int PORT = new Random()
             .ints(4300, 4500)
@@ -26,12 +26,12 @@ public class KeyGenServiceLauncher {
 
 
     public static void main(String[] args) throws Exception {
-        KeyGenServiceLauncher keyGenServiceLauncher = new KeyGenServiceLauncher();
-        keyGenServiceLauncher.start();
-        keyGenServiceLauncher.awaitInitialization();
+        IdGenServiceLauncher idGenServiceLauncher = new IdGenServiceLauncher();
+        idGenServiceLauncher.start();
+        idGenServiceLauncher.awaitInitialization();
         System.out.println("Press any key to exit..");
         System.in.read();
-        keyGenServiceLauncher.stop();
+        idGenServiceLauncher.stop();
     }
 
     private void setupSpark() {
@@ -58,7 +58,7 @@ public class KeyGenServiceLauncher {
     private void registerForDiscovery() throws Exception {
         UriSpec uriSpec = new UriSpec("http://localhost:{port}");
         instance = ServiceInstance.<String>builder()
-                .name("key-gen-service")
+                .name("id-gen-service")
                 .address("http://localhost:" + PORT)
                 .payload("Provides unique ids")
                 .port(PORT)

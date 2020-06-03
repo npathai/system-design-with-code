@@ -1,46 +1,52 @@
 package org.npathai;
 
-import org.npathai.controller.RootController;
 import org.npathai.api.UrlExpanderAPI;
 import org.npathai.api.UrlShortenerAPI;
+import org.npathai.client.IdGenerationServiceClient;
+import org.npathai.controller.RootController;
 import org.npathai.dao.InMemoryUrlDao;
+import org.npathai.discovery.ServiceDiscoveryClient;
+import org.npathai.discovery.zookeeper.ZkServiceDiscoveryClientFactory;
 import org.npathai.domain.UrlShortener;
-import org.npathai.service.IdGenerationService;
 import org.npathai.util.Stoppable;
 import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
-import java.io.Closeable;
-import java.io.IOException;
+import java.util.Properties;
 
 public class Router implements Stoppable {
 
     private final ZkManager zkManager;
-    private IdGenerationService idGenerationService;
+    private IdGenerationServiceClient idGenerationServiceClient;
+    private ZkServiceDiscoveryClientFactory zkServiceDiscoveryClientFactory;
 
     public Router(ZkManager zkManager) {
         this.zkManager = zkManager;
     }
 
+    // FIXME starting to become Object Mother. Need to do damage control
     public void initRoutes() throws Exception {
-        idGenerationService = new IdGenerationService(zkManager);
-        UrlShortener urlShortener = new UrlShortener(idGenerationService, new InMemoryUrlDao());
-        UrlShortenerAPI urlShortenerController =
-                new UrlShortenerAPI(urlShortener);
-        UrlExpanderAPI urlExpanderAPI =
-                new UrlExpanderAPI(urlShortener);
+        zkServiceDiscoveryClientFactory = new ZkServiceDiscoveryClientFactory(zkManager);
+        Properties properties = new Properties();
+        properties.setProperty(ZkServiceDiscoveryClientFactory.Z_NODE_PATH, "/instances");
+        ServiceDiscoveryClient idGenServiceDiscoveryClient =
+                zkServiceDiscoveryClientFactory.createDiscoveryClient("id-gen-service", properties);
+
+        idGenerationServiceClient = new IdGenerationServiceClient(idGenServiceDiscoveryClient);
+
+        UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient, new InMemoryUrlDao());
+        UrlShortenerAPI urlShortenerApi = new UrlShortenerAPI(urlShortener);
+        UrlExpanderAPI urlExpanderAPI = new UrlExpanderAPI(urlShortener);
         RootController rootController = new RootController(urlShortener);
 
-        Spark.post("/shorten", (req, res) -> urlShortenerController.shorten(req, res));
+
+        Spark.post("/shorten", (req, res) -> urlShortenerApi.shorten(req, res));
         Spark.get("/expand/:id", (req, res) -> urlExpanderAPI.expand(req, res));
-
-
-        // Unprotected paths
         Spark.get("/:id", (req, res) -> rootController.handle(req, res));
     }
 
     @Override
     public void stop() throws Exception {
-        idGenerationService.stop();
+        idGenerationServiceClient.stop();
     }
 }

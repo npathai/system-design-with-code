@@ -16,14 +16,14 @@ public class AcceptanceTests {
     static ShortUrlGeneratorLauncher shortUrlGeneratorLauncher;
 
     @BeforeClass
-    public static void createMain() {
+    public static void createMain() throws Exception {
         shortUrlGeneratorLauncher = new ShortUrlGeneratorLauncher();
         shortUrlGeneratorLauncher.start();
         shortUrlGeneratorLauncher.awaitInitialization();
     }
 
     @AfterClass
-    public static void stop() {
+    public static void stop() throws Exception {
         shortUrlGeneratorLauncher.stop();
     }
 }
