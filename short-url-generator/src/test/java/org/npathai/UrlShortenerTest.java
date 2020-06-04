@@ -8,9 +8,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.npathai.dao.InMemoryUrlDao;
+import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.domain.UrlShortener;
-import org.npathai.model.ShortUrl;
+import org.npathai.model.Redirection;
 import org.npathai.client.IdGenerationServiceClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,26 +29,26 @@ public class UrlShortenerTest {
     @Before
     public void initialize() throws Exception {
         MockitoAnnotations.initMocks(this);
-        shortener = new UrlShortener(idGenerationServiceClient, new InMemoryUrlDao());
+        shortener = new UrlShortener(idGenerationServiceClient, new InMemoryRedirectionDao());
         Mockito.when(idGenerationServiceClient.getId()).thenReturn(ID);
     }
 
     @Parameters(method = "longUrls")
     @Test
     public void validateShortenedUrlFormat(String longUrl) throws Exception {
-        ShortUrl shortUrl = shortener.shorten(longUrl);
+        Redirection redirection = shortener.shorten(longUrl);
 
-        assertThat(shortUrl).isNotNull();
+        assertThat(redirection).isNotNull();
         Mockito.verify(idGenerationServiceClient).getId();
-        assertThat(shortUrl.longUrl()).isEqualTo(longUrl);
-        assertThat(shortUrl.id()).isEqualTo(ID);
+        assertThat(redirection.longUrl()).isEqualTo(longUrl);
+        assertThat(redirection.id()).isEqualTo(ID);
     }
 
     @Parameters(method = "longUrls")
     @Test
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) throws Exception {
-        ShortUrl shortUrl = shortener.shorten(originalLongUrl);
-        assertThat(shortener.expand(shortUrl.id())).isEqualTo(originalLongUrl);
+        Redirection redirection = shortener.shorten(originalLongUrl);
+        assertThat(shortener.expand(redirection.id())).isEqualTo(originalLongUrl);
     }
 
     @SuppressWarnings("unused")

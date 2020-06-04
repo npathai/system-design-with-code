@@ -2,8 +2,11 @@ package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
 import org.npathai.domain.UrlShortener;
+import org.npathai.model.Redirection;
 import spark.Request;
 import spark.Response;
+
+import java.util.Optional;
 
 public class UrlExpanderAPI {
 
@@ -13,10 +16,19 @@ public class UrlExpanderAPI {
         this.urlShortener = urlShortener;
     }
 
-    public String expand(Request req, Response res) {
+    public String expand(Request req, Response res) throws Exception {
         String id = req.params("id");
-        String longUrl = urlShortener.expand(id);
-        return prepareOkResponse(res, id, longUrl);
+        Optional<Redirection> redirection = urlShortener.expand(id);
+        if (redirection.isPresent()) {
+            return prepareOkResponse(res, id, redirection.get().longUrl());
+        } else {
+            return prepareNotFoundResponse(res);
+        }
+    }
+
+    private String prepareNotFoundResponse(Response res) {
+        res.status(404);
+        return null;
     }
 
     private String prepareOkResponse(Response res, String id, String longUrl) {

@@ -1,8 +1,15 @@
 package org.npathai;
 
+import org.npathai.util.NullSafe;
 import org.npathai.zookeeper.DefaultZkManager;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
+import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import static spark.Spark.before;
 
@@ -11,14 +18,19 @@ public class ShortUrlGeneratorLauncher {
     public static final int PORT = 4321;
     private Router router;
     private DefaultZkManager zkManager;
+    private Properties applicationProperties;
 
     public static void main(String[] args) throws Exception {
         ShortUrlGeneratorLauncher shortUrlGeneratorLauncher = new ShortUrlGeneratorLauncher();
-        shortUrlGeneratorLauncher.start();
-        shortUrlGeneratorLauncher.awaitInitialization();
-        System.out.println("Press any key to exit..");
-        System.in.read();
-        shortUrlGeneratorLauncher.stop();
+        try {
+            shortUrlGeneratorLauncher.start();
+            shortUrlGeneratorLauncher.awaitInitialization();
+            System.out.println("Press any key to exit..");
+            System.in.read();
+        } finally {
+            shortUrlGeneratorLauncher.stop();
+        }
+
     }
 
     private void setupSpark() {
@@ -31,13 +43,19 @@ public class ShortUrlGeneratorLauncher {
     }
 
     public void start() throws Exception {
+        readApplicationProperties();
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
         zkManager = zkManagerFactory.createConnected("0.0.0.0:2181");
 
         setupSpark();
 
-        router = new Router(zkManager);
+        router = new Router(applicationProperties, zkManager);
         router.initRoutes();
+    }
+
+    private void readApplicationProperties() throws IOException {
+        applicationProperties = new Properties();
+        applicationProperties.load(this.getClass().getClassLoader().getResourceAsStream("application.properties"));
     }
 
 
@@ -47,7 +65,7 @@ public class ShortUrlGeneratorLauncher {
 
     public void stop() throws Exception {
         Spark.stop();
-        router.stop();
-        zkManager.stop();
+        NullSafe.ifNotNull(router, Router::stop);
+        NullSafe.ifNotNull(zkManager, ZkManager::stop);
     }
 }

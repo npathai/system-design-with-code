@@ -3,7 +3,7 @@ package org.npathai.api;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import org.npathai.domain.UrlShortener;
-import org.npathai.model.ShortUrl;
+import org.npathai.model.Redirection;
 import spark.Request;
 import spark.Response;
 
@@ -16,10 +16,10 @@ public class UrlShortenerAPI {
 
     public String shorten(Request req, Response res) {
         ShortenUrlRequest shortenUrlRequest = formShortenRequest(req);
-        ShortUrl shortUrl = null;
+        Redirection redirection = null;
         try {
-            shortUrl = shortener.shorten(shortenUrlRequest.longUrl());
-            return prepareOkResponse(res, shortUrl);
+            redirection = shortener.shorten(shortenUrlRequest.longUrl());
+            return prepareOkResponse(res, redirection);
         } catch (Exception e) {
             return prepareUnavailableResponse(res);
         }
@@ -30,16 +30,16 @@ public class UrlShortenerAPI {
         return null;
     }
 
-    private String prepareOkResponse(Response res, ShortUrl shortUrl) {
+    private String prepareOkResponse(Response res, Redirection redirection) {
         res.type("application/json");
-        return jsonFor(shortUrl);
+        return jsonFor(redirection);
     }
 
-    private String jsonFor(ShortUrl shortUrl) {
+    private String jsonFor(Redirection redirection) {
         return new JsonObject()
-                .add("id", shortUrl.id())
-                .add("longUrl", shortUrl.longUrl())
-                .add("createdAt", shortUrl.createdAt())
+                .add("id", redirection.id())
+                .add("longUrl", redirection.longUrl())
+                .add("createdAt", redirection.createdAt())
                 .toString();
     }
 

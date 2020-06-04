@@ -2,15 +2,22 @@ package org.npathai.model;
 
 import java.util.Objects;
 
-public class ShortUrl {
+public class Redirection {
     private String id;
-    private String longUrl;
+    private final String longUrl;
     private long createdAt;
 
-    public ShortUrl(String id, String longUrl) {
+    public Redirection(String id, String longUrl) {
         this.id = id;
         this.longUrl = longUrl;
+        // TODO not sure if should assign it here or should be inserted by DB layer.
         createdAt = System.currentTimeMillis();
+    }
+
+    public Redirection(String id, String lonUrl, long createdAt) {
+        this.id = id;
+        this.longUrl = lonUrl;
+        this.createdAt = createdAt;
     }
 
     public String id() {
@@ -29,8 +36,8 @@ public class ShortUrl {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShortUrl shortUrl = (ShortUrl) o;
-        return Objects.equals(id, shortUrl.id);
+        Redirection redirection = (Redirection) o;
+        return Objects.equals(id, redirection.id);
     }
 
     @Override

@@ -1,8 +1,11 @@
 package org.npathai.controller;
 
 import org.npathai.domain.UrlShortener;
+import org.npathai.model.Redirection;
 import spark.Request;
 import spark.Response;
+
+import java.util.Optional;
 
 public class RootController {
 
@@ -12,13 +15,13 @@ public class RootController {
         this.urlShortener = urlShortener;
     }
 
-    public String handle(Request req, Response res) {
+    public String handle(Request req, Response res) throws Exception {
         String id = req.params("id");
-        String longUrl = urlShortener.expand(id);
-        if (longUrl == null) {
+        Optional<Redirection> redirection = urlShortener.expand(id);
+        if (redirection.isEmpty()) {
             return prepare404Response(res);
         }
-        return prepareRedirectResponse(res, longUrl);
+        return prepareRedirectResponse(res, redirection.get().longUrl());
     }
 
     private String prepareRedirectResponse(Response res, String longUrl) {

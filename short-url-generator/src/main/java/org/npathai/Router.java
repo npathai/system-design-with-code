@@ -4,7 +4,7 @@ import org.npathai.api.UrlExpanderAPI;
 import org.npathai.api.UrlShortenerAPI;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.controller.RootController;
-import org.npathai.dao.InMemoryUrlDao;
+import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.discovery.ServiceDiscoveryClient;
 import org.npathai.discovery.zookeeper.ZkServiceDiscoveryClientFactory;
 import org.npathai.domain.UrlShortener;
@@ -16,11 +16,13 @@ import java.util.Properties;
 
 public class Router implements Stoppable {
 
+    private final Properties applicationProperties;
     private final ZkManager zkManager;
     private IdGenerationServiceClient idGenerationServiceClient;
     private ZkServiceDiscoveryClientFactory zkServiceDiscoveryClientFactory;
 
-    public Router(ZkManager zkManager) {
+    public Router(Properties applicationProperties, ZkManager zkManager) {
+        this.applicationProperties = applicationProperties;
         this.zkManager = zkManager;
     }
 
@@ -34,7 +36,7 @@ public class Router implements Stoppable {
 
         idGenerationServiceClient = new IdGenerationServiceClient(idGenServiceDiscoveryClient);
 
-        UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient, new InMemoryUrlDao());
+        UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient, new MySqlRedirectionDao(applicationProperties));
         UrlShortenerAPI urlShortenerApi = new UrlShortenerAPI(urlShortener);
         UrlExpanderAPI urlExpanderAPI = new UrlExpanderAPI(urlShortener);
         RootController rootController = new RootController(urlShortener);

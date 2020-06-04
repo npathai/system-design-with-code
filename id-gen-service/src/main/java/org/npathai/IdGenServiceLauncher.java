@@ -1,8 +1,10 @@
 package org.npathai;
 
 import org.apache.curator.x.discovery.*;
+import org.npathai.util.NullSafe;
 import org.npathai.zookeeper.DefaultZkManager;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
+import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
 import java.io.IOException;
@@ -27,11 +29,14 @@ public class IdGenServiceLauncher {
 
     public static void main(String[] args) throws Exception {
         IdGenServiceLauncher idGenServiceLauncher = new IdGenServiceLauncher();
-        idGenServiceLauncher.start();
-        idGenServiceLauncher.awaitInitialization();
-        System.out.println("Press any key to exit..");
-        System.in.read();
-        idGenServiceLauncher.stop();
+        try {
+            idGenServiceLauncher.start();
+            idGenServiceLauncher.awaitInitialization();
+            System.out.println("Press any key to exit..");
+            System.in.read();
+        } finally {
+            idGenServiceLauncher.stop();
+        }
     }
 
     private void setupSpark() {
@@ -79,10 +84,10 @@ public class IdGenServiceLauncher {
         Spark.awaitInitialization();
     }
 
-    public void stop() throws InterruptedException, IOException {
+    public void stop() throws Exception {
         Spark.stop();
-        router.stop();
-        discovery.close();
-        manager.stop();
+        NullSafe.ifNotNull(router, Router::stop);
+        NullSafe.ifNotNull(discovery, ServiceDiscovery::close);
+        NullSafe.ifNotNull(manager, ZkManager::stop);
     }
 }
