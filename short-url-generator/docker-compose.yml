@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: urldb
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=unsecured
+      - MYSQL_DATABASE=short_url_generator
+
+#    volumes:
+#      - D:\DATA\MYSQL:/var/lib/mysql
+#      - ./init:/docker-entrypoint-initdb.d/:ro

@@ -3,3 +3,6 @@
 /.gradle/
 build
 */out/
+
+# Data directory
+*/data
