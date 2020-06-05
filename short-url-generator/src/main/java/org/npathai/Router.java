@@ -2,6 +2,7 @@ package org.npathai;
 
 import org.npathai.api.UrlExpanderAPI;
 import org.npathai.api.UrlShortenerAPI;
+import org.npathai.cache.RedisRedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.controller.RootController;
 import org.npathai.dao.MySqlRedirectionDao;
@@ -20,6 +21,7 @@ public class Router implements Stoppable {
     private final ZkManager zkManager;
     private IdGenerationServiceClient idGenerationServiceClient;
     private ZkServiceDiscoveryClientFactory zkServiceDiscoveryClientFactory;
+    private RedisRedirectionCache redirectionCache;
 
     public Router(Properties applicationProperties, ZkManager zkManager) {
         this.applicationProperties = applicationProperties;
@@ -36,7 +38,11 @@ public class Router implements Stoppable {
 
         idGenerationServiceClient = new IdGenerationServiceClient(idGenServiceDiscoveryClient);
 
-        UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient, new MySqlRedirectionDao(applicationProperties));
+        redirectionCache = new RedisRedirectionCache(applicationProperties);
+
+        UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient,
+                new MySqlRedirectionDao(applicationProperties),
+                redirectionCache);
         UrlShortenerAPI urlShortenerApi = new UrlShortenerAPI(urlShortener);
         UrlExpanderAPI urlExpanderAPI = new UrlExpanderAPI(urlShortener);
         RootController rootController = new RootController(urlShortener);
@@ -50,5 +56,6 @@ public class Router implements Stoppable {
     @Override
     public void stop() throws Exception {
         idGenerationServiceClient.stop();
+        redirectionCache.close();
     }
 }

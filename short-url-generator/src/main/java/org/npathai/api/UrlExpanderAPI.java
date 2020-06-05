@@ -18,7 +18,7 @@ public class UrlExpanderAPI {
 
     public String expand(Request req, Response res) throws Exception {
         String id = req.params("id");
-        Optional<Redirection> redirection = urlShortener.expand(id);
+        Optional<Redirection> redirection = urlShortener.getById(id);
         if (redirection.isPresent()) {
             return prepareOkResponse(res, id, redirection.get().longUrl());
         } else {

@@ -10,6 +10,20 @@ services:
       - MYSQL_ROOT_PASSWORD=unsecured
       - MYSQL_DATABASE=short_url_generator
 
+  zookeeper:
+    container_name: testZooKeeper
+    image: zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_PORT: 2182
+
+  redis-cache:
+    container_name: urlCache
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
 #    volumes:
 #      - D:\DATA\MYSQL:/var/lib/mysql
 #      - ./init:/docker-entrypoint-initdb.d/:ro
