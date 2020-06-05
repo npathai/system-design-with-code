@@ -1,6 +1,17 @@
 group 'org.npathai'
 version '1.0-SNAPSHOT'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:0.12.1"
+    }
+}
+
+apply plugin: 'com.avast.gradle.docker-compose'
 
 subprojects {
     apply plugin: 'java'
@@ -72,4 +83,10 @@ subprojects {
             configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
         }
     }
+
+    composeUp.dependsOn(jar)
+}
+
+dockerCompose {
+    useComposeFiles = ['docker-compose-dev.yml']
 }

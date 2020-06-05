@@ -35,6 +35,8 @@ services:
       - "4301:4301"
     environment:
       PORT: 4301
+    volumes:
+    - ./id-gen-service/build/libs/id-gen-service.jar:/app.jar
     depends_on:
       - zookeeper
 
@@ -45,6 +47,8 @@ services:
       - "4321:4321"
     environment:
       PORT: 4321
+    volumes:
+    - ./short-url-generator/build/libs/short-url-generator.jar:/app.jar
     depends_on:
       - zookeeper
       - db
