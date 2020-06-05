@@ -32,3 +32,7 @@ gradlew composeUp
 gradlew composeDown
 ````
 For easy way to view the logs and login to containers use Docker dashboard on Windows OS
+
+### Start Shortening the URLs
+
+After starting the application stack using `gradlew composeUp`, open `index.html` file which contains not so feature rich UI to use the application.
