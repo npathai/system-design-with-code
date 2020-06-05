@@ -20,36 +20,15 @@ All systems built in this repository should be
 
 ## URL Shortening Service
 
-Starting the service is a three step process, working towards making it easier to get running in fewer steps.
+Starting the service is a single step process.
 
-### How to start
-
-#### Create fat jar
-
-From the root directory
+### How to start/stop the application stack
 
 ```
-gradlew clean jar
-```
+# Start the application stack
+gradlew composeUp
 
-#### Create docker images
-
-From the root directory
-
-```
-# Build the Id generation service
-docker build ./id-gen-service -t id-gen-service:latest
-
-# Build the short url generator service
-docker build ./short-url-generator -t short-url-generator:latest
-
-```
-
-#### Run docker compose
-
-From the root directory
-
-```
-docker-compose run
+# Stop the application stack
+gradlew composeDown
 ````
 For easy way to view the logs and login to containers use Docker dashboard on Windows OS
