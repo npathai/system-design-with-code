@@ -6,8 +6,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.npathai.api.IdGeneratorAPIAcceptanceTest;
 
-import java.io.IOException;
-
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         IdGeneratorAPIAcceptanceTest.class
@@ -25,7 +23,7 @@ public class AcceptanceTests {
     }
 
     @AfterClass
-    public static void stop() throws InterruptedException, IOException {
+    public static void stop() throws Exception {
         idGenServiceLauncher.stop();
     }
 }

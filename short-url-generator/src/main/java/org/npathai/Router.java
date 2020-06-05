@@ -9,6 +9,7 @@ import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.discovery.ServiceDiscoveryClient;
 import org.npathai.discovery.zookeeper.ZkServiceDiscoveryClientFactory;
 import org.npathai.domain.UrlShortener;
+import org.npathai.util.NullSafe;
 import org.npathai.util.Stoppable;
 import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
@@ -55,7 +56,7 @@ public class Router implements Stoppable {
 
     @Override
     public void stop() throws Exception {
-        idGenerationServiceClient.stop();
-        redirectionCache.close();
+        NullSafe.ifNotNull(idGenerationServiceClient, IdGenerationServiceClient::stop);
+        NullSafe.ifNotNull(redirectionCache, RedisRedirectionCache::close);
     }
 }

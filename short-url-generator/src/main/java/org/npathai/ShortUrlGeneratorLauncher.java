@@ -7,16 +7,14 @@ import org.npathai.zookeeper.DefaultZkManagerFactory;
 import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import static spark.Spark.before;
 
 public class ShortUrlGeneratorLauncher {
 
-    public static final int PORT = 4321;
+    public static final int PORT = Integer.parseInt(System.getenv("PORT"));
     private Router router;
     private DefaultZkManager zkManager;
     private Properties applicationProperties;
@@ -26,8 +24,7 @@ public class ShortUrlGeneratorLauncher {
         try {
             shortUrlGeneratorLauncher.start();
             shortUrlGeneratorLauncher.awaitInitialization();
-            System.out.println("Press any key to exit..");
-            System.in.read();
+            Thread.currentThread().join();
         } finally {
             shortUrlGeneratorLauncher.stop();
         }

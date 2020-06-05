@@ -6,3 +6,9 @@ dependencies {
     // https://mvnrepository.com/artifact/redis.clients/jedis
     compile group: 'redis.clients', name: 'jedis', version: '3.3.0'
 }
+
+jar {
+    manifest {
+        attributes "Main-Class": "org.npathai.ShortUrlGeneratorLauncher"
+    }
+}

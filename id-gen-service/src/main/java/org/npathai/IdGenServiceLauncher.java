@@ -1,6 +1,9 @@
 package org.npathai;
 
-import org.apache.curator.x.discovery.*;
+import org.apache.curator.x.discovery.ServiceDiscovery;
+import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
+import org.apache.curator.x.discovery.ServiceInstance;
+import org.apache.curator.x.discovery.UriSpec;
 import org.npathai.properties.ApplicationProperties;
 import org.npathai.util.NullSafe;
 import org.npathai.zookeeper.DefaultZkManager;
@@ -9,17 +12,14 @@ import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Properties;
-import java.util.Random;
 
 import static spark.Spark.before;
 
 public class IdGenServiceLauncher {
 
-    public static final int PORT = new Random()
-            .ints(4300, 4500)
-            .findFirst()
-            .getAsInt();
+    public static final int PORT = Integer.parseInt(System.getenv("PORT"));
 
     private static final String INSTANCES_ZNODE = "/instances";
 
@@ -35,8 +35,7 @@ public class IdGenServiceLauncher {
         try {
             idGenServiceLauncher.start();
             idGenServiceLauncher.awaitInitialization();
-            System.out.println("Press any key to exit..");
-            System.in.read();
+            Thread.currentThread().join();
         } finally {
             idGenServiceLauncher.stop();
         }
@@ -72,10 +71,12 @@ public class IdGenServiceLauncher {
     }
 
     private void registerForDiscovery() throws Exception {
-        UriSpec uriSpec = new UriSpec("http://localhost:{port}");
+        String containerIp = InetAddress.getByName("id-gen-service").getHostAddress();
+
+        UriSpec uriSpec = new UriSpec("http://{host}:{port}");
         instance = ServiceInstance.<String>builder()
                 .name("id-gen-service")
-                .address("http://localhost:" + PORT)
+                .address(String.format("http://%s:%d", containerIp, PORT))
                 .payload("Provides unique ids")
                 .port(PORT)
                 .uriSpec(uriSpec)

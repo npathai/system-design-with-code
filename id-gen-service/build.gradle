@@ -2,3 +2,10 @@
 dependencies {
     compile project(':common-goodies')
 }
+
+jar {
+    manifest {
+        attributes "Main-Class": "org.npathai.IdGenServiceLauncher"
+    }
+}
+
