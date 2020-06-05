@@ -1,5 +1,6 @@
 package org.npathai;
 
+import org.npathai.properties.ApplicationProperties;
 import org.npathai.util.NullSafe;
 import org.npathai.zookeeper.DefaultZkManager;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
@@ -30,7 +31,6 @@ public class ShortUrlGeneratorLauncher {
         } finally {
             shortUrlGeneratorLauncher.stop();
         }
-
     }
 
     private void setupSpark() {
@@ -45,7 +45,8 @@ public class ShortUrlGeneratorLauncher {
     public void start() throws Exception {
         readApplicationProperties();
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
-        zkManager = zkManagerFactory.createConnected("0.0.0.0:2181");
+        zkManager = zkManagerFactory.createConnected(
+                applicationProperties.getProperty(ApplicationProperties.ZOOKEEPER_URL.name()));
 
         setupSpark();
 

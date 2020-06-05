@@ -1,6 +1,7 @@
 package org.npathai;
 
 import org.apache.curator.x.discovery.*;
+import org.npathai.properties.ApplicationProperties;
 import org.npathai.util.NullSafe;
 import org.npathai.zookeeper.DefaultZkManager;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
@@ -8,6 +9,7 @@ import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.Random;
 
 import static spark.Spark.before;
@@ -25,6 +27,7 @@ public class IdGenServiceLauncher {
     private Router router;
     private ServiceInstance<String> instance;
     private ServiceDiscovery<String> discovery;
+    private Properties applicationProperties;
 
 
     public static void main(String[] args) throws Exception {
@@ -49,8 +52,10 @@ public class IdGenServiceLauncher {
     }
 
     public void start() throws Exception {
+        readApplicationProperties();
+
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
-        manager = zkManagerFactory.createConnected("0.0.0.0:2181");
+        manager = zkManagerFactory.createConnected(ApplicationProperties.ZOOKEEPER_URL);
 
         setupSpark();
         router = new Router(manager);
@@ -58,6 +63,11 @@ public class IdGenServiceLauncher {
         // On successful start
         registerForDiscovery();
         System.out.println("Successfully started listening on port: " + PORT);
+    }
+
+    private void readApplicationProperties() throws IOException {
+        applicationProperties = new Properties();
+        applicationProperties.load(this.getClass().getClassLoader().getResourceAsStream("application.properties"));
     }
 
     private void registerForDiscovery() throws Exception {
