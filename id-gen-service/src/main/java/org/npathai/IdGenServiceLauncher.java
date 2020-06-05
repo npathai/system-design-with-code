@@ -55,7 +55,8 @@ public class IdGenServiceLauncher {
         readApplicationProperties();
 
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
-        manager = zkManagerFactory.createConnected(ApplicationProperties.ZOOKEEPER_URL);
+        manager = zkManagerFactory.createConnected(
+                applicationProperties.getProperty(ApplicationProperties.ZOOKEEPER_URL));
 
         setupSpark();
         router = new Router(manager);
