@@ -6,6 +6,7 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
 import org.npathai.util.thread.ThrowingRunnable;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class DefaultZkManager implements ZkManager {
@@ -27,18 +28,20 @@ public class DefaultZkManager implements ZkManager {
     }
 
     @Override
-    public void runWithinLock(String lockPath, ThrowingRunnable runnable) throws Exception {
-        InterProcessMutex lock = new InterProcessMutex(client, lockPath);
-        if (!lock.acquire(100, TimeUnit.SECONDS)) {
-            throw new IllegalStateException("Could not acquire the lock to Next id node");
-        }
-        try {
-            System.out.println("Acquired lock: " + System.currentTimeMillis());
-            runnable.run();
-        } finally {
-            lock.release(); // always release the lock in a finally block
-            System.out.println("Released lock: " + System.currentTimeMillis());
-        }
+    public <T> Callable<T> withinLock(String lockPath, Callable<T> callable) {
+        return () -> {
+            InterProcessMutex lock = new InterProcessMutex(client, lockPath);
+            if (!lock.acquire(100, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Could not acquire the lock to Next id node");
+            }
+            try {
+                System.out.println("Acquired lock: " + System.currentTimeMillis());
+                return callable.call();
+            } finally {
+                lock.release(); // always release the lock in a finally block
+                System.out.println("Released lock: " + System.currentTimeMillis());
+            }
+        };
     }
 
     @Override
