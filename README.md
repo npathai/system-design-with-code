@@ -14,6 +14,7 @@ All systems built in this repository should be
  - Lightweight
  - Highly scalable
  - Fault tolerant (kill machines randomly and system shouldn't cave in)
+    - No single point of failure
  - High performance
  
 
