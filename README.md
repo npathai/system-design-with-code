@@ -18,6 +18,7 @@ All systems built in this repository should be
  - Fault tolerant (kill machines randomly and system shouldn't cave in)
     - No single point of failure
  - High performance
+ - Observable and Traceable
  
 
 ## URL Shortening Service
