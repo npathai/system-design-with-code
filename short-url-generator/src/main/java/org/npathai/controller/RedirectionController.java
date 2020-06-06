@@ -6,11 +6,11 @@ import spark.Response;
 
 import java.util.Optional;
 
-public class RootController {
+public class RedirectionController {
 
     private final UrlShortener urlShortener;
 
-    public RootController(UrlShortener urlShortener) {
+    public RedirectionController(UrlShortener urlShortener) {
         this.urlShortener = urlShortener;
     }
 

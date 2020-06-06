@@ -4,7 +4,7 @@ import org.npathai.api.UrlExpanderAPI;
 import org.npathai.api.UrlShortenerAPI;
 import org.npathai.cache.RedisRedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
-import org.npathai.controller.RootController;
+import org.npathai.controller.RedirectionController;
 import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.discovery.ServiceDiscoveryClient;
 import org.npathai.discovery.zookeeper.ZkServiceDiscoveryClientFactory;
@@ -46,12 +46,12 @@ public class Router implements Stoppable {
                 redirectionCache);
         UrlShortenerAPI urlShortenerApi = new UrlShortenerAPI(urlShortener);
         UrlExpanderAPI urlExpanderAPI = new UrlExpanderAPI(urlShortener);
-        RootController rootController = new RootController(urlShortener);
+        RedirectionController redirectionController = new RedirectionController(urlShortener);
 
 
         Spark.post("/shorten", (req, res) -> urlShortenerApi.shorten(req, res));
         Spark.get("/expand/:id", (req, res) -> urlExpanderAPI.expand(req, res));
-        Spark.get("/:id", (req, res) -> rootController.handle(req, res));
+        Spark.get("/:id", (req, res) -> redirectionController.handle(req, res));
     }
 
     @Override

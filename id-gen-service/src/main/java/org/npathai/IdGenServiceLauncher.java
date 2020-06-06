@@ -70,6 +70,8 @@ public class IdGenServiceLauncher {
         applicationProperties.load(this.getClass().getClassLoader().getResourceAsStream("application.properties"));
     }
 
+    // TODO Apply hexagonal architecture to move zookeeper specific information
+    // out of here
     private void registerForDiscovery() throws Exception {
         String containerIp = InetAddress.getByName("id-gen-service").getHostAddress();
 
