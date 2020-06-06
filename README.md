@@ -1,6 +1,8 @@
 # system-design-with-code
 System design not just on whiteboard, but with code.
 
+<a href="https://systemdesignwithcode.slack.com/"><img alt="Slack Status" src="https://badgen.net/badge/icon/slack?icon=slack&label=Join%20discussion"></a>
+
 ## Why this repository?
 This repository represents an effort to learn System Design by experimenting, failing-fast, learning from that experince and providing all the fellow developers a wealth of knowledge in terms of source code.
 
@@ -16,40 +18,24 @@ All systems built in this repository should be
  - Fault tolerant (kill machines randomly and system shouldn't cave in)
     - No single point of failure
  - High performance
+ - Observable and Traceable
  
 
 ## URL Shortening Service
 
-Starting the service is a three step process, working towards making it easier to get running in fewer steps.
+Starting the service is a single step process.
 
-### How to start
-
-#### Create fat jar
-
-From the root directory
+### How to start/stop the application stack
 
 ```
-gradlew clean jar
-```
+# Start the application stack
+gradlew composeUp
 
-#### Create docker images
-
-From the root directory
-
-```
-# Build the Id generation service
-docker build ./id-gen-service -t id-gen-service:latest
-
-# Build the short url generator service
-docker build ./short-url-generator -t short-url-generator:latest
-
-```
-
-#### Run docker compose
-
-From the root directory
-
-```
-docker-compose run
+# Stop the application stack
+gradlew composeDown
 ````
 For easy way to view the logs and login to containers use Docker dashboard on Windows OS
+
+### Start Shortening the URLs
+
+After starting the application stack using `gradlew composeUp`, open `index.html` file which contains not so feature rich UI to use the application.

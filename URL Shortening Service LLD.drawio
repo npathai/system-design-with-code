@@ -1,0 +1,112 @@
+<mxfile host="app.diagrams.net" modified="2020-06-06T13:03:58.536Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36" etag="dCDp8r3e9UdWOpnfr7B-" version="13.1.14" type="github">
+  <diagram name="Page-1" id="5f0bae14-7c28-e335-631c-24af17079c00">
+    <mxGraphModel dx="1106" dy="1372" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="39150e848f15840c-1" value="short-url-generator" style="verticalAlign=top;align=left;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
+          <mxGeometry x="110" y="120" width="550" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-1" target="23aOrpUNfITLGCsau30i-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-1" value="URL Shortening API&lt;br&gt;POST /shorten" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-2" target="23aOrpUNfITLGCsau30i-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-2" value="URL Expander API&lt;br&gt;GET /expand" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-3" target="23aOrpUNfITLGCsau30i-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-3" value="RedirectionController&lt;br&gt;/{id}" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="380" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-4" target="23aOrpUNfITLGCsau30i-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-4" value="URL Shortener" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="280" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-9" target="23aOrpUNfITLGCsau30i-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-9" value="IdGenerationServiceClient" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="280" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-14" value="zookeeper" style="verticalAlign=top;align=left;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="740" y="-120" width="290" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-16" value="/instances/id-gen-service" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="750" y="-70" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-17" value="Discover id-gen-service instances" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="-90" width="190" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.23;entryY=1.003;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-18" target="23aOrpUNfITLGCsau30i-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-18" value="«interface»&lt;br&gt;&lt;b&gt;ServiceDiscoveryClient&lt;/b&gt;" style="html=1;" vertex="1" parent="1">
+          <mxGeometry x="477.5" y="180" width="155" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-23" value="id-gen-service" style="verticalAlign=top;align=left;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="860" y="240" width="660" height="450" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-24" value="/next-id" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="960" y="50" width="50" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-29" target="23aOrpUNfITLGCsau30i-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-29" value="Id Generator API&lt;br&gt;/generate" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="365" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-9" target="23aOrpUNfITLGCsau30i-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-31" target="23aOrpUNfITLGCsau30i-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-31" target="23aOrpUNfITLGCsau30i-37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-31" value="IdProviderService" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="365" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-32" value="Acquires lock, generates and caches batch of generated ids in memory for speed" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="450" width="130" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-32" target="23aOrpUNfITLGCsau30i-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-34" value="BatchIdGenerator" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="365" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.67;entryY=-0.003;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-37" target="23aOrpUNfITLGCsau30i-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-37" value="«interface»&lt;br&gt;&lt;b&gt;ZkManager&lt;/b&gt;" style="html=1;" vertex="1" parent="1">
+          <mxGeometry x="1032.5" y="270" width="155" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-40" value="Lock and update /next-id" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="160" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="23aOrpUNfITLGCsau30i-41" target="23aOrpUNfITLGCsau30i-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-41" value="" style="shape=image;html=1;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="1180" y="480" width="52" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-42" value="BatchGenrationProcess" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;" vertex="1" parent="1">
+          <mxGeometry x="1136" y="550" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="23aOrpUNfITLGCsau30i-45" value="Generates batch of ids &lt;br&gt;and caches" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="475" width="140" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
