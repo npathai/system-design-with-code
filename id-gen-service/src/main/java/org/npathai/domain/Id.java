@@ -55,7 +55,7 @@ public class Id {
     }
 
     // FIXME will fail at runtime with Index Out of Bounds if we exhaust all short urls
-    public Id next() throws IdExhaustedException {
+    public Id incrementAndGet() throws IdExhaustedException {
         int[] next = Arrays.copyOf(decoded, decoded.length);
         int index = 0;
         int carry = 1;

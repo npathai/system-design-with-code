@@ -31,6 +31,6 @@ public class BatchedIdGeneratorTest {
     public void returnsNextIdToBeGenerated() throws IdExhaustedException {
         Batch batch = batchIdGenerator.generate(1);
 
-        assertThat(batch.nextId().encode()).isEqualTo(Id.first().next().encode());
+        assertThat(batch.nextId().encode()).isEqualTo(Id.first().incrementAndGet().encode());
     }
 }

@@ -34,11 +34,12 @@ public class IdTest {
             "yzzzz,zAAAA"
     })
     public void nextReturnsIdIncrementedByOne(String current, String expectedNext) throws IdExhaustedException {
-        assertThat(Id.fromEncoded(current).next().encode()).isEqualTo(expectedNext);
+        assertThat(Id.fromEncoded(current).incrementAndGet().encode()).isEqualTo(expectedNext);
     }
 
     @Test
     public void shouldThrowIdExhaustedExceptionWhenAllIdsAreExhausted() {
-        assertThatThrownBy(() -> Id.fromEncoded("zzzzz").next()).isInstanceOf(IdExhaustedException.class);
+        assertThatThrownBy(() -> Id.fromEncoded("zzzzz").incrementAndGet()).isInstanceOf(IdExhaustedException.class);
     }
+
 }

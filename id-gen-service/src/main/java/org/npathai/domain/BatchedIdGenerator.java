@@ -28,7 +28,7 @@ public class BatchedIdGenerator {
 
     private String getAndIncrementCurrentId() throws IdExhaustedException {
         String id = current.encode();
-        current = current.next();
+        current = current.incrementAndGet();
         return id;
     }
 }
