@@ -1,20 +1,20 @@
 package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
-import org.npathai.domain.IdProviderService;
+import org.npathai.domain.IdGenerationService;
 import spark.Request;
 import spark.Response;
 
 public class IdGeneratorAPI {
 
-    private final IdProviderService idProviderService;
+    private final IdGenerationService idGenerationService;
 
-    public IdGeneratorAPI(IdProviderService idProviderService) {
-        this.idProviderService = idProviderService;
+    public IdGeneratorAPI(IdGenerationService idGenerationService) {
+        this.idGenerationService = idGenerationService;
     }
 
     public String generate(Request req, Response res) {
-        return prepareOkResponse(res, idProviderService.nextId());
+        return prepareOkResponse(res, idGenerationService.nextId());
     }
 
     private String prepareOkResponse(Response res, String generatedId) {

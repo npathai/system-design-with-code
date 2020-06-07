@@ -1,7 +1,7 @@
 package org.npathai;
 
 import org.npathai.api.IdGeneratorAPI;
-import org.npathai.domain.IdProviderService;
+import org.npathai.domain.IdGenerationService;
 import org.npathai.util.Stoppable;
 import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class Router implements Stoppable {
 
     private final ZkManager manager;
-    private IdProviderService idProviderService;
+    private IdGenerationService idGenerationService;
     private ScheduledExecutorService scheduledExecutor;
 
     public Router(ZkManager manager) {
@@ -22,8 +22,8 @@ public class Router implements Stoppable {
 
     public void initRoutes() throws Exception {
         scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-        idProviderService = new IdProviderService(manager, scheduledExecutor);
-        IdGeneratorAPI idGeneratorAPI = new IdGeneratorAPI(idProviderService);
+        idGenerationService = new IdGenerationService(manager, scheduledExecutor);
+        IdGeneratorAPI idGeneratorAPI = new IdGeneratorAPI(idGenerationService);
 
         Spark.get("/generate", (req, res) -> idGeneratorAPI.generate(req, res));
     }

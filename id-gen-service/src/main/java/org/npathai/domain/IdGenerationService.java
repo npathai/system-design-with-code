@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class IdProviderService {
+public class IdGenerationService {
 
     public static final String NEXT_ID_ZNODE_NAME = "/next-id";
     private final ZkManager manager;
@@ -18,10 +18,9 @@ public class IdProviderService {
     // FIXME rethink the decision of ScheduledExecutorService, not scheduling. Can we replace with ExecutorService?
     // FIXME because of async nature of trigger hydration, service might become available even though keys are not
     // cached. Are we okay with that?
-    public IdProviderService(ZkManager manager, ScheduledExecutorService scheduledExecutorService) throws Exception {
+    public IdGenerationService(ZkManager manager, ScheduledExecutorService scheduledExecutorService) throws Exception {
         this.manager = manager;
         this.scheduledExecutorService = scheduledExecutorService;
-        manager.createIfAbsent(NEXT_ID_ZNODE_NAME);
         triggerHydrationAsync().get();
     }
 
