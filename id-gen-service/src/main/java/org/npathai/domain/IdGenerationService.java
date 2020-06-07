@@ -2,25 +2,19 @@ package org.npathai.domain;
 
 import org.npathai.zookeeper.ZkManager;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 
 public class IdGenerationService {
 
     public static final String NEXT_ID_ZNODE_NAME = "/next-id";
     private final ZkManager manager;
-    private final ScheduledExecutorService scheduledExecutorService;
+    private final ExecutorService executorService;
     private ConcurrentLinkedQueue<String> cachedIds = new ConcurrentLinkedQueue<>();
 
     // FIXME constructor is doing real work. Options?
-    // FIXME rethink the decision of ScheduledExecutorService, not scheduling. Can we replace with ExecutorService?
-    // FIXME because of async nature of trigger hydration, service might become available even though keys are not
-    // cached. Are we okay with that?
-    public IdGenerationService(ZkManager manager, ScheduledExecutorService scheduledExecutorService) throws Exception {
+    public IdGenerationService(ZkManager manager, ExecutorService executorService) throws Exception {
         this.manager = manager;
-        this.scheduledExecutorService = scheduledExecutorService;
+        this.executorService = executorService;
         triggerHydrationAsync().get();
     }
 
@@ -32,7 +26,7 @@ public class IdGenerationService {
     }
 
     private Future<?> triggerHydrationAsync() {
-        return scheduledExecutorService.submit(new BatchGenerationProcess(manager));
+        return executorService.submit(new BatchGenerationProcess(manager));
     }
 
     private class BatchGenerationProcess implements Callable<Void> {
@@ -44,14 +38,6 @@ public class IdGenerationService {
         }
 
         @Override
-        /* TODO batch generation algorithm can be improved for performance - Lock stripping
-         * 1) Acquire lock and read next id
-         * 2) Increment next id by BATCH count and update zookeeper node
-         * 3) Release lock
-         * 4) Generate batch ids and cache them
-         *
-         * This will reduce the overall locking period by some amount if batch size is higher.
-         */
         public Void call() throws Exception {
             System.out.println("Batch Id generation started");
 
