@@ -1,8 +1,6 @@
 # system-design-with-code
 System design not just on whiteboard, but with code.
 
-<a href="https://systemdesignwithcode.slack.com/"><img alt="Slack Status" src="https://badgen.net/badge/icon/slack?icon=slack&label=Join%20discussion"></a>
-
 ## Why this repository?
 This repository represents an effort to learn System Design by experimenting, failing-fast, learning from that experince and providing all the fellow developers a wealth of knowledge in terms of source code.
 
