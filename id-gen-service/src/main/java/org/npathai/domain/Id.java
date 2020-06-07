@@ -30,10 +30,6 @@ public class Id {
         this.decoded = decoded;
     }
 
-    public static Id fromDecoded(int[] decoded) {
-        return new Id(decoded);
-    }
-
     public static Id first() {
         return new Id(new int[] {0, 0, 0, 0, 0});
     }
@@ -59,15 +55,20 @@ public class Id {
     }
 
     // FIXME will fail at runtime with Index Out of Bounds if we exhaust all short urls
-    public Id next() {
+    public Id next() throws IdExhaustedException {
         int[] next = Arrays.copyOf(decoded, decoded.length);
         int index = 0;
         int carry = 1;
-        while (carry > 0) {
+        while (carry > 0 && index < decoded.length) {
             int sum = next[index] + carry;
             next[index] = sum % charSet.size();
             carry = sum / charSet.size();
             index++;
+        }
+
+        if (carry > 0) {
+            // We have exhausted all ids possible within id size e.g. 5
+            throw new IdExhaustedException();
         }
         return new Id(next);
     }

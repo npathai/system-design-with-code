@@ -1,7 +1,7 @@
 package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
-import org.npathai.service.IdProviderService;
+import org.npathai.domain.IdProviderService;
 import spark.Request;
 import spark.Response;
 

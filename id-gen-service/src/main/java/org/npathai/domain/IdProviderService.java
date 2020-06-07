@@ -1,8 +1,5 @@
-package org.npathai.service;
+package org.npathai.domain;
 
-import org.npathai.domain.Batch;
-import org.npathai.domain.BatchedIdGenerator;
-import org.npathai.domain.Id;
 import org.npathai.zookeeper.ZkManager;
 
 import java.util.concurrent.Callable;
@@ -41,10 +38,10 @@ public class IdProviderService {
     }
 
     private class BatchGenerationProcess implements Callable<Void> {
-        private final ZkManager manager;
+        private final ZkManager zkManager;
 
-        BatchGenerationProcess(ZkManager manager) {
-            this.manager = manager;
+        BatchGenerationProcess(ZkManager zkManager) {
+            this.zkManager = zkManager;
         }
 
         @Override
@@ -58,7 +55,21 @@ public class IdProviderService {
          */
         public Void call() throws Exception {
             System.out.println("Batch Id generation started");
-            byte[] data = manager.getData(NEXT_ID_ZNODE_NAME);
+            Id startId = getStartId();
+            BatchedIdGenerator generator = new BatchedIdGenerator(startId);
+            Batch batch = generator.generate(10);
+            cachedIds.addAll(batch.ids());
+            System.out.println(cachedIds);
+
+            zkManager.setData(NEXT_ID_ZNODE_NAME, batch.nextId().encode().getBytes());
+            System.out.println("Saved next id value in zookeeper as: " + batch.nextId().encode());
+            System.out.println("Batch Id generation ended");
+
+            return null;
+        }
+
+        private Id getStartId() throws Exception {
+            byte[] data = zkManager.getData(NEXT_ID_ZNODE_NAME);
             Id startId;
             if (data.length == 0) {
                 System.out.println("Next id data is empty");
@@ -67,16 +78,7 @@ public class IdProviderService {
                 startId = Id.fromEncoded(new String(data));
                 System.out.println("Next id data is not null. Found value: " + startId.encode());
             }
-            BatchedIdGenerator generator = new BatchedIdGenerator(startId);
-            Batch batch = generator.generate(10);
-            cachedIds.addAll(batch.ids());
-            System.out.println(cachedIds);
-
-            manager.setData(NEXT_ID_ZNODE_NAME, batch.nextId().encode().getBytes());
-            System.out.println("Saved next id value in zookeeper as: " + batch.nextId().encode());
-            System.out.println("Batch Id generation ended");
-
-            return null;
+            return startId;
         }
     }
 }

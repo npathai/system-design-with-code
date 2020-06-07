@@ -1,7 +1,7 @@
 package org.npathai;
 
 import org.npathai.api.IdGeneratorAPI;
-import org.npathai.service.IdProviderService;
+import org.npathai.domain.IdProviderService;
 import org.npathai.util.Stoppable;
 import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
