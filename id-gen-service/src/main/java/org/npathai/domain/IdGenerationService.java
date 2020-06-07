@@ -15,6 +15,7 @@ public class IdGenerationService {
     public IdGenerationService(ZkManager manager, ExecutorService executorService) throws Exception {
         this.manager = manager;
         this.executorService = executorService;
+        manager.createIfAbsent(NEXT_ID_ZNODE_NAME);
         triggerHydrationAsync().get();
     }
 

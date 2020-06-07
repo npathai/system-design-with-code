@@ -15,7 +15,7 @@ services:
 
 
   zookeeper:
-    container_name: testZooKeeper
+    container_name: zooKeeper
     image: zookeeper:latest
     ports:
       - "2181:2181"
@@ -29,10 +29,9 @@ services:
       - "6379:6379"
 
   id-gen-service:
-    container_name: idGenService
     image: id-gen-service:latest
     ports:
-      - "4301:4301"
+      - "4301"
     environment:
       PORT: 4301
     volumes:
@@ -41,10 +40,9 @@ services:
       - zookeeper
 
   short-url-generator:
-    container_name: shortUrlGenerator
     image: short-url-generator:latest
     ports:
-      - "4321:4321"
+      - "4321"
     environment:
       PORT: 4321
     volumes:
@@ -53,3 +51,12 @@ services:
       - zookeeper
       - db
       - redis-cache
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - short-url-generator
+    ports:
+      - "4000:4000"
