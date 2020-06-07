@@ -54,11 +54,14 @@ public class Id {
         return url.toString();
     }
 
-    // FIXME will fail at runtime with Index Out of Bounds if we exhaust all short urls
     public Id incrementAndGet() throws IdExhaustedException {
+        return incrementAndGet(1);
+    }
+
+    public Id incrementAndGet(int count) throws IdExhaustedException {
         int[] next = Arrays.copyOf(decoded, decoded.length);
         int index = 0;
-        int carry = 1;
+        int carry = count;
         while (carry > 0 && index < decoded.length) {
             int sum = next[index] + carry;
             next[index] = sum % charSet.size();

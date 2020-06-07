@@ -15,6 +15,7 @@ public class Batch {
         return ids;
     }
 
+    // TODO can remove this method, now that we have provided incrementAndGet in Id
     public Id nextId() {
         return nextId;
     }
