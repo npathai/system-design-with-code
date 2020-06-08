@@ -8,12 +8,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.npathai.cache.RedirectionCache;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
 import org.npathai.client.IdGenerationServiceClient;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 @RunWith(JUnitParamsRunner.class)
 public class UrlShortenerTest {
@@ -29,8 +34,11 @@ public class UrlShortenerTest {
     @Before
     public void initialize() throws Exception {
         MockitoAnnotations.initMocks(this);
-        shortener = new UrlShortener(idGenerationServiceClient, new InMemoryRedirectionDao());
-        Mockito.when(idGenerationServiceClient.getId()).thenReturn(ID);
+        RedirectionCache redirectionCache = Mockito.mock(RedirectionCache.class);
+        when(redirectionCache.get(anyString())).thenReturn(Optional.empty());
+        shortener = new UrlShortener(idGenerationServiceClient, new InMemoryRedirectionDao(),
+                redirectionCache);
+        when(idGenerationServiceClient.getId()).thenReturn(ID);
     }
 
     @Parameters(method = "longUrls")
@@ -48,7 +56,7 @@ public class UrlShortenerTest {
     @Test
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) throws Exception {
         Redirection redirection = shortener.shorten(originalLongUrl);
-        assertThat(shortener.expand(redirection.id())).isEqualTo(originalLongUrl);
+        assertThat(shortener.expand(redirection.id()).get()).isEqualTo(originalLongUrl);
     }
 
     @SuppressWarnings("unused")
