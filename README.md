@@ -1,4 +1,4 @@
-# system-design-with-code
+# system-design-with-code :computer:
 System design not just on whiteboard, but with code.
 
 ## Why this repository?
