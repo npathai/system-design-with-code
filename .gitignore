@@ -6,3 +6,7 @@ build
 
 # Data directory
 */data
+
+# React
+*/public
+*/node_modules
