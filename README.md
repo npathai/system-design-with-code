@@ -36,4 +36,8 @@ For easy way to view the logs and login to containers use Docker dashboard on Wi
 
 ### Start Shortening the URLs
 
-After starting the application stack using `gradlew composeUp`, open `index.html` file which contains not so feature rich UI to use the application.
+1) Start the application stack using `gradlew composeUp`
+2) Switch to `app` and execute the `npm start`, this will start the not so feature rich React app
+    - Working on creating image for this as well, so can be part of docker compose stack
+3) Shorten the URLs :hurray:
+4) Stop the application stack and react app when done
