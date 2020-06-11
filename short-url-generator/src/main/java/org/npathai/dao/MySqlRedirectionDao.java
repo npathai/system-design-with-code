@@ -12,8 +12,10 @@ import java.util.Properties;
 
 public class MySqlRedirectionDao implements RedirectionDao {
 
-    public static final String SELECT_BY_ID_SQL = "select * from redirection where id = ?";
-    private static final String INSERT_SQL = "insert into redirection (id, long_url, created_at) values (?, ?, ?)";
+    private static final String SELECT_BY_ID_SQL = "select * from redirection where id = ?";
+    private static final String INSERT_SQL = "insert into redirection (id, long_url, created_at, expiry_at) values (?, ?, ?, ?)";
+    private static final String DELETE_BY_ID_SQL = "delete from redirection where id = ?";
+
     private final MysqlDataSource dataSource;
 
     // FIXME constructor is doing real work
@@ -36,7 +38,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
             preparedStatement.setString(1, redirection.id());
             preparedStatement.setString(2, redirection.longUrl());
             preparedStatement.setTimestamp(3, new Timestamp(redirection.createdAt()));
-
+            preparedStatement.setTimestamp(4, new Timestamp(redirection.expiryTimeInMillis()));
             int count = preparedStatement.executeUpdate();
             assert count == 1;
         } catch (SQLException ex) {
@@ -61,8 +63,15 @@ public class MySqlRedirectionDao implements RedirectionDao {
     }
 
     @Override
-    public void deleteById(String id) {
-        // FIXME implement this
+    public void deleteById(String id) throws DataAccessException {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
+
+            preparedStatement.setString(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex);
+        }
     }
 
     private PreparedStatement createSelectByIdStatement(Connection connection, String id) throws SQLException {
@@ -72,8 +81,8 @@ public class MySqlRedirectionDao implements RedirectionDao {
     }
 
     private Redirection createShortUrl(ResultSet resultSet) throws SQLException {
-        // FIXME fix this
         return new Redirection(resultSet.getString("id"), resultSet.getString("long_url"),
-                resultSet.getTimestamp("created_at").getTime(),  0);
+                resultSet.getTimestamp("created_at").getTime(),
+                resultSet.getTimestamp("expiry_at").getTime());
     }
 }

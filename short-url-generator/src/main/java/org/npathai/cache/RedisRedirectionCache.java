@@ -32,7 +32,7 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
         Preconditions.checkState(createdAt != null,
                 "createdAt must be present in cache if long url is present");
         String expiryAtMillis = jedis.get(expiryAtKey(id));
-        Preconditions.checkState(createdAt != null,
+        Preconditions.checkState(expiryAtMillis != null,
                 "expiryAtMillis must be present in cache if long url is present");
 
         return Optional.of(new Redirection(id, longUrl, Long.parseLong(createdAt), Long.parseLong(expiryAtMillis)));
@@ -42,7 +42,7 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
     public void put(Redirection redirection) {
         jedis.set(redirectionIdKey(redirection.id()), redirection.longUrl());
         jedis.set(createdAtKey(redirection.id()), String.valueOf(redirection.createdAt()));
-        jedis.set(expiryAtKey(redirection.id()), String.valueOf(redirection.longUrl()));
+        jedis.set(expiryAtKey(redirection.id()), String.valueOf(redirection.expiryTimeInMillis()));
     }
 
     private String createdAtKey(String id) {

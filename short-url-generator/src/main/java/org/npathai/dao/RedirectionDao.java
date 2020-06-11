@@ -8,5 +8,5 @@ public interface RedirectionDao {
     void save(Redirection redirection) throws DataAccessException;
     Optional<Redirection> getById(String id) throws DataAccessException;
 
-    void deleteById(String id);
+    void deleteById(String id) throws DataAccessException;
 }

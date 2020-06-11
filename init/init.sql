@@ -10,5 +10,6 @@ CREATE TABLE redirection(
     id VARCHAR(10) NOT NULL,
     long_url VARCHAR(500) NOT NULL,
     created_at TIMESTAMP NOT NULL,
+    expiry_at TIMESTAMP NOT NULL,
     PRIMARY KEY(id)
 )

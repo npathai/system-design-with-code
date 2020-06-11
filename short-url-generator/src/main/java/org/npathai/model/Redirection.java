@@ -1,5 +1,6 @@
 package org.npathai.model;
 
+import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Objects;
 
@@ -47,5 +48,15 @@ public class Redirection {
 
     public boolean isExpired(Clock clock) {
         return expiryTimeInMillis <= clock.millis();
+    }
+
+    @Override
+    public String toString() {
+        return "Redirection{" +
+                "id='" + id + '\'' +
+                ", longUrl='" + longUrl + '\'' +
+                ", createdAt=" + new Timestamp(createdAtMillis) +
+                ", expiresAt=" + new Timestamp(expiryTimeInMillis) +
+                '}';
     }
 }
