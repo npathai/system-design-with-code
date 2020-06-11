@@ -60,6 +60,11 @@ public class MySqlRedirectionDao implements RedirectionDao {
         }
     }
 
+    @Override
+    public void deleteById(String id) {
+        // FIXME implement this
+    }
+
     private PreparedStatement createSelectByIdStatement(Connection connection, String id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL);
         preparedStatement.setString(1, id);
@@ -67,7 +72,8 @@ public class MySqlRedirectionDao implements RedirectionDao {
     }
 
     private Redirection createShortUrl(ResultSet resultSet) throws SQLException {
+        // FIXME fix this
         return new Redirection(resultSet.getString("id"), resultSet.getString("long_url"),
-                resultSet.getTimestamp("created_at").getTime());
+                resultSet.getTimestamp("created_at").getTime(),  0);
     }
 }

@@ -18,4 +18,10 @@ public class InMemoryRedirectionDao implements RedirectionDao {
     public Optional<Redirection> getById(String id) {
         return Optional.ofNullable(idToRedirection.get(id));
     }
+
+    @Override
+    public void deleteById(String id) {
+        idToRedirection.remove(id);
+    }
+
 }

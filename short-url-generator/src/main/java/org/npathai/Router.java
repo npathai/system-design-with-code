@@ -14,6 +14,7 @@ import org.npathai.util.Stoppable;
 import org.npathai.zookeeper.ZkManager;
 import spark.Spark;
 
+import java.time.Clock;
 import java.util.Properties;
 
 public class Router implements Stoppable {
@@ -43,7 +44,7 @@ public class Router implements Stoppable {
 
         UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient,
                 new MySqlRedirectionDao(applicationProperties),
-                redirectionCache);
+                redirectionCache, Clock.systemDefaultZone());
         UrlShortenerAPI urlShortenerApi = new UrlShortenerAPI(urlShortener);
         UrlExpanderAPI urlExpanderAPI = new UrlExpanderAPI(urlShortener);
         RedirectionController redirectionController = new RedirectionController(urlShortener);

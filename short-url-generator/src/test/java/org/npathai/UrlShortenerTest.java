@@ -13,12 +13,14 @@ import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
 import org.npathai.client.IdGenerationServiceClient;
+import org.npathai.util.time.MutableClock;
 
+import java.time.*;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class UrlShortenerTest {
@@ -28,16 +30,21 @@ public class UrlShortenerTest {
 
     @Mock
     private IdGenerationServiceClient idGenerationServiceClient;
+    private MutableClock mutableClock = new MutableClock();
 
     private UrlShortener shortener;
+    private RedirectionCache redirectionCache;
+    private InMemoryRedirectionDao inMemoryRedirectionDao;
 
     @Before
     public void initialize() throws Exception {
         MockitoAnnotations.initMocks(this);
-        RedirectionCache redirectionCache = Mockito.mock(RedirectionCache.class);
+        redirectionCache = Mockito.mock(RedirectionCache.class);
         when(redirectionCache.get(anyString())).thenReturn(Optional.empty());
-        shortener = new UrlShortener(idGenerationServiceClient, new InMemoryRedirectionDao(),
-                redirectionCache);
+        inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
+
+        shortener = new UrlShortener(idGenerationServiceClient, inMemoryRedirectionDao,
+                redirectionCache, mutableClock);
         when(idGenerationServiceClient.getId()).thenReturn(ID);
     }
 
@@ -65,5 +72,91 @@ public class UrlShortenerTest {
                 new Object[] {"http://google.com"},
                 new Object[] {"http://youtube.com"}
         };
+    }
+
+    @Test
+    public void putsValueInCacheForFastAccess() throws Exception {
+        Redirection redirection = shortener.shorten(LONG_URL);
+
+        shortener.expand(redirection.id());
+
+        verify(redirectionCache).put(redirection.id(), redirection.longUrl(), redirection.expiryTimeInMillis());
+    }
+
+    @Test
+    public void returnsValueFromFastCacheOnSubsequentCalls() throws Exception {
+        Redirection redirection = shortener.shorten(LONG_URL);
+        reset(inMemoryRedirectionDao);
+        when(redirectionCache.get(redirection.id())).thenReturn(Optional.of(LONG_URL));
+        when(redirectionCache.getExpiryAtMillis(redirection.id()))
+                .thenReturn(Optional.of(redirection.expiryTimeInMillis()));
+
+        Optional<String> longUrl = shortener.expand(redirection.id());
+
+        assertThat(longUrl).hasValue(LONG_URL);
+        verify(redirectionCache).get(redirection.id());
+        verifyZeroInteractions(inMemoryRedirectionDao);
+    }
+
+    @Test
+    public void redirectionHaveExpiryOfOneMinute() throws Exception {
+        Redirection redirection = shortener.shorten(LONG_URL);
+        long expiryTime = redirection.expiryTimeInMillis();
+        assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofMinutes(1).toMillis());
+    }
+
+    @Test
+    @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
+    public void deletesExpiredUrlsFromDatabaseLazilyWhenRequestedForFirstTime(Duration duration) throws Exception {
+        Redirection redirection = shortener.shorten(LONG_URL);
+
+        mutableClock.advanceBy(duration);
+
+        shortener.expand(redirection.id());
+
+        verify(inMemoryRedirectionDao).deleteById(redirection.id());
+    }
+
+    @Test
+    @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
+    public void deletesExpiredUrlsFromCacheAndDatabaseLazilyWhenRequested(Duration duration) throws Exception {
+        Redirection redirection = shortener.shorten(LONG_URL);
+        when(redirectionCache.get(redirection.id())).thenReturn(Optional.of(LONG_URL));
+        when(redirectionCache.getExpiryAtMillis(redirection.id()))
+                .thenReturn(Optional.of(redirection.expiryTimeInMillis()));
+
+        mutableClock.advanceBy(duration);
+
+        shortener.expand(redirection.id());
+
+        verify(redirectionCache).delete(redirection.id());
+        verify(inMemoryRedirectionDao).deleteById(redirection.id());
+    }
+
+    public Object[][] durationsGreaterThanOrEqualToOneMinute() {
+        return new Object[][] {
+                new Object[] {Duration.ofMinutes(1)},
+                new Object[] {Duration.ofMinutes(2)},
+                new Object[] {Duration.ofHours(1)},
+                new Object[] {Duration.ofDays(1)},
+        };
+    }
+
+    @Test
+    @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
+    public void returnsEmptyRedirectionWhenItIsExpired(Duration duration) throws Exception {
+        Redirection redirection = shortener.shorten(LONG_URL);
+        when(redirectionCache.get(redirection.id())).thenReturn(Optional.of(LONG_URL));
+        when(redirectionCache.getExpiryAtMillis(redirection.id()))
+                .thenReturn(Optional.of(redirection.expiryTimeInMillis()));
+
+        mutableClock.advanceBy(duration);
+
+        assertThat(shortener.expand(redirection.id())).isEmpty();
+    }
+
+    @Test
+    public void returnsEmptyRedirectionForUnknownId() throws Exception {
+        assertThat(shortener.expand("GFSFA")).isEmpty();
     }
 }

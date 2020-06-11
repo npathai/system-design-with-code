@@ -22,12 +22,26 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
     @Override
     public Optional<String> get(String id) {
-        return Optional.ofNullable(jedis.get("redirection#" + id));
+        return Optional.ofNullable(jedis.get(redirectionId(id)));
     }
 
     @Override
-    public void put(String id, String longUrl) {
-        jedis.set("redirection#" + id, longUrl);
+    public Optional<Long> getExpiryAtMillis(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void put(String id, String longUrl, long expiryAtMillis) {
+        jedis.set(redirectionId(id), longUrl);
+    }
+
+    private String redirectionId(String id) {
+        return "redirection#" + id;
+    }
+
+    @Override
+    public void delete(String id) {
+        jedis.del(redirectionId(id));
     }
 
     @Override

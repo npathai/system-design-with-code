@@ -1,23 +1,19 @@
 package org.npathai.model;
 
+import java.time.Clock;
 import java.util.Objects;
 
 public class Redirection {
     private String id;
     private final String longUrl;
-    private long createdAt;
+    private long createdAtMillis;
+    private long expiryTimeInMillis;
 
-    public Redirection(String id, String longUrl) {
-        this.id = id;
-        this.longUrl = longUrl;
-        // TODO not sure if should assign it here or should be inserted by DB layer.
-        createdAt = System.currentTimeMillis();
-    }
-
-    public Redirection(String id, String lonUrl, long createdAt) {
+    public Redirection(String id, String lonUrl, long createdAtMillis, long expiryTimeInMillis) {
         this.id = id;
         this.longUrl = lonUrl;
-        this.createdAt = createdAt;
+        this.createdAtMillis = createdAtMillis;
+        this.expiryTimeInMillis = expiryTimeInMillis;
     }
 
     public String id() {
@@ -29,7 +25,7 @@ public class Redirection {
     }
 
     public long createdAt() {
-        return createdAt;
+        return createdAtMillis;
     }
 
     @Override
@@ -43,5 +39,13 @@ public class Redirection {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public long expiryTimeInMillis() {
+        return expiryTimeInMillis;
+    }
+
+    public boolean isExpired(Clock clock) {
+        return expiryTimeInMillis <= clock.millis();
     }
 }

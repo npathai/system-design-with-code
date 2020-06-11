@@ -6,26 +6,33 @@ import org.npathai.dao.DataAccessException;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.model.Redirection;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.util.Optional;
 
 public class UrlShortener {
 
     private final IdGenerationServiceClient idGenerationServiceClient;
+    private final Clock clock;
     private RedirectionDao dao;
     private final RedirectionCache redirectionCache;
 
     public UrlShortener(IdGenerationServiceClient idGenerationServiceClient,
                         RedirectionDao dao,
-                        RedirectionCache redirectionCache) {
+                        RedirectionCache redirectionCache,
+                        Clock clock) {
         this.idGenerationServiceClient = idGenerationServiceClient;
         this.dao = dao;
         this.redirectionCache = redirectionCache;
+        this.clock = clock;
     }
 
     public Redirection shorten(String longUrl) throws Exception {
         // Remote call
         String id = idGenerationServiceClient.getId();
-        Redirection redirection = new Redirection(id, longUrl);
+        long creationTime = clock.millis();
+        long expiryTime = creationTime + Duration.ofMinutes(1).toMillis();
+        Redirection redirection = new Redirection(id, longUrl, creationTime, expiryTime);
         dao.save(redirection);
         return redirection;
     }
@@ -40,12 +47,34 @@ public class UrlShortener {
     public Optional<String> expand(String id) throws Exception {
         Optional<String> cachedRedirection = redirectionCache.get(id);
         if (cachedRedirection.isPresent()) {
-            return cachedRedirection;
+            if (!isExpired(redirectionCache.getExpiryAtMillis(id).get())) {
+                return cachedRedirection;
+            }
+
+            // Is expired so remove from db and cache
+            redirectionCache.delete(id);
+            dao.deleteById(id);
+            return Optional.empty();
         }
 
-        Optional<Redirection> redirection = dao.getById(id);
+        // This is first time url is being accessed
+        Optional<Redirection> optionalRedirection = dao.getById(id);
 
-        redirection.ifPresent(it -> redirectionCache.put(it.id(), it.longUrl()));
-        return redirection.map(Redirection::longUrl);
+        if (!optionalRedirection.isPresent()) {
+            return Optional.empty();
+        }
+
+        Redirection redirection = optionalRedirection.get();
+        if (redirection.isExpired(clock)) {
+            dao.deleteById(id);
+            return Optional.empty();
+        }
+
+        redirectionCache.put(redirection.id(), redirection.longUrl(), redirection.expiryTimeInMillis());
+        return optionalRedirection.map(Redirection::longUrl);
+    }
+
+    private boolean isExpired(Long expiryTimeInMillis) {
+        return expiryTimeInMillis <= clock.millis();
     }
 }
