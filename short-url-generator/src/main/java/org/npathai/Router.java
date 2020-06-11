@@ -45,6 +45,7 @@ public class Router implements Stoppable {
         UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient,
                 new MySqlRedirectionDao(applicationProperties),
                 redirectionCache, Clock.systemDefaultZone());
+
         UrlShortenerAPI urlShortenerApi = new UrlShortenerAPI(urlShortener);
         UrlExpanderAPI urlExpanderAPI = new UrlExpanderAPI(urlShortener);
         RedirectionController redirectionController = new RedirectionController(urlShortener);

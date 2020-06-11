@@ -56,7 +56,6 @@ public class ShortUrlGeneratorLauncher {
         applicationProperties.load(this.getClass().getClassLoader().getResourceAsStream("application.properties"));
     }
 
-
     public void awaitInitialization() {
         Spark.awaitInitialization();
     }
