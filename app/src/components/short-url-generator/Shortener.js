@@ -1,6 +1,8 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import {AuthContext} from "../../context/AuthContext";
 
 class Shortener extends React.Component {
+    static contextType = AuthContext
 
     constructor(props) {
         super(props);
@@ -42,6 +44,7 @@ class Shortener extends React.Component {
     }
 
     postLongUrl() {
+        console.log(this.context)
         fetch("http://localhost:4000/shorten", {
             method: 'POST',
             mode: 'cors',

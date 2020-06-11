@@ -7,24 +7,27 @@ import Shortener from "./components/short-url-generator/Shortener";
 import NavBar from "./components/navbar/NavBar";
 
 import SignIn from "./components/login/SignIn";
+import UserProvider from "./context/AuthContext";
 
 class App extends React.Component {
 
     render() {
         return (
-            <div>
+            <UserProvider>
                 <div>
-                    <Router>
-                        <NavBar/>
-                        <Route exact path="/" component={Shortener}/>
-                        <Route path="/signin" component={SignIn}/>
-                    </Router>
+                    <div>
+                        <Router>
+                            <NavBar/>
+                            <Route exact path="/" component={Shortener}/>
+                            <Route path="/signin" component={SignIn}/>
+                        </Router>
+                    </div>
                 </div>
-            </div>
+            </UserProvider>
         );
     }
 }
 
 ReactDOM.render(
-        <App/>, document.getElementById('root')
+    <App/>, document.getElementById('root')
 );
