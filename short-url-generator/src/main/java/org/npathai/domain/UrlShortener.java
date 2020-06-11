@@ -45,14 +45,14 @@ public class UrlShortener {
      * Should be used to get redirection url
      */
     public Optional<String> expand(String id) throws Exception {
-        Optional<String> cachedRedirection = redirectionCache.get(id);
+        Optional<Redirection> cachedRedirection = redirectionCache.getById(id);
         if (cachedRedirection.isPresent()) {
-            if (!isExpired(redirectionCache.getExpiryAtMillis(id).get())) {
-                return cachedRedirection;
+            if (!cachedRedirection.get().isExpired(clock)) {
+                return cachedRedirection.map(Redirection::longUrl);
             }
 
             // Is expired so remove from db and cache
-            redirectionCache.delete(id);
+            redirectionCache.deleteById(id);
             dao.deleteById(id);
             return Optional.empty();
         }
@@ -70,7 +70,7 @@ public class UrlShortener {
             return Optional.empty();
         }
 
-        redirectionCache.put(redirection.id(), redirection.longUrl(), redirection.expiryTimeInMillis());
+        redirectionCache.put(redirection);
         return optionalRedirection.map(Redirection::longUrl);
     }
 

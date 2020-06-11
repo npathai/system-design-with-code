@@ -1,16 +1,14 @@
 package org.npathai.cache;
 
+import org.npathai.model.Redirection;
+
 import java.util.Optional;
 
 public interface RedirectionCache {
 
-    Optional<String> get(String id);
-    /**
-     * TODO Temporary hack to continue with usage of Jedis. Long term option will be to switch to Redisson
-     */
-    Optional<Long> getExpiryAtMillis(String id);
+    Optional<Redirection> getById(String id);
 
-    void put(String id, String longUrl, long expiryAtMillis);
+    void put(Redirection redirection);
 
-    void delete(String id);
+    void deleteById(String id);
 }

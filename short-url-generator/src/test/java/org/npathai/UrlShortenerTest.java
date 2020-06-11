@@ -9,13 +9,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
-import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.util.time.MutableClock;
 
-import java.time.*;
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +40,7 @@ public class UrlShortenerTest {
     public void initialize() throws Exception {
         MockitoAnnotations.initMocks(this);
         redirectionCache = Mockito.mock(RedirectionCache.class);
-        when(redirectionCache.get(anyString())).thenReturn(Optional.empty());
+        when(redirectionCache.getById(anyString())).thenReturn(Optional.empty());
         inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
 
         shortener = new UrlShortener(idGenerationServiceClient, inMemoryRedirectionDao,
@@ -80,21 +80,19 @@ public class UrlShortenerTest {
 
         shortener.expand(redirection.id());
 
-        verify(redirectionCache).put(redirection.id(), redirection.longUrl(), redirection.expiryTimeInMillis());
+        verify(redirectionCache).put(redirection);
     }
 
     @Test
     public void returnsValueFromFastCacheOnSubsequentCalls() throws Exception {
         Redirection redirection = shortener.shorten(LONG_URL);
         reset(inMemoryRedirectionDao);
-        when(redirectionCache.get(redirection.id())).thenReturn(Optional.of(LONG_URL));
-        when(redirectionCache.getExpiryAtMillis(redirection.id()))
-                .thenReturn(Optional.of(redirection.expiryTimeInMillis()));
+        when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         Optional<String> longUrl = shortener.expand(redirection.id());
 
         assertThat(longUrl).hasValue(LONG_URL);
-        verify(redirectionCache).get(redirection.id());
+        verify(redirectionCache).getById(redirection.id());
         verifyZeroInteractions(inMemoryRedirectionDao);
     }
 
@@ -121,15 +119,13 @@ public class UrlShortenerTest {
     @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromCacheAndDatabaseLazilyWhenRequested(Duration duration) throws Exception {
         Redirection redirection = shortener.shorten(LONG_URL);
-        when(redirectionCache.get(redirection.id())).thenReturn(Optional.of(LONG_URL));
-        when(redirectionCache.getExpiryAtMillis(redirection.id()))
-                .thenReturn(Optional.of(redirection.expiryTimeInMillis()));
+        when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         mutableClock.advanceBy(duration);
 
         shortener.expand(redirection.id());
 
-        verify(redirectionCache).delete(redirection.id());
+        verify(redirectionCache).deleteById(redirection.id());
         verify(inMemoryRedirectionDao).deleteById(redirection.id());
     }
 
@@ -146,9 +142,7 @@ public class UrlShortenerTest {
     @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
     public void returnsEmptyRedirectionWhenItIsExpired(Duration duration) throws Exception {
         Redirection redirection = shortener.shorten(LONG_URL);
-        when(redirectionCache.get(redirection.id())).thenReturn(Optional.of(LONG_URL));
-        when(redirectionCache.getExpiryAtMillis(redirection.id()))
-                .thenReturn(Optional.of(redirection.expiryTimeInMillis()));
+        when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         mutableClock.advanceBy(duration);
 

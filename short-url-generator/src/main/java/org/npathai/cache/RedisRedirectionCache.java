@@ -1,5 +1,7 @@
 package org.npathai.cache;
 
+import com.google.common.base.Preconditions;
+import org.npathai.model.Redirection;
 import org.npathai.properties.ApplicationProperties;
 import redis.clients.jedis.Jedis;
 
@@ -11,7 +13,7 @@ import java.util.Properties;
 
 public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
-    // TODO maybe Redisson client library?
+    // TODO Use Reddisson client library because it makes it easy to store custom objects in cache
     private final Jedis jedis;
 
     public RedisRedirectionCache(Properties applicationProperties) {
@@ -21,31 +23,50 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
     }
 
     @Override
-    public Optional<String> get(String id) {
-        return Optional.ofNullable(jedis.get(redirectionId(id)));
+    public Optional<Redirection> getById(String id) {
+        String longUrl = jedis.get(redirectionIdKey(id));
+        if (longUrl == null) {
+            return Optional.empty();
+        }
+        String createdAt = jedis.get(createdAtKey(id));
+        Preconditions.checkState(createdAt != null,
+                "createdAt must be present in cache if long url is present");
+        String expiryAtMillis = jedis.get(expiryAtKey(id));
+        Preconditions.checkState(createdAt != null,
+                "expiryAtMillis must be present in cache if long url is present");
+
+        return Optional.of(new Redirection(id, longUrl, Long.parseLong(createdAt), Long.parseLong(expiryAtMillis)));
     }
 
     @Override
-    public Optional<Long> getExpiryAtMillis(String id) {
-        throw new UnsupportedOperationException();
+    public void put(Redirection redirection) {
+        jedis.set(redirectionIdKey(redirection.id()), redirection.longUrl());
+        jedis.set(createdAtKey(redirection.id()), String.valueOf(redirection.createdAt()));
+        jedis.set(expiryAtKey(redirection.id()), String.valueOf(redirection.longUrl()));
     }
 
-    @Override
-    public void put(String id, String longUrl, long expiryAtMillis) {
-        jedis.set(redirectionId(id), longUrl);
+    private String createdAtKey(String id) {
+        return "createdAt#" + id;
     }
 
-    private String redirectionId(String id) {
+    private String expiryAtKey(String id) {
+        return "expiryAt#" + id;
+    }
+
+
+    private String redirectionIdKey(String id) {
         return "redirection#" + id;
     }
 
     @Override
-    public void delete(String id) {
-        jedis.del(redirectionId(id));
+    public void deleteById(String id) {
+        jedis.del(redirectionIdKey(id));
+        jedis.del(createdAtKey(id));
+        jedis.del(expiryAtKey(id));
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         jedis.close();
     }
 }
