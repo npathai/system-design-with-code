@@ -13,10 +13,12 @@ import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
+import org.npathai.properties.ApplicationProperties;
 import org.npathai.util.time.MutableClock;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -27,6 +29,8 @@ public class UrlShortenerTest {
 
     public static final String LONG_URL = "http://google.com";
     public static final String ID = "AAAAA";
+
+    private Properties applicationProperties = new Properties();
 
     @Mock
     private IdGenerationServiceClient idGenerationServiceClient;
@@ -42,8 +46,8 @@ public class UrlShortenerTest {
         redirectionCache = Mockito.mock(RedirectionCache.class);
         when(redirectionCache.getById(anyString())).thenReturn(Optional.empty());
         inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
-
-        shortener = new UrlShortener(idGenerationServiceClient, inMemoryRedirectionDao,
+        applicationProperties.put(ApplicationProperties.ANONYMOUS_URL_LIFETIME_SECONDS.name(), "60");
+        shortener = new UrlShortener(applicationProperties, idGenerationServiceClient, inMemoryRedirectionDao,
                 redirectionCache, mutableClock);
         when(idGenerationServiceClient.getId()).thenReturn(ID);
     }
@@ -97,10 +101,19 @@ public class UrlShortenerTest {
     }
 
     @Test
-    public void redirectionHaveExpiryOfOneMinute() throws Exception {
+    @Parameters({
+            "60",
+            "100",
+            "1000"
+    })
+    public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
+        applicationProperties.put(ApplicationProperties.ANONYMOUS_URL_LIFETIME_SECONDS.name(),
+                String.valueOf(expiryInSeconds));
+
         Redirection redirection = shortener.shorten(LONG_URL);
         long expiryTime = redirection.expiryTimeInMillis();
-        assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofMinutes(1).toMillis());
+
+        assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
     }
 
     @Test

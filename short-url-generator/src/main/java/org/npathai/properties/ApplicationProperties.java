@@ -5,5 +5,6 @@ public enum ApplicationProperties {
     MYSQL_PASSWORD,
     MYSQL_URL,
     REDIS_URL,
-    ZOOKEEPER_URL;
+    ZOOKEEPER_URL,
+    ANONYMOUS_URL_LIFETIME_SECONDS
 }

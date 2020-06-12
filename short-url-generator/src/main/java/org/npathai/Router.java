@@ -42,7 +42,8 @@ public class Router implements Stoppable {
 
         redirectionCache = new RedisRedirectionCache(applicationProperties);
 
-        UrlShortener urlShortener = new UrlShortener(idGenerationServiceClient,
+        UrlShortener urlShortener = new UrlShortener(applicationProperties,
+                idGenerationServiceClient,
                 new MySqlRedirectionDao(applicationProperties),
                 redirectionCache, Clock.systemDefaultZone());
 
