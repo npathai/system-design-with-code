@@ -18,7 +18,6 @@ public class UrlShortenerAPIAcceptanceTest {
     @Test
     public void returnsShortenedUrl() {
         String url = AcceptanceTests.BASEURL + "/shorten";
-        System.out.println(url);
         Response response = given()
                 .body(withJsonContaining(LONG_URL))
                 .when()

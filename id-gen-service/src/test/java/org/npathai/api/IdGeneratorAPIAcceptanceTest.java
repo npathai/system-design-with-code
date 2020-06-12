@@ -14,7 +14,6 @@ public class IdGeneratorAPIAcceptanceTest {
     @Test
     public void idFormatTest() {
         String url = AcceptanceTests.BASEURL + "/generate";
-        System.out.println(url);
         Response response = given()
                 .when()
                 .get(url);

@@ -2,14 +2,16 @@ package org.npathai.zookeeper;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
-import org.npathai.util.thread.ThrowingRunnable;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class DefaultZkManager implements ZkManager {
+    private static final Logger LOG = LogManager.getLogger(DefaultZkManager.class);
 
     private final CuratorFramework client;
 
@@ -22,7 +24,7 @@ public class DefaultZkManager implements ZkManager {
         try {
             client.create().creatingParentContainersIfNeeded().forPath(path, "".getBytes());
         } catch (KeeperException.NodeExistsException ex) {
-            System.out.println(path + " node already exists.");
+            LOG.debug(path + " node already exists.");
         }
         return null;
     }
@@ -35,11 +37,11 @@ public class DefaultZkManager implements ZkManager {
                 throw new IllegalStateException("Could not acquire the lock to Next id node");
             }
             try {
-                System.out.println("Acquired lock: " + System.currentTimeMillis());
+                LOG.debug("Acquired lock: " + System.currentTimeMillis());
                 return callable.call();
             } finally {
                 lock.release(); // always release the lock in a finally block
-                System.out.println("Released lock: " + System.currentTimeMillis());
+                LOG.debug("Released lock: " + System.currentTimeMillis());
             }
         };
     }

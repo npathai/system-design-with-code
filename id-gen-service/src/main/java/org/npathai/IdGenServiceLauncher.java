@@ -1,9 +1,12 @@
 package org.npathai;
 
+import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.UriSpec;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.npathai.properties.ApplicationProperties;
 import org.npathai.util.NullSafe;
 import org.npathai.zookeeper.DefaultZkManager;
@@ -18,6 +21,7 @@ import java.util.Properties;
 import static spark.Spark.before;
 
 public class IdGenServiceLauncher {
+    private static final Logger LOG = LogManager.getLogger(IdGenServiceLauncher.class);
 
     public static final int PORT = Integer.parseInt(System.getenv("PORT"));
 
@@ -34,10 +38,12 @@ public class IdGenServiceLauncher {
         IdGenServiceLauncher idGenServiceLauncher = new IdGenServiceLauncher();
         try {
             idGenServiceLauncher.start();
+            LOG.info("Started successfully, listening for requests on port: {}", PORT);
             idGenServiceLauncher.awaitInitialization();
             Thread.currentThread().join();
         } finally {
             idGenServiceLauncher.stop();
+            LOG.info("Stopped successfully");
         }
     }
 
@@ -62,7 +68,6 @@ public class IdGenServiceLauncher {
         router.initRoutes();
         // On successful start
         registerForDiscovery();
-        System.out.println("Successfully started listening on port: " + PORT);
     }
 
     private void readApplicationProperties() throws IOException {

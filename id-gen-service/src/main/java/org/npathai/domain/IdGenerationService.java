@@ -1,10 +1,13 @@
 package org.npathai.domain;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.npathai.zookeeper.ZkManager;
 
 import java.util.concurrent.*;
 
 public class IdGenerationService {
+    private static final Logger LOG = LogManager.getLogger(IdGenerationService.class);
 
     public static final String NEXT_ID_ZNODE_NAME = "/next-id";
     private final ZkManager manager;
@@ -40,15 +43,14 @@ public class IdGenerationService {
 
         @Override
         public Void call() throws Exception {
-            System.out.println("Batch Id generation started");
+            LOG.info("Batch Id generation started");
 
             Id startId = manager.withinLock(NEXT_ID_ZNODE_NAME, new GetAndSetIncrementIdOperation()).call();
             BatchedIdGenerator generator = new BatchedIdGenerator(startId);
             Batch batch = generator.generate(BATCH_SIZE);
             cachedIds.addAll(batch.ids());
 
-            System.out.println(cachedIds);
-            System.out.println("Batch Id generation ended");
+            LOG.info("Batch Id generation ended. Cached size: {}", cachedIds.size());
             return null;
         }
 
@@ -59,7 +61,7 @@ public class IdGenerationService {
                 Id startId = readStartId();
                 Id nextAvailableId = startId.incrementAndGet(BATCH_SIZE);
                 zkManager.setData(NEXT_ID_ZNODE_NAME, nextAvailableId.encode().getBytes());
-                System.out.println("Saved next id value in zookeeper as: " + nextAvailableId.encode());
+                LOG.debug("Saved next id value in zookeeper as: " + nextAvailableId.encode());
                 return startId;
             }
 
@@ -67,11 +69,11 @@ public class IdGenerationService {
                 byte[] data = zkManager.getData(NEXT_ID_ZNODE_NAME);
                 Id startId;
                 if (data.length == 0) {
-                    System.out.println("Next id data is empty");
+                    LOG.debug("Next id data is empty");
                     startId = Id.first();
                 } else {
                     startId = Id.fromEncoded(new String(data));
-                    System.out.println("Next id data is not null. Found value: " + startId.encode());
+                    LOG.debug("Next id data is not null. Found value: {}", startId.encode());
                 }
                 return startId;
             }
