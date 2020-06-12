@@ -39,5 +39,5 @@ For easy way to view the logs and login to containers use Docker dashboard on Wi
 1) Start the application stack using `gradlew composeUp`
 2) Switch to `app` and execute the `npm install` followed by `npm start`, this will start the not so feature rich React app
     - Working on creating image for this as well, so can be part of docker compose stack
-3) Shorten the URLs :scissors:
+3) Shorten the URLs at `http://localhost:3000` :scissors:
 4) Stop the application stack and react app when done
