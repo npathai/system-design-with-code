@@ -1,13 +1,16 @@
 package org.npathai.controller;
 
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.domain.UrlShortener;
-import spark.Request;
-import spark.Response;
 
+import java.net.URI;
 import java.util.Optional;
 
+@Controller
 public class RedirectionController {
     private static final Logger LOG = LogManager.getLogger(RedirectionController.class);
 
@@ -17,28 +20,18 @@ public class RedirectionController {
         this.urlShortener = urlShortener;
     }
 
-    public String handle(Request req, Response res) throws Exception {
+    @Get("/{id}")
+    public HttpResponse<String> handle(String id) throws Exception {
         try {
-            String id = req.params("id");
             LOG.info("Request received for expanding id: " + id);
             Optional<String> redirection = urlShortener.expand(id);
             if (redirection.isEmpty()) {
-                return prepare404Response(res);
+                return HttpResponse.notFound();
             }
-            return prepareRedirectResponse(res, redirection.get());
+            return HttpResponse.redirect(URI.create(redirection.get()));
         } catch (Exception ex) {
             LOG.error(ex);
             throw ex;
         }
-    }
-
-    private String prepareRedirectResponse(Response res, String longUrl) {
-        res.redirect(longUrl, 301);
-        return null;
-    }
-
-    private String prepare404Response(Response res) {
-        res.status(404);
-        return null;
     }
 }

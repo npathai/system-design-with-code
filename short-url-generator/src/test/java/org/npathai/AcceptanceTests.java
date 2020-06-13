@@ -12,18 +12,18 @@ import org.npathai.api.UrlShortenerAPIAcceptanceTest;
 })
 public class AcceptanceTests {
 
-    public static final String BASEURL = "http://localhost:" + ShortUrlGeneratorLauncher.PORT;
-    static ShortUrlGeneratorLauncher shortUrlGeneratorLauncher;
+//    public static final String BASEURL = "http://localhost:" + Application.PORT;
+    static Application application;
 
     @BeforeClass
     public static void createMain() throws Exception {
-        shortUrlGeneratorLauncher = new ShortUrlGeneratorLauncher();
-        shortUrlGeneratorLauncher.start();
-        shortUrlGeneratorLauncher.awaitInitialization();
+//        application = new Application();
+//        application.start();
+//        application.awaitInitialization();
     }
 
     @AfterClass
     public static void stop() throws Exception {
-        shortUrlGeneratorLauncher.stop();
+//        application.stop();
     }
 }

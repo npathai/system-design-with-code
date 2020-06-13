@@ -1,0 +1,27 @@
+micronaut:
+  application:
+    name: short-url-generator
+  server:
+    port: 8080
+    cors:
+      enabled: true
+
+---
+zookeeperUrl: zookeeper:2181
+---
+redisUrl: redis://redis-cache:6379
+---
+anonymousUrlLifetimeInSeconds: 60
+---
+
+mysql:
+  url: jdbc:mysql://db:3306/short_url_generator
+  user: root
+  password: unsecured
+
+---
+consul:
+  client:
+    registration:
+      enabled: true
+    defaultZone: "${CONSUL_HOST:consul}:${CONSUL_PORT:8500}"

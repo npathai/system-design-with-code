@@ -1,6 +1,7 @@
 package org.npathai.domain;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Generates batch of ids

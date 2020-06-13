@@ -47,6 +47,9 @@ class Shortener extends React.Component {
         console.log(this.context)
         fetch("http://localhost:4000/shorten", {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             mode: 'cors',
             body: JSON.stringify({
                 longUrl: this.state.longUrl,

@@ -7,7 +7,6 @@ import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.DataAccessException;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.model.Redirection;
-import org.npathai.properties.ApplicationProperties;
 
 import java.sql.Timestamp;
 import java.time.Clock;
@@ -39,7 +38,7 @@ public class UrlShortener {
 
     public Redirection shorten(String longUrl) throws Exception {
         // Remote call
-        String id = idGenerationServiceClient.getId();
+        String id = idGenerationServiceClient.generateId();
         long creationTime = clock.millis();
         long expiryTime = creationTime + lifetimeInMillis();
         Redirection redirection = new Redirection(id, longUrl, creationTime, expiryTime);
@@ -50,7 +49,7 @@ public class UrlShortener {
 
     private long lifetimeInMillis() {
         return Duration.ofSeconds(Integer.parseInt(applicationProperties.getProperty(
-                ApplicationProperties.ANONYMOUS_URL_LIFETIME_SECONDS.name()))).toMillis();
+                "anonymousUrlLifetimeInSeconds"))).toMillis();
     }
 
     public Optional<Redirection> getById(String id) throws DataAccessException {

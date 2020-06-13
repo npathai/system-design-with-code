@@ -2,22 +2,25 @@ package org.npathai.domain;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.npathai.ScheduledJobService;
 import org.npathai.zookeeper.ZkManager;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 
 public class IdGenerationService {
     private static final Logger LOG = LogManager.getLogger(IdGenerationService.class);
 
     public static final String NEXT_ID_ZNODE_NAME = "/next-id";
     private final ZkManager manager;
-    private final ExecutorService executorService;
+    private final ScheduledJobService scheduledJobService;
     private ConcurrentLinkedQueue<String> cachedIds = new ConcurrentLinkedQueue<>();
 
     // FIXME constructor is doing real work. Options?
-    public IdGenerationService(ZkManager manager, ExecutorService executorService) throws Exception {
+    public IdGenerationService(ZkManager manager, ScheduledJobService scheduledJobService) throws Exception {
         this.manager = manager;
-        this.executorService = executorService;
+        this.scheduledJobService = scheduledJobService;
         manager.createIfAbsent(NEXT_ID_ZNODE_NAME);
         triggerHydrationAsync().get();
     }
@@ -30,7 +33,7 @@ public class IdGenerationService {
     }
 
     private Future<?> triggerHydrationAsync() {
-        return executorService.submit(new BatchGenerationProcess(manager));
+        return scheduledJobService.submit(new BatchGenerationProcess(manager));
     }
 
     private class BatchGenerationProcess implements Callable<Void> {

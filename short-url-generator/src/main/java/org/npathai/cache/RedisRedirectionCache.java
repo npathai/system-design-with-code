@@ -2,7 +2,6 @@ package org.npathai.cache;
 
 import com.google.common.base.Preconditions;
 import org.npathai.model.Redirection;
-import org.npathai.properties.ApplicationProperties;
 import redis.clients.jedis.Jedis;
 
 import java.io.Closeable;
@@ -18,7 +17,7 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
     public RedisRedirectionCache(Properties applicationProperties) {
         jedis = new Jedis(Objects.requireNonNull(
-                applicationProperties.getProperty(ApplicationProperties.REDIS_URL.name())));
+                applicationProperties.getProperty("redisUrl")));
         jedis.connect();
     }
 

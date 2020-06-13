@@ -1,0 +1,17 @@
+micronaut:
+  application:
+    name: id-gen-service
+  server:
+    port: 8080
+    cors:
+      enabled: true
+
+---
+zookeeperUrl: zookeeper:2181
+
+---
+consul:
+  client:
+    registration:
+      enabled: true
+    defaultZone: "${CONSUL_HOST:consul}:${CONSUL_PORT:8500}"

@@ -2,7 +2,6 @@ package org.npathai.dao;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.npathai.model.Redirection;
-import org.npathai.properties.ApplicationProperties;
 
 import javax.annotation.Nonnull;
 import java.sql.*;
@@ -22,9 +21,9 @@ public class MySqlRedirectionDao implements RedirectionDao {
     // FIXME use connection pooling
     public MySqlRedirectionDao(Properties properties) throws SQLException {
         dataSource = new MysqlDataSource();
-        dataSource.setUser(Objects.requireNonNull(properties.getProperty(ApplicationProperties.MYSQL_USER.name())));
-        dataSource.setPassword(Objects.requireNonNull(properties.getProperty(ApplicationProperties.MYSQL_PASSWORD.name())));
-        dataSource.setUrl(Objects.requireNonNull(properties.getProperty(ApplicationProperties.MYSQL_URL.name())));
+        dataSource.setUser(Objects.requireNonNull(properties.getProperty("mysql.user")));
+        dataSource.setPassword(Objects.requireNonNull(properties.getProperty("mysql.password")));
+        dataSource.setUrl(Objects.requireNonNull(properties.getProperty("mysql.url")));
         // FIXME how to ensure DB availability when services are starting dynamically and don't have control over when
         // DB will start. Commenting this check because causes intermittent failures in docker compose
         // dataSource.getConnection().close();

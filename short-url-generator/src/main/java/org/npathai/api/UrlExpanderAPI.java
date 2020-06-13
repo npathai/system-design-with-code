@@ -1,13 +1,15 @@
 package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
-import spark.Request;
-import spark.Response;
 
 import java.util.Optional;
 
+@Controller("/expand")
 public class UrlExpanderAPI {
 
     private final UrlShortener urlShortener;
@@ -16,24 +18,14 @@ public class UrlExpanderAPI {
         this.urlShortener = urlShortener;
     }
 
-    public String expand(Request req, Response res) throws Exception {
-        String id = req.params("id");
+    @Get("/{id}")
+    public HttpResponse<String> expand(String id) throws Exception {
         Optional<Redirection> redirection = urlShortener.getById(id);
         if (redirection.isPresent()) {
-            return prepareOkResponse(res, id, redirection.get().longUrl());
+            return HttpResponse.ok(jsonFor(id, redirection.get().longUrl()));
         } else {
-            return prepareNotFoundResponse(res);
+            return HttpResponse.notFound();
         }
-    }
-
-    private String prepareNotFoundResponse(Response res) {
-        res.status(404);
-        return null;
-    }
-
-    private String prepareOkResponse(Response res, String id, String longUrl) {
-        res.type("application/json");
-        return jsonFor(id, longUrl);
     }
 
     private String jsonFor(String id, String longUrl) {

@@ -12,18 +12,18 @@ import org.npathai.api.IdGeneratorAPIAcceptanceTest;
 })
 public class AcceptanceTests {
 
-    public static final String BASEURL = "http://localhost:" + IdGenServiceLauncher.PORT;
-    static IdGenServiceLauncher idGenServiceLauncher;
+//    public static final String BASEURL = "http://localhost:" + Application.PORT;
+    static Application application;
 
     @BeforeClass
     public static void createLauncher() throws Exception {
-        idGenServiceLauncher = new IdGenServiceLauncher();
-        idGenServiceLauncher.start();
-        idGenServiceLauncher.awaitInitialization();
+//        application = new Application();
+//        application.start();
+//        application.awaitInitialization();
     }
 
     @AfterClass
     public static void stop() throws Exception {
-        idGenServiceLauncher.stop();
+//        application.stop();
     }
 }

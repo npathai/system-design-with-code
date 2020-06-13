@@ -22,6 +22,12 @@ services:
     environment:
       ZOO_PORT: 2182
 
+  consul:
+    container_name: consul
+    image: consul:latest
+    ports:
+      - "8500:8500"
+
   redis-cache:
     container_name: urlCache
     image: redis:latest
@@ -31,26 +37,24 @@ services:
   id-gen-service:
     image: id-gen-service:latest
     ports:
-      - "4301"
-    environment:
-      PORT: 4301
+      - "8080"
     volumes:
-    - ./id-gen-service/build/libs/id-gen-service.jar:/app.jar
+    - ./id-gen-service/build/libs/id-gen-service-all.jar:/app.jar
     depends_on:
       - zookeeper
+      - consul
 
   short-url-generator:
     image: short-url-generator:latest
     ports:
-      - "4321"
-    environment:
-      PORT: 4321
+      - "8080"
     volumes:
-    - ./short-url-generator/build/libs/short-url-generator.jar:/app.jar
+    - ./short-url-generator/build/libs/short-url-generator-all.jar:/app.jar
     depends_on:
       - zookeeper
       - db
       - redis-cache
+      - consul
 
   nginx:
     image: nginx:latest
