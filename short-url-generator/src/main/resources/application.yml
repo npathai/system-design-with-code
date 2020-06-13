@@ -5,8 +5,24 @@ micronaut:
     port: 8080
     cors:
       enabled: true
-
 ---
+micronaut:
+  security:
+    enabled: true
+    endpoints:
+      login:
+        enabled: true
+      oauth:
+        enabled: true
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          secret:
+            generator:
+              secret: "${JWT_GENERATOR_SIGNATURE_SECRET:ThisIsHighlySensitiveInformation}"
+---
+
 zookeeperUrl: zookeeper:2181
 ---
 redisUrl: redis://redis-cache:6379
