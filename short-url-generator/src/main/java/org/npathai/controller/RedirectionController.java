@@ -3,6 +3,7 @@ package org.npathai.controller;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.security.annotation.Secured;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.domain.UrlShortener;
@@ -20,6 +21,7 @@ public class RedirectionController {
         this.urlShortener = urlShortener;
     }
 
+    @Secured("isAnonymous()")
     @Get("/{id}")
     public HttpResponse<String> handle(String id) throws Exception {
         try {
