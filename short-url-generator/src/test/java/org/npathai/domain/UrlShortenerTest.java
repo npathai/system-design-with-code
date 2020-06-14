@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
+import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.model.Redirection;
 import org.npathai.util.time.MutableClock;
@@ -32,7 +33,7 @@ public class UrlShortenerTest {
     public static final String LONG_URL = "http://google.com";
     public static final String ID = "AAAAA";
 
-    private Properties applicationProperties = new Properties();
+    private UrlLifetimeConfiguration urlLifetimeConfiguration = new UrlLifetimeConfiguration();
 
     @Mock
     private IdGenerationServiceClient idGenerationServiceClient;
@@ -48,8 +49,8 @@ public class UrlShortenerTest {
         redirectionCache = Mockito.mock(RedirectionCache.class);
         when(redirectionCache.getById(anyString())).thenReturn(Optional.empty());
         inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
-        applicationProperties.put("anonymousUrlLifetimeInSeconds", "60");
-        shortener = new UrlShortener(applicationProperties, idGenerationServiceClient, inMemoryRedirectionDao,
+        urlLifetimeConfiguration.setAnonymous("60");
+        shortener = new UrlShortener(urlLifetimeConfiguration, idGenerationServiceClient, inMemoryRedirectionDao,
                 redirectionCache, mutableClock);
         when(idGenerationServiceClient.generateId()).thenReturn(ID);
     }
@@ -112,8 +113,7 @@ public class UrlShortenerTest {
                 "1000"
         })
         public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
-            applicationProperties.put("anonymousUrlLifetimeInSeconds",
-                    String.valueOf(expiryInSeconds));
+            urlLifetimeConfiguration.setAnonymous(String.valueOf(expiryInSeconds));
 
             Redirection redirection = shortenAnonymously(LONG_URL);
             long expiryTime = redirection.expiryTimeInMillis();
@@ -132,8 +132,7 @@ public class UrlShortenerTest {
                 "1000"
         })
         public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
-            applicationProperties.put("authenticatedUserUrlLifetimeInSeconds",
-                    String.valueOf(expiryInSeconds));
+            urlLifetimeConfiguration.setAuthenticated(String.valueOf(expiryInSeconds));
 
             Redirection redirection = shortenAuthenticated(LONG_URL);
 

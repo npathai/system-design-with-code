@@ -6,6 +6,10 @@ import io.micronaut.context.env.Environment;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.cache.RedisRedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
+import org.npathai.config.MySqlDatasourceConfiguration;
+import org.npathai.config.RedisConfiguration;
+import org.npathai.config.UrlLifetimeConfiguration;
+import org.npathai.config.ZookeeperConfiguration;
 import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.domain.UrlShortener;
@@ -16,13 +20,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.sql.SQLException;
 import java.time.Clock;
-import java.util.Properties;
 
 @Factory
 public class ObjectMother {
-
-    @Inject
-    Environment environment;
 
     @Inject
     BeanContext beanContext;
@@ -30,39 +30,22 @@ public class ObjectMother {
     @Singleton
      public ZkManager createZkManager() throws InterruptedException {
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
-        return zkManagerFactory.createConnected(environment.getProperty("zookeeperUrl", String.class).get());
+        return zkManagerFactory.createConnected(beanContext.getBean(ZookeeperConfiguration.class).getUrl());
     }
 
     @Singleton
     public RedirectionCache redirectionCache() {
-        Properties properties = new Properties();
-        properties.put("redisUrl",
-                environment.getProperty("redisUrl", String.class).get());
-        return new RedisRedirectionCache(properties);
+        return new RedisRedirectionCache(beanContext.getBean(RedisConfiguration.class));
     }
 
     @Singleton
     public RedirectionDao redirectionDao() throws SQLException {
-        Properties properties = new Properties();
-        properties.put("mysql.user",
-                environment.getProperty("mysql.user", String.class).get());
-        properties.put("mysql.password",
-                environment.getProperty("mysql.password", String.class).get());
-        properties.put("mysql.url",
-                environment.getProperty("mysql.url", String.class).get());
-
-        return new MySqlRedirectionDao(properties);
+        return new MySqlRedirectionDao(beanContext.getBean(MySqlDatasourceConfiguration.class));
     }
 
     @Singleton
     public UrlShortener urlShortener() {
-        Properties properties = new Properties();
-        properties.put("anonymousUrlLifetimeInSeconds",
-                environment.getProperty("anonymousUrlLifetimeInSeconds", String.class).get());
-        properties.put("authenticatedUserUrlLifetimeInSeconds",
-                environment.getProperty("authenticatedUserUrlLifetimeInSeconds", String.class).get());
-
-        return new UrlShortener(properties,
+        return new UrlShortener(beanContext.getBean(UrlLifetimeConfiguration.class),
                 beanContext.getBean(IdGenerationServiceClient.class),
                 beanContext.getBean(RedirectionDao.class),
                 beanContext.getBean(RedirectionCache.class),

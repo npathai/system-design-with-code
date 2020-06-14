@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
+import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.DataAccessException;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.model.Redirection;
@@ -13,24 +14,23 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Optional;
-import java.util.Properties;
 
 public class UrlShortener {
     private static final Logger LOG = LogManager.getLogger(UrlShortener.class);
 
-    private final Properties applicationProperties;
     private final IdGenerationServiceClient idGenerationServiceClient;
     private final Clock clock;
+    private final UrlLifetimeConfiguration urlLifetimeConfiguration;
     private RedirectionDao dao;
     private final RedirectionCache redirectionCache;
 
     public UrlShortener(
-            Properties applicationProperties,
+            UrlLifetimeConfiguration urlLifetimeConfiguration,
             IdGenerationServiceClient idGenerationServiceClient,
             RedirectionDao dao,
             RedirectionCache redirectionCache,
             Clock clock) {
-        this.applicationProperties = applicationProperties;
+        this.urlLifetimeConfiguration = urlLifetimeConfiguration;
         this.idGenerationServiceClient = idGenerationServiceClient;
         this.dao = dao;
         this.redirectionCache = redirectionCache;
@@ -49,10 +49,10 @@ public class UrlShortener {
     }
 
     private long lifetimeInMillis(boolean isAnonymous) {
-        String lifetimeProperty = isAnonymous ? "anonymousUrlLifetimeInSeconds"
-                : "authenticatedUserUrlLifetimeInSeconds";
+        int lifetimeInSeconds = isAnonymous? Integer.parseInt(urlLifetimeConfiguration.getAnonymous())
+                : Integer.parseInt(urlLifetimeConfiguration.getAuthenticated());
 
-        return Duration.ofSeconds(Integer.parseInt(applicationProperties.getProperty(lifetimeProperty))).toMillis();
+        return Duration.ofSeconds(lifetimeInSeconds).toMillis();
     }
 
     public Optional<Redirection> getById(String id) throws DataAccessException {

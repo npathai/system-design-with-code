@@ -10,7 +10,8 @@ micronaut:
 
 
 ---
-zookeeperUrl: zookeeper:2181
+zookeeper:
+  url: zookeeper:2181
 
 ---
 consul:

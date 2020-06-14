@@ -25,13 +25,15 @@ micronaut:
             generator:
               secret: "${JWT_GENERATOR_SIGNATURE_SECRET:ThisIsHighlySensitiveInformation}"
 ---
-
-zookeeperUrl: zookeeper:2181
+zookeeper:
+  url: zookeeper:2181
 ---
-redisUrl: redis://redis-cache:6379
+redis:
+  url: redis://redis-cache:6379
 ---
-anonymousUrlLifetimeInSeconds: 60
-authenticatedUserUrlLifetimeInSeconds: 120
+url-lifetime-in-secs:
+  anonymous: 60
+  authenticated: 120
 ---
 
 mysql:

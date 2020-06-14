@@ -1,22 +1,22 @@
 package org.npathai.cache;
 
 import com.google.common.base.Preconditions;
+import org.npathai.config.RedisConfiguration;
 import org.npathai.model.Redirection;
 import redis.clients.jedis.Jedis;
 
 import java.io.Closeable;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
     // TODO Use Reddisson client library because it makes it easy to store custom objects in cache
     private final Jedis jedis;
 
-    public RedisRedirectionCache(Properties applicationProperties) {
+    public RedisRedirectionCache(RedisConfiguration redisConfiguration) {
         jedis = new Jedis(Objects.requireNonNull(
-                applicationProperties.getProperty("redisUrl")));
+                redisConfiguration.getUrl()));
         jedis.connect();
     }
 
