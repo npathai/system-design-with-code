@@ -13,12 +13,19 @@ class UserProvider extends React.Component {
         this.setLoggedInUser = this.setLoggedInUser.bind(this)
     }
 
-    setLoggedInUser(user) {
+    setLoggedInUser(data) {
         this.setState({
             isLoggedIn: true,
-            user: user
+            user: data.username,
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            tokenType: data.token_type
         })
-        console.log("Logged in user set in context: " + user)
+        const {user, accessToken, refreshToken, tokenType} = this.state
+        console.log("Logged in user set in context:" + user)
+        console.log("Access token: " + accessToken)
+        console.log("Refresh token: " + refreshToken)
+        console.log("tokenType: " + tokenType)
     }
 
     render() {

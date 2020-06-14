@@ -1,4 +1,5 @@
 import React from 'react'
+import {Redirect} from 'react-router-dom'
 import './SignIn.css'
 import {AuthContext} from "../../context/AuthContext";
 
@@ -9,7 +10,8 @@ class SignIn extends React.Component {
         super(props);
         this.state = {
             username: "",
-            password: ""
+            password: "",
+            loginAttemptFailure: false
         }
         this.signIn = this.signIn.bind(this)
         this.handleChange = this.handleChange.bind(this)
@@ -24,12 +26,43 @@ class SignIn extends React.Component {
 
     signIn(e) {
         const {setLoggedInUser} = this.context
-        setLoggedInUser(this.state.username)
+        fetch("http://localhost:4000/login", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password
+            })
+        })
+        .then(res => {
+            if (res.status !== 200) {
+                throw new Error("Invalid login attempt")
+            }
+            return res.json()
+        })
+        .then(data => setLoggedInUser(data))
+        .catch(err => {
+            console.log(err)
+            this.setState({
+                loginAttemptFailure: true
+            })
+        })
+
         e.preventDefault();
     }
 
     render() {
-        return (
+        const {isLoggedIn} = this.context
+        const {loginAttemptFailure} = this.state
+        const loginAttemptFailureFeedback = loginAttemptFailure ?
+            <div className="alert alert-error">
+                Incorrect Username or Password!
+            </div> : null
+
+        return isLoggedIn ? <Redirect to="/"/> :
             <div>
                 <form className="form-signin">
                     <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
@@ -43,11 +76,13 @@ class SignIn extends React.Component {
                            required=""
                             onChange={this.handleChange}
                     />
+
                     <button className="btn btn-lg btn-primary btn-block" type="button"
                             onClick={this.signIn}>Sign in</button>
+
+                    {loginAttemptFailureFeedback}
                 </form>
             </div>
-        )
     }
 }
 
