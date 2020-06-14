@@ -1,20 +1,23 @@
 package org.npathai;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.InMemoryRedirectionDao;
+import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
-import org.npathai.properties.ApplicationProperties;
 import org.npathai.util.time.MutableClock;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -22,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(JUnitParamsRunner.class)
 public class UrlShortenerTest {
 
     public static final String LONG_URL = "http://google.com";
@@ -38,42 +40,42 @@ public class UrlShortenerTest {
     private RedirectionCache redirectionCache;
     private InMemoryRedirectionDao inMemoryRedirectionDao;
 
-    @Before
+    @BeforeEach
     public void initialize() throws Exception {
         MockitoAnnotations.initMocks(this);
         redirectionCache = Mockito.mock(RedirectionCache.class);
         when(redirectionCache.getById(anyString())).thenReturn(Optional.empty());
         inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
-        applicationProperties.put(ApplicationProperties.ANONYMOUS_URL_LIFETIME_SECONDS.name(), "60");
+        applicationProperties.put("anonymousUrlLifetimeInSeconds", "60");
         shortener = new UrlShortener(applicationProperties, idGenerationServiceClient, inMemoryRedirectionDao,
                 redirectionCache, mutableClock);
-        when(idGenerationServiceClient.getId()).thenReturn(ID);
+        when(idGenerationServiceClient.generateId()).thenReturn(ID);
     }
 
-    @Parameters(method = "longUrls")
-    @Test
+    @MethodSource("longUrls")
+    @ParameterizedTest
     public void validateShortenedUrlFormat(String longUrl) throws Exception {
         Redirection redirection = shortener.shorten(longUrl);
 
         assertThat(redirection).isNotNull();
-        Mockito.verify(idGenerationServiceClient).getId();
+        Mockito.verify(idGenerationServiceClient).generateId();
         assertThat(redirection.longUrl()).isEqualTo(longUrl);
         assertThat(redirection.id()).isEqualTo(ID);
     }
 
-    @Parameters(method = "longUrls")
-    @Test
+    @MethodSource("longUrls")
+    @ParameterizedTest
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) throws Exception {
         Redirection redirection = shortener.shorten(originalLongUrl);
         assertThat(shortener.expand(redirection.id()).get()).isEqualTo(originalLongUrl);
     }
 
     @SuppressWarnings("unused")
-    static Object[][] longUrls() {
-        return new Object[][]{
-                new Object[] {"http://google.com"},
-                new Object[] {"http://youtube.com"}
-        };
+    static List<Arguments> longUrls() {
+        return List.of(
+                Arguments.of("http://google.com"),
+                Arguments.of("http://youtube.com")
+        );
     }
 
     @Test
@@ -98,14 +100,14 @@ public class UrlShortenerTest {
         verifyZeroInteractions(inMemoryRedirectionDao);
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
             "60",
             "100",
             "1000"
     })
     public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
-        applicationProperties.put(ApplicationProperties.ANONYMOUS_URL_LIFETIME_SECONDS.name(),
+        applicationProperties.put("anonymousUrlLifetimeInSeconds",
                 String.valueOf(expiryInSeconds));
 
         Redirection redirection = shortener.shorten(LONG_URL);
@@ -114,8 +116,8 @@ public class UrlShortenerTest {
         assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
     }
 
-    @Test
-    @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
+    @ParameterizedTest
+    @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromDatabaseLazilyWhenRequestedForFirstTime(Duration duration) throws Exception {
         Redirection redirection = shortener.shorten(LONG_URL);
 
@@ -126,8 +128,8 @@ public class UrlShortenerTest {
         verify(inMemoryRedirectionDao).deleteById(redirection.id());
     }
 
-    @Test
-    @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
+    @ParameterizedTest
+    @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromCacheAndDatabaseLazilyWhenRequested(Duration duration) throws Exception {
         Redirection redirection = shortener.shorten(LONG_URL);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
@@ -140,17 +142,17 @@ public class UrlShortenerTest {
         verify(inMemoryRedirectionDao).deleteById(redirection.id());
     }
 
-    public Object[][] durationsGreaterThanOrEqualToOneMinute() {
-        return new Object[][] {
-                new Object[] {Duration.ofMinutes(1)},
-                new Object[] {Duration.ofMinutes(2)},
-                new Object[] {Duration.ofHours(1)},
-                new Object[] {Duration.ofDays(1)},
-        };
+    static List<Arguments> durationsGreaterThanOrEqualToOneMinute() {
+        return List.of(
+                Arguments.of(Duration.ofMinutes(1)),
+                Arguments.of(Duration.ofMinutes(2)),
+                Arguments.of(Duration.ofHours(1)),
+                Arguments.of(Duration.ofDays(1))
+        );
     }
 
-    @Test
-    @Parameters(method = "durationsGreaterThanOrEqualToOneMinute")
+    @ParameterizedTest
+    @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void returnsEmptyRedirectionWhenItIsExpired(Duration duration) throws Exception {
         Redirection redirection = shortener.shorten(LONG_URL);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));

@@ -1,11 +1,5 @@
 package org.npathai.api;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import org.assertj.core.data.Offset;
-import org.junit.Test;
-import org.npathai.AcceptanceTests;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UrlShortenerAPIAcceptanceTest {
