@@ -59,6 +59,8 @@ public class ObjectMother {
         Properties properties = new Properties();
         properties.put("anonymousUrlLifetimeInSeconds",
                 environment.getProperty("anonymousUrlLifetimeInSeconds", String.class).get());
+        properties.put("authenticatedUserUrlLifetimeInSeconds",
+                environment.getProperty("authenticatedUserUrlLifetimeInSeconds", String.class).get());
 
         return new UrlShortener(properties,
                 beanContext.getBean(IdGenerationServiceClient.class),
