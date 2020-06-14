@@ -2,7 +2,6 @@ package org.npathai;
 
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.Factory;
-import io.micronaut.context.env.Environment;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.cache.RedisRedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;

@@ -6,9 +6,7 @@ import org.npathai.model.Redirection;
 
 import javax.annotation.Nonnull;
 import java.sql.*;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 public class MySqlRedirectionDao implements RedirectionDao {
 
