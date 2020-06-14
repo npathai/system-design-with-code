@@ -5,6 +5,9 @@ micronaut:
     port: 8080
     cors:
       enabled: true
+    netty:
+      log-level: ERROR
+
 
 ---
 zookeeperUrl: zookeeper:2181

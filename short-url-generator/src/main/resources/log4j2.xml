@@ -6,7 +6,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Root name="org.npathai" level="INFO">
+        <Root level="ALL">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
