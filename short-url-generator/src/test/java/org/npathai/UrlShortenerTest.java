@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.InMemoryRedirectionDao;
@@ -55,7 +56,7 @@ public class UrlShortenerTest {
     @MethodSource("longUrls")
     @ParameterizedTest
     public void validateShortenedUrlFormat(String longUrl) throws Exception {
-        Redirection redirection = shortener.shorten(longUrl);
+        Redirection redirection = shorten(longUrl);
 
         assertThat(redirection).isNotNull();
         Mockito.verify(idGenerationServiceClient).generateId();
@@ -66,7 +67,7 @@ public class UrlShortenerTest {
     @MethodSource("longUrls")
     @ParameterizedTest
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) throws Exception {
-        Redirection redirection = shortener.shorten(originalLongUrl);
+        Redirection redirection = shorten(originalLongUrl);
         assertThat(shortener.expand(redirection.id()).get()).isEqualTo(originalLongUrl);
     }
 
@@ -80,7 +81,7 @@ public class UrlShortenerTest {
 
     @Test
     public void putsValueInCacheForFastAccess() throws Exception {
-        Redirection redirection = shortener.shorten(LONG_URL);
+        Redirection redirection = shorten(LONG_URL);
 
         shortener.expand(redirection.id());
 
@@ -89,7 +90,7 @@ public class UrlShortenerTest {
 
     @Test
     public void returnsValueFromFastCacheOnSubsequentCalls() throws Exception {
-        Redirection redirection = shortener.shorten(LONG_URL);
+        Redirection redirection = shorten(LONG_URL);
         reset(inMemoryRedirectionDao);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
@@ -110,7 +111,7 @@ public class UrlShortenerTest {
         applicationProperties.put("anonymousUrlLifetimeInSeconds",
                 String.valueOf(expiryInSeconds));
 
-        Redirection redirection = shortener.shorten(LONG_URL);
+        Redirection redirection = shorten(LONG_URL);
         long expiryTime = redirection.expiryTimeInMillis();
 
         assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
@@ -119,7 +120,7 @@ public class UrlShortenerTest {
     @ParameterizedTest
     @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromDatabaseLazilyWhenRequestedForFirstTime(Duration duration) throws Exception {
-        Redirection redirection = shortener.shorten(LONG_URL);
+        Redirection redirection = shorten(LONG_URL);
 
         mutableClock.advanceBy(duration);
 
@@ -131,7 +132,7 @@ public class UrlShortenerTest {
     @ParameterizedTest
     @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromCacheAndDatabaseLazilyWhenRequested(Duration duration) throws Exception {
-        Redirection redirection = shortener.shorten(LONG_URL);
+        Redirection redirection = shorten(LONG_URL);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         mutableClock.advanceBy(duration);
@@ -154,7 +155,7 @@ public class UrlShortenerTest {
     @ParameterizedTest
     @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void returnsEmptyRedirectionWhenItIsExpired(Duration duration) throws Exception {
-        Redirection redirection = shortener.shorten(LONG_URL);
+        Redirection redirection = shorten(LONG_URL);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         mutableClock.advanceBy(duration);
@@ -165,5 +166,11 @@ public class UrlShortenerTest {
     @Test
     public void returnsEmptyRedirectionForUnknownId() throws Exception {
         assertThat(shortener.expand("GFSFA")).isEmpty();
+    }
+
+    private Redirection shorten(String longUrl) throws Exception {
+        ShortenRequest shortenRequest = new ShortenRequest();
+        shortenRequest.setLongUrl(longUrl);
+        return shortener.shorten(shortenRequest);
     }
 }

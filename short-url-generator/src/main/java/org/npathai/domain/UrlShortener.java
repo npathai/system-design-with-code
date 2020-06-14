@@ -2,6 +2,7 @@ package org.npathai.domain;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.DataAccessException;
@@ -36,12 +37,12 @@ public class UrlShortener {
         this.clock = clock;
     }
 
-    public Redirection shorten(String longUrl) throws Exception {
+    public Redirection shorten(ShortenRequest shortenRequest) throws Exception {
         // Remote call
         String id = idGenerationServiceClient.generateId();
         long creationTime = clock.millis();
         long expiryTime = creationTime + lifetimeInMillis();
-        Redirection redirection = new Redirection(id, longUrl, creationTime, expiryTime);
+        Redirection redirection = new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime);
         dao.save(redirection);
         LOG.info("Created new redirection. " + redirection);
         return redirection;
