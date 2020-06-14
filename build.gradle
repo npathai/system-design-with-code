@@ -9,9 +9,8 @@ buildscript {
 }
 
 plugins {
-    id "net.ltgt.apt-eclipse" version "0.21"
-    id "com.github.johnrengelman.shadow" version "5.2.0"
-    id "application"
+    id "net.ltgt.apt-eclipse" version "0.21" apply false
+    id "com.github.johnrengelman.shadow" version "5.2.0" apply false
 }
 
 version "0.1"
@@ -26,9 +25,10 @@ def microserviceProjects() {
 }
 
 subprojects {
-    sourceCompatibility = 11
 
     apply plugin: "java"
+
+    sourceCompatibility = 11
 
     repositories {
         mavenCentral()
@@ -88,6 +88,8 @@ configure(microserviceProjects()) {
     apply plugin: 'application'
     apply plugin: 'com.github.johnrengelman.shadow'
 
+    mainClassName = "org.npathai.Application"
+
     dependencies {
         annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
         annotationProcessor "io.micronaut:micronaut-inject-java"
@@ -118,8 +120,6 @@ configure(microserviceProjects()) {
 // https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
         compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.31'
     }
-
-    mainClassName = "org.npathai.Application"
 
     shadowJar {
         mergeServiceFiles()
