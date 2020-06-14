@@ -1,14 +1,16 @@
 package org.npathai.domain;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@RunWith(JUnitParamsRunner.class)
 public class IdTest {
 
     @Test
@@ -26,8 +28,8 @@ public class IdTest {
         assertThat(Id.fromEncoded("AAAAB").encode()).isEqualTo("AAAAB");
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
             "AAAAA,AAAAB",
             "AAAAZ,AAAAa",
             "AAAAz,AAABA",
@@ -42,35 +44,35 @@ public class IdTest {
         assertThatThrownBy(() -> Id.fromEncoded("zzzzz").incrementAndGet()).isInstanceOf(IdExhaustedException.class);
     }
 
-    @Test
-    @Parameters(method = "dataFor_returnsIdIncrementedByNeededCount")
+    @ParameterizedTest
+    @MethodSource("dataFor_returnsIdIncrementedByNeededCount")
     public void returnsIdIncrementedByNeededCount(String currentId, int increment, String expectedId) throws IdExhaustedException {
         assertThat(Id.fromEncoded(currentId).incrementAndGet(increment).encode()).isEqualTo(expectedId);
     }
 
-    public Object[][] dataFor_returnsIdIncrementedByNeededCount() {
-        return new Object[][]{
-                new Object[] { "AAAAA", 0, "AAAAA"},
-                new Object[] { "AAAAA", 1, "AAAAB"},
-                new Object[] { "AAAAA", 2, "AAAAC"},
-                new Object[] { "AAAAA", 52, "AAABA"},
-                new Object[] { "zzzzy", 1, "zzzzz"},
-        };
+    public static List<Arguments> dataFor_returnsIdIncrementedByNeededCount() {
+        return List.of(
+                Arguments.of( "AAAAA", 0, "AAAAA"),
+                Arguments.of( "AAAAA", 1, "AAAAB"),
+                Arguments.of( "AAAAA", 2, "AAAAC"),
+                Arguments.of( "AAAAA", 52, "AAABA"),
+                Arguments.of( "zzzzy", 1, "zzzzz")
+        );
     }
 
-    @Test
-    @Parameters(method = "dataFor_throwsIdExhaustedExceptionWhenCountExceedsLimit")
+    @ParameterizedTest
+    @MethodSource("dataFor_throwsIdExhaustedExceptionWhenCountExceedsLimit")
     public void throwsIdExhaustedExceptionWhenCountExceedsLimit(String currentId, int increment) {
         assertThatThrownBy(() -> Id.fromEncoded(currentId).incrementAndGet(increment))
                 .isInstanceOf(IdExhaustedException.class);
     }
 
-    public Object[][] dataFor_throwsIdExhaustedExceptionWhenCountExceedsLimit() {
-        return new Object[][]{
-                new Object[] { "zzzzA", 52},
-                new Object[] { "zzzzy", 2},
-                new Object[] { "zzzzy", 3},
-                new Object[] { "zzzza", 52},
-        };
+    public static List<Arguments> dataFor_throwsIdExhaustedExceptionWhenCountExceedsLimit() {
+        return List.of(
+                Arguments.of( "zzzzA", 52),
+                Arguments.of( "zzzzy", 2),
+                Arguments.of( "zzzzy", 3),
+                Arguments.of( "zzzza", 52)
+        );
     }
 }

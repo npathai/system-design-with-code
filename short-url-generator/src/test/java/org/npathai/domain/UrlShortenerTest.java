@@ -1,4 +1,4 @@
-package org.npathai;
+package org.npathai.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +14,6 @@ import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.dao.InMemoryRedirectionDao;
-import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
 import org.npathai.util.time.MutableClock;
 
