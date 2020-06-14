@@ -11,6 +11,7 @@ class UserProvider extends React.Component {
             user: ""
         }
         this.setLoggedInUser = this.setLoggedInUser.bind(this)
+        this.addAuthorizationHeader = this.addAuthorizationHeader.bind(this)
     }
 
     setLoggedInUser(data) {
@@ -28,12 +29,19 @@ class UserProvider extends React.Component {
         console.log("tokenType: " + tokenType)
     }
 
+    addAuthorizationHeader(headers) {
+        const {isLoggedIn, accessToken, tokenType} = this.state
+        if (isLoggedIn) {
+            headers["Authorization"] = tokenType + " " + accessToken
+        }
+    }
+
     render() {
         const { user } = this.state
-        const { setLoggedInUser } = this
+        const { setLoggedInUser, addAuthorizationHeader } = this
         const {isLoggedIn} = this.state
         return (
-            <AuthContext.Provider value={{user, setLoggedInUser, isLoggedIn}}>
+            <AuthContext.Provider value={{user, setLoggedInUser, isLoggedIn, addAuthorizationHeader}}>
                 {this.props.children}
             </AuthContext.Provider>
         );

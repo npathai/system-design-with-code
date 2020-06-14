@@ -45,11 +45,15 @@ class Shortener extends React.Component {
 
     postLongUrl() {
         console.log(this.context)
+        const headers = {
+            'Content-Type': 'application/json'
+        }
+        const {addAuthorizationHeader} = this.context
+        addAuthorizationHeader(headers)
+
         fetch("http://localhost:4000/shorten", {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             mode: 'cors',
             body: JSON.stringify({
                 longUrl: this.state.longUrl,
