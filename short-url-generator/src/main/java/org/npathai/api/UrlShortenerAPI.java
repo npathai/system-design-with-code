@@ -26,7 +26,7 @@ public class UrlShortenerAPI {
     @Post
     @Produces(MediaType.APPLICATION_JSON)
     public String shorten(@Nullable Principal principal, @Body ShortenRequest shortenRequest) throws Exception {
-        System.out.println("Principal >>>>>>>>>>>>" + principal);
+        shortenRequest.setPrincipal(principal);
         Redirection redirection = shortener.shorten(shortenRequest);
         return jsonFor(redirection);
     }

@@ -1,6 +1,7 @@
 package org.npathai;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,6 +18,7 @@ import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
 import org.npathai.util.time.MutableClock;
 
+import java.security.Principal;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +58,7 @@ public class UrlShortenerTest {
     @MethodSource("longUrls")
     @ParameterizedTest
     public void validateShortenedUrlFormat(String longUrl) throws Exception {
-        Redirection redirection = shorten(longUrl);
+        Redirection redirection = shortenAnonymously(longUrl);
 
         assertThat(redirection).isNotNull();
         Mockito.verify(idGenerationServiceClient).generateId();
@@ -67,7 +69,7 @@ public class UrlShortenerTest {
     @MethodSource("longUrls")
     @ParameterizedTest
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) throws Exception {
-        Redirection redirection = shorten(originalLongUrl);
+        Redirection redirection = shortenAnonymously(originalLongUrl);
         assertThat(shortener.expand(redirection.id()).get()).isEqualTo(originalLongUrl);
     }
 
@@ -81,7 +83,7 @@ public class UrlShortenerTest {
 
     @Test
     public void putsValueInCacheForFastAccess() throws Exception {
-        Redirection redirection = shorten(LONG_URL);
+        Redirection redirection = shortenAnonymously(LONG_URL);
 
         shortener.expand(redirection.id());
 
@@ -90,7 +92,7 @@ public class UrlShortenerTest {
 
     @Test
     public void returnsValueFromFastCacheOnSubsequentCalls() throws Exception {
-        Redirection redirection = shorten(LONG_URL);
+        Redirection redirection = shortenAnonymously(LONG_URL);
         reset(inMemoryRedirectionDao);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
@@ -101,26 +103,51 @@ public class UrlShortenerTest {
         verifyZeroInteractions(inMemoryRedirectionDao);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "60",
-            "100",
-            "1000"
-    })
-    public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
-        applicationProperties.put("anonymousUrlLifetimeInSeconds",
-                String.valueOf(expiryInSeconds));
+    @Nested
+    class AnonymousUser {
 
-        Redirection redirection = shorten(LONG_URL);
-        long expiryTime = redirection.expiryTimeInMillis();
+        @ParameterizedTest
+        @CsvSource({
+                "60",
+                "100",
+                "1000"
+        })
+        public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
+            applicationProperties.put("anonymousUrlLifetimeInSeconds",
+                    String.valueOf(expiryInSeconds));
 
-        assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
+            Redirection redirection = shortenAnonymously(LONG_URL);
+            long expiryTime = redirection.expiryTimeInMillis();
+
+            assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
+        }
+    }
+
+    @Nested
+    class AuthenticatedUser {
+
+        @ParameterizedTest
+        @CsvSource({
+                "60",
+                "100",
+                "1000"
+        })
+        public void redirectionExpiresAfterConfiguredDuration(int expiryInSeconds) throws Exception {
+            applicationProperties.put("authenticatedUserUrlLifetimeInSeconds",
+                    String.valueOf(expiryInSeconds));
+
+            Redirection redirection = shortenAuthenticated(LONG_URL);
+
+            long expiryTime = redirection.expiryTimeInMillis();
+
+            assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
+        }
     }
 
     @ParameterizedTest
     @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromDatabaseLazilyWhenRequestedForFirstTime(Duration duration) throws Exception {
-        Redirection redirection = shorten(LONG_URL);
+        Redirection redirection = shortenAnonymously(LONG_URL);
 
         mutableClock.advanceBy(duration);
 
@@ -132,7 +159,7 @@ public class UrlShortenerTest {
     @ParameterizedTest
     @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void deletesExpiredUrlsFromCacheAndDatabaseLazilyWhenRequested(Duration duration) throws Exception {
-        Redirection redirection = shorten(LONG_URL);
+        Redirection redirection = shortenAnonymously(LONG_URL);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         mutableClock.advanceBy(duration);
@@ -155,7 +182,7 @@ public class UrlShortenerTest {
     @ParameterizedTest
     @MethodSource("durationsGreaterThanOrEqualToOneMinute")
     public void returnsEmptyRedirectionWhenItIsExpired(Duration duration) throws Exception {
-        Redirection redirection = shorten(LONG_URL);
+        Redirection redirection = shortenAnonymously(LONG_URL);
         when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
 
         mutableClock.advanceBy(duration);
@@ -168,9 +195,18 @@ public class UrlShortenerTest {
         assertThat(shortener.expand("GFSFA")).isEmpty();
     }
 
-    private Redirection shorten(String longUrl) throws Exception {
+    private Redirection shortenAnonymously(String longUrl) throws Exception {
         ShortenRequest shortenRequest = new ShortenRequest();
         shortenRequest.setLongUrl(longUrl);
         return shortener.shorten(shortenRequest);
     }
+
+    private Redirection shortenAuthenticated(String longUrl) throws Exception {
+        ShortenRequest shortenRequest = new ShortenRequest();
+        shortenRequest.setLongUrl(longUrl);
+        shortenRequest.setPrincipal(Mockito.mock(Principal.class));
+        return shortener.shorten(shortenRequest);
+    }
+
+
 }

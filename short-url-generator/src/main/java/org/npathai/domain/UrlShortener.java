@@ -41,16 +41,18 @@ public class UrlShortener {
         // Remote call
         String id = idGenerationServiceClient.generateId();
         long creationTime = clock.millis();
-        long expiryTime = creationTime + lifetimeInMillis();
+        long expiryTime = creationTime + lifetimeInMillis(shortenRequest.isAnonymous());
         Redirection redirection = new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime);
         dao.save(redirection);
         LOG.info("Created new redirection. " + redirection);
         return redirection;
     }
 
-    private long lifetimeInMillis() {
-        return Duration.ofSeconds(Integer.parseInt(applicationProperties.getProperty(
-                "anonymousUrlLifetimeInSeconds"))).toMillis();
+    private long lifetimeInMillis(boolean isAnonymous) {
+        String lifetimeProperty = isAnonymous ? "anonymousUrlLifetimeInSeconds"
+                : "authenticatedUserUrlLifetimeInSeconds";
+
+        return Duration.ofSeconds(Integer.parseInt(applicationProperties.getProperty(lifetimeProperty))).toMillis();
     }
 
     public Optional<Redirection> getById(String id) throws DataAccessException {

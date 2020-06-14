@@ -28,6 +28,7 @@ zookeeperUrl: zookeeper:2181
 redisUrl: redis://redis-cache:6379
 ---
 anonymousUrlLifetimeInSeconds: 60
+authenticatedUserUrlLifetimeInSeconds: 120
 ---
 
 mysql:
