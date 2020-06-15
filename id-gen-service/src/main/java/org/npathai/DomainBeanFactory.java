@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Factory
-public class ObjectMother {
+public class DomainBeanFactory {
 
     @Inject
     BeanContext beanContext;

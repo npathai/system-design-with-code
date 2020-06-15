@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.time.Clock;
 
 @Factory
-public class ObjectMother {
+public class DomainBeanFactory {
 
     @Inject
     BeanContext beanContext;
