@@ -15,22 +15,15 @@ public class BatchedIdGeneratorTest {
     }
 
     @Test
-    public void validateShortenedUrlFormat() {
+    public void validateIdFormat() {
         assertThat(batchIdGenerator.generate(1).ids().iterator().next()).hasSize(5);
     }
 
     @Test
-    public void returnsUniqueUrl() {
+    public void returnsBatchWithUniqueIds() {
         Batch batch = batchIdGenerator.generate(1000);
 
         // If all were unique then set should have all unique values
         assertThat(batch.ids()).hasSize(1000);
-    }
-
-    @Test
-    public void returnsNextIdToBeGenerated() throws IdExhaustedException {
-        Batch batch = batchIdGenerator.generate(1);
-
-        assertThat(batch.nextId().encode()).isEqualTo(Id.first().incrementAndGet().encode());
     }
 }

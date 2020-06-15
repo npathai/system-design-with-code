@@ -26,10 +26,11 @@ public class IdGenerationService {
     }
 
     public String nextId() {
+        String id = cachedIds.poll();
         if (cachedIds.size() < 5) {
             triggerHydrationAsync();
         }
-        return cachedIds.poll();
+        return id;
     }
 
     private Future<?> triggerHydrationAsync() {

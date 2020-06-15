@@ -6,6 +6,8 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.TimeUnit;
+
 public class DefaultZkManagerFactory {
     private static final Logger LOG = LogManager.getLogger(DefaultZkManagerFactory.class);
 
@@ -14,7 +16,6 @@ public class DefaultZkManagerFactory {
                 new ExponentialBackoffRetry(1000, 3));
         LOG.info("Connecting to Zookeeper using connection string: {}", connectionString);
         client.start();
-        client.blockUntilConnected();
         LOG.info("Connected to Zookeeper");
         return new DefaultZkManager(client);
     }
