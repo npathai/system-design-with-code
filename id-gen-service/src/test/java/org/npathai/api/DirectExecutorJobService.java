@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
-import org.npathai.ScheduledJobService;
+import org.npathai.util.thread.ScheduledJobService;
 import org.npathai.annotations.TestingUtil;
 
 import java.util.concurrent.Callable;

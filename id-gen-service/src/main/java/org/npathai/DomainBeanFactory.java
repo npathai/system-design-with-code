@@ -4,6 +4,8 @@ import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.Factory;
 import org.npathai.config.ZookeeperConfiguration;
 import org.npathai.domain.IdGenerationService;
+import org.npathai.util.thread.DefaultScheduledJobService;
+import org.npathai.util.thread.ScheduledJobService;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
 import org.npathai.zookeeper.ZkManager;
 
@@ -27,5 +29,10 @@ public class DomainBeanFactory {
     public IdGenerationService idGenerationService() throws Exception {
         return new IdGenerationService(beanContext.getBean(ZkManager.class),
                 beanContext.getBean(ScheduledJobService.class));
+    }
+
+    @Singleton
+    public ScheduledJobService defaultScheduledJobServiceService() {
+        return new DefaultScheduledJobService();
     }
 }

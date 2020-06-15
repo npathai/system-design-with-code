@@ -1,4 +1,4 @@
-package org.npathai;
+package org.npathai.util.thread;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
