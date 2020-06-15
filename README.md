@@ -1,7 +1,7 @@
 # system-design-with-code :computer:
 System design not just on whiteboard, but with code.
 
-[![Build Status](https://travis-ci.org/npathai/system-design-with-code.svg?branch=master)](https://travis-ci.org/npathai/system-design-with-code)
+[![Build Status](https://api.travis-ci.org/npathai/system-design-with-code.svg?branch=master)](https://travis-ci.org/npathai/system-design-with-code)
 
 ## Why this repository?
 This repository represents an effort to learn System Design by experimenting, failing-fast, learning from that experince and providing all the fellow developers a wealth of knowledge in terms of source code.
