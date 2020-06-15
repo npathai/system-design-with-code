@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.npathai.api.DirectExecutorJobService;
-import org.npathai.api.TestingZkManager;
+import org.npathai.zookeeper.TestingZkManager;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
