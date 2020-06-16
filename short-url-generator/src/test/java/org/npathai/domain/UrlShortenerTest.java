@@ -14,6 +14,7 @@ import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.config.UrlLifetimeConfiguration;
+import org.npathai.dao.DataAccessException;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.model.Redirection;
 import org.npathai.util.time.MutableClock;
@@ -31,6 +32,7 @@ public class UrlShortenerTest {
 
     public static final String LONG_URL = "http://google.com";
     public static final String ID = "AAAAA";
+    public static final String UNKNOWN_ID = "GFSFA";
 
     private UrlLifetimeConfiguration urlLifetimeConfiguration = new UrlLifetimeConfiguration();
 
@@ -189,7 +191,12 @@ public class UrlShortenerTest {
 
     @Test
     public void returnsEmptyRedirectionForUnknownId() throws Exception {
-        assertThat(shortener.expand("GFSFA")).isEmpty();
+        assertThat(shortener.expand(UNKNOWN_ID)).isEmpty();
+    }
+
+    @Test
+    public void returnsEmptyRedirectionWhenGettingById() throws DataAccessException {
+        assertThat(shortener.getById(UNKNOWN_ID)).isEmpty();
     }
 
     private Redirection shortenAnonymously(String longUrl) throws Exception {
