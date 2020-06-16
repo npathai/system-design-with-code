@@ -10,9 +10,9 @@ public class Redirection {
     private long createdAtMillis;
     private long expiryTimeInMillis;
 
-    public Redirection(String id, String lonUrl, long createdAtMillis, long expiryTimeInMillis) {
+    public Redirection(String id, String longUrl, long createdAtMillis, long expiryTimeInMillis) {
         this.id = id;
-        this.longUrl = lonUrl;
+        this.longUrl = longUrl;
         this.createdAtMillis = createdAtMillis;
         this.expiryTimeInMillis = expiryTimeInMillis;
     }

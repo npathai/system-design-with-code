@@ -110,6 +110,9 @@ configure(microserviceProjects()) {
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
         testImplementation("org.junit.jupiter:junit-jupiter-params")
         implementation "io.micronaut:micronaut-discovery-client"
+        // https://mvnrepository.com/artifact/org.unitils/unitils-core
+        testCompile group: 'org.unitils', name: 'unitils-core', version: '3.4.6'
+
 
         compile group: 'com.eclipsesource.minimal-json', name: 'minimal-json', version: '0.9.5'
         // https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-client

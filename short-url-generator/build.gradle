@@ -7,4 +7,9 @@ dependencies {
     compile group: 'redis.clients', name: 'jedis', version: '3.3.0'
 
     implementation "io.micronaut:micronaut-security-jwt"
+
+    testCompile platform('org.testcontainers:testcontainers-bom:1.14.3') //import bom
+    testCompile "org.testcontainers:testcontainers"
+    testCompile "org.testcontainers:mysql"
+    testCompile "org.testcontainers:junit-jupiter"
 }
