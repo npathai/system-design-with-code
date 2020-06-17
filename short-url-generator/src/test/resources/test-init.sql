@@ -1,8 +1,3 @@
-CREATE DATABASE IF NOT EXISTS short_url_generator;
-
-ALTER USER 'root' IDENTIFIED BY 'unsecured';
-GRANT ALL PRIVILEGES ON urldb.* TO 'root'@'%';
-GRANT ALL PRIVILEGES ON urldb.* TO 'root'@'localhost';
 
 USE short_url_generator;
 
@@ -16,4 +11,4 @@ CREATE TABLE redirection(
     created_at TIMESTAMP(3) NOT NULL,
     expiry_at TIMESTAMP(3) NOT NULL,
     PRIMARY KEY(id)
-)
+);
