@@ -1,0 +1,12 @@
+dependencies {
+    compile project(":common-goodies")
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.20'
+
+    implementation "io.micronaut:micronaut-security-jwt"
+
+    testCompile platform('org.testcontainers:testcontainers-bom:1.14.3') //import bom
+    testCompile "org.testcontainers:testcontainers"
+    testCompile "org.testcontainers:mysql"
+    testCompile "org.testcontainers:junit-jupiter"
+}

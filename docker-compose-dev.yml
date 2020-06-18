@@ -13,6 +13,17 @@ services:
       - ./init:/docker-entrypoint-initdb.d/:ro
 #          - D:\DATA\MYSQL:/var/lib/mysql
 
+  userdb:
+    container_name: userdb
+    image: mysql
+    ports:
+      # HOST:CONTAINER
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=unsecured
+      - MYSQL_DATABASE=user_db
+    volumes:
+      - ./user-service/init:/docker-entrypoint-initdb.d/:ro
 
   zookeeper:
     container_name: zooKeeper
@@ -39,7 +50,7 @@ services:
     ports:
       - "8080"
     volumes:
-    - ./id-gen-service/build/libs/id-gen-service-all.jar:/app.jar
+      - ./id-gen-service/build/libs/id-gen-service-all.jar:/app.jar
     depends_on:
       - zookeeper
       - consul
@@ -49,12 +60,21 @@ services:
     ports:
       - "8080"
     volumes:
-    - ./short-url-generator/build/libs/short-url-generator-all.jar:/app.jar
+      - ./short-url-generator/build/libs/short-url-generator-all.jar:/app.jar
     depends_on:
       - zookeeper
       - db
       - redis-cache
       - consul
+
+  user-service:
+    image: user-service:latest
+    ports:
+      - "8080"
+    volumes:
+      - ./user-service/build/libs/user-service-all.jar:/app.jar
+    depends_on:
+      - userdb
 
   nginx:
     image: nginx:latest

@@ -18,7 +18,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
 
     // FIXME constructor is doing real work
     // FIXME use connection pooling
-    public MySqlRedirectionDao(MySqlDatasourceConfiguration mySqlDatasourceConfiguration) throws SQLException {
+    public MySqlRedirectionDao(MySqlDatasourceConfiguration mySqlDatasourceConfiguration) {
         dataSource = new MysqlDataSource();
         dataSource.setUser(mySqlDatasourceConfiguration.getUser());
         dataSource.setPassword(mySqlDatasourceConfiguration.getPassword());

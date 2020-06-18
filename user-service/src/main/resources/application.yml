@@ -1,6 +1,6 @@
 micronaut:
   application:
-    name: short-url-generator
+    name: user-service
   server:
     port: 8080
     cors:
@@ -14,11 +14,11 @@ micronaut:
     enabled: true
     endpoints:
       login:
-        enabled: false
+        enabled: true
       logout:
-        enabled: false
+        enabled: true
       oauth:
-        enabled: false
+        enabled: true
     token:
       jwt:
         enabled: true
@@ -27,19 +27,9 @@ micronaut:
             generator:
               secret: "${JWT_GENERATOR_SIGNATURE_SECRET:ThisIsHighlySensitiveInformation}"
 ---
-zookeeper:
-  url: zookeeper:2181
----
-redis:
-  url: redis://redis-cache:6379
----
-url-lifetime-in-secs:
-  anonymous: 60
-  authenticated: 120
----
 
 mysql:
-  url: jdbc:mysql://db:3306/short_url_generator
+  url: jdbc:mysql://userdb:3306/user_db
   user: root
   password: unsecured
 
