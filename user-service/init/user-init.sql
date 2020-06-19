@@ -16,7 +16,8 @@ password VARCHAR(100) NOT NULL,
 email VARCHAR(100)
 );
 
-INSERT INTO users VALUES(UUID_TO_BIN(UUID(), true), 'root', 'root', NULL);
+INSERT INTO users VALUES(UUID_TO_BIN(UUID(), true), 'root',
+'$2a$09$C75xhHFSNwj0GV6STPWTqOgZ2qYpvH88QxGXbxWUF/kC0qgfJAEI.', NULL);
 
 
 COMMIT;

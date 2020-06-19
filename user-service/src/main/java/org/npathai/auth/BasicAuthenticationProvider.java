@@ -1,5 +1,6 @@
 package org.npathai.auth;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import io.micronaut.security.authentication.*;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
@@ -43,9 +44,17 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
         }
 
         User user = optionalUser.get();
-        if (authenticationRequest.getSecret().equals(user.getPassword())) {
+        if (validateCredentials(authenticationRequest, user)) {
             return Flowable.just(new UserDetails(user.getUsername(), new ArrayList<>()));
         }
         return Flowable.just(new AuthenticationFailed());
+    }
+
+    /**
+     * Uses bcrypt cryptographic hash for calculating and validating password hash
+     */
+    private boolean validateCredentials(AuthenticationRequest authenticationRequest, User user) {
+        return BCrypt.verifyer().verify(String.valueOf(authenticationRequest.getSecret()).toCharArray(),
+                user.getPassword()).verified;
     }
 }

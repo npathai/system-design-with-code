@@ -9,7 +9,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.unitils.reflectionassert.ReflectionAssert;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +27,7 @@ class MySqlUserDaoTest {
     private MySqlUserDao dao;
 
     @BeforeEach
-    public void setUp() throws SQLException {
+    public void setUp() {
         MySqlDatasourceConfiguration configuration = new MySqlDatasourceConfiguration();
         configuration.setUser("testUser");
         configuration.setPassword("unsecured");
@@ -41,7 +40,7 @@ class MySqlUserDaoTest {
     public void canGetRootUser() throws DataAccessException {
         User rootUser = new User();
         rootUser.setUsername("root");
-        rootUser.setPassword("root");
+        rootUser.setPassword("$2a$09$C75xhHFSNwj0GV6STPWTqOgZ2qYpvH88QxGXbxWUF/kC0qgfJAEI.");
 
         Optional<User> optionalRoot = dao.getUserByName("root");
         assertThat(optionalRoot).isNotEmpty();

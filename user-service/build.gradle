@@ -9,4 +9,6 @@ dependencies {
     testCompile "org.testcontainers:testcontainers"
     testCompile "org.testcontainers:mysql"
     testCompile "org.testcontainers:junit-jupiter"
+
+    implementation 'at.favre.lib:bcrypt:0.9.0'
 }
