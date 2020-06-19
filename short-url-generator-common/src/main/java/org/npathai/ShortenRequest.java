@@ -1,4 +1,4 @@
-package org.npathai.api;
+package org.npathai;
 
 import java.security.Principal;
 
@@ -24,5 +24,13 @@ public class ShortenRequest {
 
     public boolean isAnonymous() {
         return principal == null;
+    }
+
+    @Override
+    public String toString() {
+        return "ShortenRequest{" +
+                "longUrl='" + longUrl + '\'' +
+                ", principal=" + principal +
+                '}';
     }
 }

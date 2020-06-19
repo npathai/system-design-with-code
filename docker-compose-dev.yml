@@ -76,6 +76,13 @@ services:
     depends_on:
       - userdb
 
+  api-gateway:
+    image: api-gateway:latest
+    ports:
+      - "8080"
+    volumes:
+      - ./api-gateway/build/libs/api-gateway-all.jar:/app.jar
+
   nginx:
     image: nginx:latest
     volumes:

@@ -1,0 +1,6 @@
+dependencies {
+    compile project(":common-goodies")
+    compile project(":user-service-common")
+    compile project(":short-url-generator-common")
+    implementation "io.micronaut:micronaut-security-jwt"
+}

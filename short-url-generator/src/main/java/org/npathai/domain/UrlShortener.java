@@ -2,7 +2,7 @@ package org.npathai.domain;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.npathai.api.ShortenRequest;
+import org.npathai.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.config.UrlLifetimeConfiguration;

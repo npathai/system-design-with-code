@@ -1,5 +1,7 @@
 dependencies {
     compile project(":common-goodies")
+    compile project(":short-url-generator-common")
+
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.20'
 

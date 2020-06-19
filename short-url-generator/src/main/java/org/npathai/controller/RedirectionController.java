@@ -6,13 +6,14 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.npathai.RedirectionOperations;
 import org.npathai.domain.UrlShortener;
 
 import java.net.URI;
 import java.util.Optional;
 
 @Controller
-public class RedirectionController {
+public class RedirectionController implements RedirectionOperations {
     private static final Logger LOG = LogManager.getLogger(RedirectionController.class);
 
     private final UrlShortener urlShortener;
@@ -21,8 +22,7 @@ public class RedirectionController {
         this.urlShortener = urlShortener;
     }
 
-    @Secured("isAnonymous()")
-    @Get("/{id}")
+    @Override
     public HttpResponse<String> handle(String id) throws Exception {
         try {
             LOG.info("Request received for expanding id: " + id);
@@ -30,7 +30,7 @@ public class RedirectionController {
             if (redirection.isEmpty()) {
                 return HttpResponse.notFound();
             }
-            return HttpResponse.redirect(URI.create(redirection.get()));
+            return HttpResponse.ok(redirection.get());
         } catch (Exception ex) {
             LOG.error(ex);
             throw ex;

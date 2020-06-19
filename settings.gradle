@@ -1,1 +1,1 @@
-include 'short-url-generator', 'id-gen-service', 'common-goodies','user-service'
+include 'short-url-generator-common', 'short-url-generator', 'id-gen-service', 'common-goodies','user-service-common', 'user-service', 'api-gateway'

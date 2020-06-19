@@ -1,30 +1,25 @@
 package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Produces;
-import io.micronaut.security.annotation.Secured;
+import org.npathai.ShortenRequest;
+import org.npathai.UrlShortenerOperations;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
 
 import javax.annotation.Nullable;
 import java.security.Principal;
 
-
-@Controller("/shorten")
-public class UrlShortenerAPI {
+@Controller
+public class UrlShortenerAPI implements UrlShortenerOperations {
     private final UrlShortener shortener;
 
     public UrlShortenerAPI(UrlShortener shortener) {
         this.shortener = shortener;
     }
 
-    @Secured("isAnonymous()")
-    @Post
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public String shorten(@Nullable Principal principal, @Body ShortenRequest shortenRequest) throws Exception {
         shortenRequest.setPrincipal(principal);
         Redirection redirection = shortener.shorten(shortenRequest);
