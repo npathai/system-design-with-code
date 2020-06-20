@@ -101,7 +101,8 @@ configure(microserviceProjects()) {
         implementation "javax.annotation:javax.annotation-api"
         implementation "io.micronaut:micronaut-http-server-netty"
         implementation "io.micronaut:micronaut-http-client"
-        runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
+        runtimeOnly "org.apache.logging.log4j:log4j-api:2.12.1"
+        runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
         testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
         testAnnotationProcessor "io.micronaut:micronaut-inject-java"
         testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
