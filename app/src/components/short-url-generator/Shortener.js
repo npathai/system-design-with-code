@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import {AuthContext} from "../../context/AuthContext";
 
 class Shortener extends React.Component {
@@ -59,10 +59,17 @@ class Shortener extends React.Component {
                 longUrl: this.state.longUrl,
             })
         })
-            .then(res => res.json())
+            .then(res => {
+                if (res.status !== 200) {
+                    throw new Error("Received response with status: " + res.status)
+                }
+                return res.json()
+            })
             .then(data => this.setState({shortUrl: "http://localhost:4000/" + data.id}))
             // We can do better error handling than this!
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err)
+            });
     }
 
     copyToClipboard() {
