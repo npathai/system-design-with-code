@@ -45,7 +45,7 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
 
         User user = optionalUser.get();
         if (validateCredentials(authenticationRequest, user)) {
-            return Flowable.just(new UserDetails(user.getUsername(), new ArrayList<>()));
+            return Flowable.just(new CustomUserDetails(user.getUsername(), new ArrayList<>(), user.getId()));
         }
         return Flowable.just(new AuthenticationFailed());
     }

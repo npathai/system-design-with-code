@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class MySqlUserDao implements UserDao {
-    private static final String SELECT_BY_NAME_SQL = "select username, password, email from users where username=?";
+    private static final String SELECT_BY_NAME_SQL = "select username, password, email, BIN_TO_UUID(id, true) as uid "
+            + "from users where username=?";
 
     private final MysqlDataSource dataSource;
 
@@ -48,6 +49,7 @@ public class MySqlUserDao implements UserDao {
         user.setUsername(resultSet.getString("username"));
         user.setEmail(resultSet.getString("email"));
         user.setPassword(resultSet.getString("password"));
+        user.setId(resultSet.getString("uid"));
         return user;
     }
 }
