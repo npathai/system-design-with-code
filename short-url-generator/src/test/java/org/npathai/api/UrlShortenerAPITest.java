@@ -2,17 +2,11 @@ package org.npathai.api;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
+import com.nimbusds.jose.JOSEException;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.security.authentication.UsernamePasswordCredentials;
-import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
@@ -25,13 +19,12 @@ import org.npathai.cache.RedirectionCache;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
+import org.npathai.util.JWTCreator;
 import org.npathai.zookeeper.TestingZkManager;
 import org.npathai.zookeeper.ZkManager;
 
 import javax.inject.Inject;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,22 +82,8 @@ class UrlShortenerAPITest {
     }
 
     private String createJwtToken() throws JOSEException {
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
-                .type(JOSEObjectType.JWT)
-                .build();
-        JWTClaimsSet payload = new JWTClaimsSet.Builder()
-                .issuer("test-api")
-                .subject("root")
-                .claim("uid", "78e98faa-b502-11ea-a146-0242ac190002")
-                .expirationTime(Date.from(Instant.now().plusSeconds(120)))
-                .build();
-
-        SignedJWT signedJWT = new SignedJWT(header, payload);
-        MACSigner macSigner = new MACSigner(secretSignatureConfiguration.getSecret());
-        signedJWT.sign(macSigner);
-
-        System.out.println(signedJWT.serialize());
-        return signedJWT.serialize();
+        return new JWTCreator(secretSignatureConfiguration.getSecret())
+                .createJwtForRoot().serialize();
     }
 
     private static void assertCreatedResponse(String response, Duration expectedLifetime) {
