@@ -71,7 +71,7 @@ public class UrlShortener {
             }
 
             LOG.info(String.format("Expiry Time: %s <= %s",
-                    new Timestamp(cachedRedirection.get().expiryTimeInMillis()),
+                    new Timestamp(cachedRedirection.get().expiryAtMillis()),
                     new Timestamp(clock.millis())));
             LOG.info("Redirection with id: " + id + " found in cache & is expired.");
 
@@ -91,7 +91,7 @@ public class UrlShortener {
         Redirection redirection = optionalRedirection.get();
         if (redirection.isExpired(clock)) {
             LOG.info(String.format("Expiry Time: %s <= %s",
-                    new Timestamp(redirection.expiryTimeInMillis()),
+                    new Timestamp(redirection.expiryAtMillis()),
                     new Timestamp(clock.millis())));
             LOG.info("Redirection with id: " + id + " is expired.");
             dao.deleteById(id);

@@ -8,13 +8,13 @@ public class Redirection {
     private String id;
     private final String longUrl;
     private long createdAtMillis;
-    private long expiryTimeInMillis;
+    private long expiryAtMillis;
 
-    public Redirection(String id, String longUrl, long createdAtMillis, long expiryTimeInMillis) {
+    public Redirection(String id, String longUrl, long createdAtMillis, long expiryAtMillis) {
         this.id = id;
         this.longUrl = longUrl;
         this.createdAtMillis = createdAtMillis;
-        this.expiryTimeInMillis = expiryTimeInMillis;
+        this.expiryAtMillis = expiryAtMillis;
     }
 
     public String id() {
@@ -25,7 +25,7 @@ public class Redirection {
         return longUrl;
     }
 
-    public long createdAt() {
+    public long createdAtMillis() {
         return createdAtMillis;
     }
 
@@ -42,12 +42,12 @@ public class Redirection {
         return Objects.hash(id);
     }
 
-    public long expiryTimeInMillis() {
-        return expiryTimeInMillis;
+    public long expiryAtMillis() {
+        return expiryAtMillis;
     }
 
     public boolean isExpired(Clock clock) {
-        return expiryTimeInMillis <= clock.millis();
+        return expiryAtMillis <= clock.millis();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Redirection {
                 "id='" + id + '\'' +
                 ", longUrl='" + longUrl + '\'' +
                 ", createdAt=" + new Timestamp(createdAtMillis) +
-                ", expiresAt=" + new Timestamp(expiryTimeInMillis) +
+                ", expiresAt=" + new Timestamp(expiryAtMillis) +
                 '}';
     }
 }

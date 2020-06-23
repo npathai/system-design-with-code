@@ -1,10 +1,12 @@
 package org.npathai.api;
 
-import java.security.Principal;
+import org.npathai.model.UserInfo;
+
+import javax.annotation.Nullable;
 
 public class ShortenRequest {
     private String longUrl;
-    private Principal principal;
+    private UserInfo userInfo;
 
     public String getLongUrl() {
         return longUrl;
@@ -14,15 +16,16 @@ public class ShortenRequest {
         this.longUrl = longUrl;
     }
 
-    public Principal getPrincipal() {
-        return principal;
+    @Nullable
+    public UserInfo getUserInfo() {
+        return userInfo;
     }
 
-    public void setPrincipal(Principal principal) {
-        this.principal = principal;
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
     public boolean isAnonymous() {
-        return principal == null;
+        return userInfo == null;
     }
 }

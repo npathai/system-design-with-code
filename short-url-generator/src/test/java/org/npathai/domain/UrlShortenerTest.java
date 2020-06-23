@@ -17,12 +17,13 @@ import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.DataAccessException;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.model.Redirection;
+import org.npathai.model.UserInfo;
 import org.npathai.util.time.MutableClock;
 
-import java.security.Principal;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -117,9 +118,9 @@ public class UrlShortenerTest {
             urlLifetimeConfiguration.setAnonymous(String.valueOf(expiryInSeconds));
 
             Redirection redirection = shortenAnonymously(LONG_URL);
-            long expiryTime = redirection.expiryTimeInMillis();
+            long expiryTime = redirection.expiryAtMillis();
 
-            assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
+            assertThat(expiryTime - redirection.createdAtMillis()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
         }
     }
 
@@ -137,9 +138,9 @@ public class UrlShortenerTest {
 
             Redirection redirection = shortenAuthenticated(LONG_URL);
 
-            long expiryTime = redirection.expiryTimeInMillis();
+            long expiryTime = redirection.expiryAtMillis();
 
-            assertThat(expiryTime - redirection.createdAt()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
+            assertThat(expiryTime - redirection.createdAtMillis()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
         }
     }
 
@@ -208,7 +209,7 @@ public class UrlShortenerTest {
     private Redirection shortenAuthenticated(String longUrl) throws Exception {
         ShortenRequest shortenRequest = new ShortenRequest();
         shortenRequest.setLongUrl(longUrl);
-        shortenRequest.setPrincipal(Mockito.mock(Principal.class));
+        shortenRequest.setUserInfo(new UserInfo(UUID.randomUUID().toString(), "root"));
         return shortener.shorten(shortenRequest);
     }
 

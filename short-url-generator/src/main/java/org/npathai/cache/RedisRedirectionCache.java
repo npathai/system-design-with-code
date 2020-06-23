@@ -39,8 +39,8 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
     @Override
     public void put(Redirection redirection) {
         jedis.set(redirectionIdKey(redirection.id()), redirection.longUrl());
-        jedis.set(createdAtKey(redirection.id()), String.valueOf(redirection.createdAt()));
-        jedis.set(expiryAtKey(redirection.id()), String.valueOf(redirection.expiryTimeInMillis()));
+        jedis.set(createdAtKey(redirection.id()), String.valueOf(redirection.createdAtMillis()));
+        jedis.set(expiryAtKey(redirection.id()), String.valueOf(redirection.expiryAtMillis()));
     }
 
     private String createdAtKey(String id) {

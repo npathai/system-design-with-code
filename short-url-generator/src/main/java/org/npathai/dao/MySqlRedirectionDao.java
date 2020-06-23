@@ -35,8 +35,8 @@ public class MySqlRedirectionDao implements RedirectionDao {
 
             preparedStatement.setString(1, redirection.id());
             preparedStatement.setString(2, redirection.longUrl());
-            preparedStatement.setTimestamp(3, new Timestamp(redirection.createdAt()));
-            preparedStatement.setTimestamp(4, new Timestamp(redirection.expiryTimeInMillis()));
+            preparedStatement.setTimestamp(3, new Timestamp(redirection.createdAtMillis()));
+            preparedStatement.setTimestamp(4, new Timestamp(redirection.expiryAtMillis()));
             int count = preparedStatement.executeUpdate();
             assert count == 1;
         } catch (SQLException ex) {

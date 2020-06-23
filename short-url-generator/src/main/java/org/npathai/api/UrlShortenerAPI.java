@@ -7,15 +7,20 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.authentication.Authentication;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.npathai.domain.UrlShortener;
 import org.npathai.model.Redirection;
+import org.npathai.model.UserInfo;
 
 import javax.annotation.Nullable;
-import java.security.Principal;
 
 
 @Controller("/shorten")
 public class UrlShortenerAPI {
+    private static final Logger LOG = LogManager.getLogger(UrlShortenerAPI.class);
+
     private final UrlShortener shortener;
 
     public UrlShortenerAPI(UrlShortener shortener) {
@@ -25,8 +30,12 @@ public class UrlShortenerAPI {
     @Secured("isAnonymous()")
     @Post
     @Produces(MediaType.APPLICATION_JSON)
-    public String shorten(@Nullable Principal principal, @Body ShortenRequest shortenRequest) throws Exception {
-        shortenRequest.setPrincipal(principal);
+    public String shorten(@Nullable Authentication principal,
+                          @Body ShortenRequest shortenRequest) throws Exception {
+        if (principal != null) {
+            UserInfo userInfo = UserInfo.fromAuthentication(principal);
+            shortenRequest.setUserInfo(userInfo);
+        }
         Redirection redirection = shortener.shorten(shortenRequest);
         return jsonFor(redirection);
     }
@@ -35,7 +44,8 @@ public class UrlShortenerAPI {
         return new JsonObject()
                 .add("id", redirection.id())
                 .add("longUrl", redirection.longUrl())
-                .add("createdAt", redirection.createdAt())
+                .add("createdAt", redirection.createdAtMillis())
+                .add("expiryAt", redirection.expiryAtMillis())
                 .toString();
     }
 }

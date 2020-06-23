@@ -22,12 +22,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.npathai.cache.InMemoryRedirectionCache;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.zookeeper.TestingZkManager;
 import org.npathai.zookeeper.ZkManager;
 
 import javax.inject.Inject;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
@@ -39,6 +41,9 @@ class UrlShortenerAPITest {
 
     public static final String ANY_ID = "AAAAA";
     public static final String LONG_URL = "www.google.com";
+
+    @Inject
+    UrlLifetimeConfiguration urlLifetimeConfiguration;
 
     @Inject
     UrlShortenerClient client;
@@ -64,12 +69,13 @@ class UrlShortenerAPITest {
 
         String response = client.shorten(shortenRequest);
 
-        assertCreatedResponse(response);
+        assertCreatedResponse(response, Duration.ofSeconds(
+                Long.parseLong(urlLifetimeConfiguration.getAnonymous())
+        ));
     }
 
     @Test
     public void canShortenAuthenticatedUrlRequests() throws JOSEException {
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("root", "root");
         String accessToken = createJwtToken();
 
         Flowable<String> result = httpClient.retrieve(HttpRequest.create(HttpMethod.POST, "/shorten")
@@ -77,7 +83,9 @@ class UrlShortenerAPITest {
                 .body(shortenRequest()));
 
         String response = result.blockingFirst();
-        assertCreatedResponse(response);
+        assertCreatedResponse(response, Duration.ofSeconds(
+                Long.parseLong(urlLifetimeConfiguration.getAuthenticated())
+        ));
     }
 
     private String createJwtToken() throws JOSEException {
@@ -87,6 +95,7 @@ class UrlShortenerAPITest {
         JWTClaimsSet payload = new JWTClaimsSet.Builder()
                 .issuer("test-api")
                 .subject("root")
+                .claim("uid", "78e98faa-b502-11ea-a146-0242ac190002")
                 .expirationTime(Date.from(Instant.now().plusSeconds(120)))
                 .build();
 
@@ -98,12 +107,17 @@ class UrlShortenerAPITest {
         return signedJWT.serialize();
     }
 
-    private static void assertCreatedResponse(String response) {
+    private static void assertCreatedResponse(String response, Duration expectedLifetime) {
         JsonObject parsedResponse = Json.parse(response).asObject();
         assertThat(parsedResponse.get("id").asString()).isEqualTo(ANY_ID);
         assertThat(parsedResponse.get("longUrl").asString()).isEqualTo(LONG_URL);
-        assertThat(parsedResponse.get("createdAt").asLong()).isCloseTo(System.currentTimeMillis(),
+        long createdAtMillis = parsedResponse.get("createdAt").asLong();
+        assertThat(createdAtMillis).isCloseTo(System.currentTimeMillis(),
                 Offset.offset(1000L));
+        long expiryAtMillis = parsedResponse.get("expiryAt").asLong();
+        assertThat(expiryAtMillis).isGreaterThan(createdAtMillis);
+        Duration actualLifetime = Duration.ofMillis(expiryAtMillis - createdAtMillis);
+        assertThat(actualLifetime).isEqualTo(expectedLifetime);
     }
 
     private ShortenRequest shortenRequest() {
