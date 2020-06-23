@@ -26,7 +26,6 @@ import org.npathai.zookeeper.ZkManager;
 import org.unitils.reflectionassert.ReflectionAssert;
 
 import javax.inject.Inject;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -36,11 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RedirectionByUserAPITest {
     private static final String ANY_ID = "AAABB";
     private static final String LONG_URL = "www.google.com";
-
-    private static final List<Redirection> CREATED_REDIRECTIONS = List.of(
-            new Redirection(ANY_ID, LONG_URL, System.currentTimeMillis(),
-                    System.currentTimeMillis() + Duration.ofMinutes(120).toMillis(), JWTCreator.USER_ID)
-    );
 
     @Inject
     IdGenerationServiceStub idGenerationServiceStub;
@@ -56,22 +50,25 @@ public class RedirectionByUserAPITest {
     RedirectionDao redirectionDao;
 
     SignedJWT accessToken;
+    private Redirection olderRedirection;
+    private Redirection newerRedirection;
 
     @BeforeEach
-    public void setUp() throws JOSEException {
+    public void setUp() throws JOSEException, DataAccessException {
         idGenerationServiceStub.setId(ANY_ID);
         accessToken = new JWTCreator(secretSignatureConfiguration.getSecret()).createJwtForRoot();
-        CREATED_REDIRECTIONS.forEach(redirection -> {
-            try {
-                redirectionDao.save(redirection);
-            } catch (DataAccessException e) {
-                // Not possible
-            }
-        });
+
+        olderRedirection = new Redirection("AAAAA", LONG_URL, System.currentTimeMillis(),
+                System.currentTimeMillis() + 10000, JWTCreator.USER_ID);
+        redirectionDao.save(olderRedirection);
+
+        newerRedirection = new Redirection("AAAAB", LONG_URL + "/1", System.currentTimeMillis(),
+                System.currentTimeMillis() + 10000, JWTCreator.USER_ID);
+        redirectionDao.save(newerRedirection);
     }
 
     @Test
-    public void returnsAllRedirectionsCreatedByUser() {
+    public void returnsAllRedirectionsCreatedByUserInDescendingOrderOfCreation() {
         Flowable<HttpResponse<List<Redirection>>> result = httpClient.exchange(
                 HttpRequest.create(HttpMethod.GET, "/user/redirection_history")
                         .headers(Map.of("Authorization", "Bearer " + accessToken.serialize())),
@@ -80,8 +77,7 @@ public class RedirectionByUserAPITest {
 
         HttpResponse<List<Redirection>> response = result.blockingFirst();
         assertThat(response.status().getCode()).isEqualTo(200);
-        assertThat(response.body()).hasSize(1);
-        ReflectionAssert.assertReflectionEquals(CREATED_REDIRECTIONS, response.body());
+        ReflectionAssert.assertReflectionEquals(List.of(newerRedirection, olderRedirection), response.body());
     }
 
     @MockBean(ZkManager.class)
