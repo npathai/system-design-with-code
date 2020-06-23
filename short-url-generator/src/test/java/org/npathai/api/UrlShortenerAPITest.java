@@ -39,9 +39,6 @@ class UrlShortenerAPITest {
     UrlLifetimeConfiguration urlLifetimeConfiguration;
 
     @Inject
-    UrlShortenerClient client;
-
-    @Inject
     IdGenerationServiceStub idGenerationServiceStub;
 
     @Inject
@@ -58,10 +55,10 @@ class UrlShortenerAPITest {
 
     @Test
     public void canShortenAnonymousUrlRequests() {
-        ShortenRequest shortenRequest = shortenRequest();
+        Flowable<String> result = httpClient.retrieve(HttpRequest.create(HttpMethod.POST, "/shorten")
+                .body(shortenRequest()));
 
-        String response = client.shorten(shortenRequest);
-
+        String response = result.blockingFirst();
         assertCreatedResponse(response, Duration.ofSeconds(
                 Long.parseLong(urlLifetimeConfiguration.getAnonymous())
         ));
