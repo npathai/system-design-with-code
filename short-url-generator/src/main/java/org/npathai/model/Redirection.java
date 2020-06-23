@@ -1,16 +1,22 @@
 package org.npathai.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import javax.annotation.Nullable;
-import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Objects;
 
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Redirection {
     private String id;
-    private final String longUrl;
+    private String longUrl;
     private long createdAtMillis;
     private long expiryAtMillis;
-    private final String uid;
+    private String uid;
+
+    public Redirection() {
+
+    }
 
     public Redirection(String id, String longUrl, long createdAtMillis, long expiryAtMillis) {
         this(id, longUrl, createdAtMillis, expiryAtMillis, null);

@@ -2,6 +2,8 @@ package org.npathai.dao;
 
 import org.npathai.model.Redirection;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +24,11 @@ public class InMemoryRedirectionDao implements RedirectionDao {
     @Override
     public void deleteById(String id) {
         idToRedirection.remove(id);
+    }
+
+    @Override
+    public List<Redirection> getAllByUser(String uid) {
+        return new ArrayList<>(idToRedirection.values());
     }
 
 }

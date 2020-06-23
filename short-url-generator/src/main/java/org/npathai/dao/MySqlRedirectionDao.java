@@ -6,6 +6,8 @@ import org.npathai.model.Redirection;
 
 import javax.annotation.Nonnull;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class MySqlRedirectionDao implements RedirectionDao {
@@ -13,6 +15,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
     private static final String SELECT_BY_ID_SQL = "select * from redirection where id = ?";
     private static final String INSERT_SQL = "insert into redirection (id, long_url, created_at, expiry_at, uid) values (?, ?, ?, ?, ?)";
     private static final String DELETE_BY_ID_SQL = "delete from redirection where id = ?";
+    private static final String SELECT_BY_USER_ID_SQL = "select * from redirection where uid = ? order by created_at desc";
 
     private final MysqlDataSource dataSource;
 
@@ -55,7 +58,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
                 return Optional.empty();
             }
 
-            return Optional.of(createShortUrl(resultSet));
+            return Optional.of(createRedirection(resultSet));
         } catch (SQLException ex) {
             throw new DataAccessException(ex);
         }
@@ -73,13 +76,35 @@ public class MySqlRedirectionDao implements RedirectionDao {
         }
     }
 
+    @Override
+    public List<Redirection> getAllByUser(String uid) throws DataAccessException {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = createSelectByUserIdStatement(connection, uid);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            List<Redirection> redirectionsByUser = new ArrayList<>();
+            while (resultSet.next()) {
+                redirectionsByUser.add(createRedirection(resultSet));
+            }
+            return redirectionsByUser;
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex);
+        }
+    }
+
+    private PreparedStatement createSelectByUserIdStatement(Connection connection, String uid) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_USER_ID_SQL);
+        preparedStatement.setString(1, uid);
+        return preparedStatement;
+    }
+
     private PreparedStatement createSelectByIdStatement(Connection connection, String id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_SQL);
         preparedStatement.setString(1, id);
         return preparedStatement;
     }
 
-    private Redirection createShortUrl(ResultSet resultSet) throws SQLException {
+    private Redirection createRedirection(ResultSet resultSet) throws SQLException {
         return new Redirection(resultSet.getString("id"), resultSet.getString("long_url"),
                 resultSet.getTimestamp("created_at").getTime(),
                 resultSet.getTimestamp("expiry_at").getTime(),

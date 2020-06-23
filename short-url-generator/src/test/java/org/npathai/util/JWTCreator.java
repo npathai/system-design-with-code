@@ -13,6 +13,8 @@ import java.util.Date;
 
 public class JWTCreator {
 
+    public static final String USER_ID = "78e98faa-b502-11ea-a146-0242ac190002";
+    public static final String USER_NAME = "root";
     private final String secret;
 
     public JWTCreator(String secret) {
@@ -25,8 +27,8 @@ public class JWTCreator {
                 .build();
         JWTClaimsSet payload = new JWTClaimsSet.Builder()
                 .issuer("test-api")
-                .subject("root")
-                .claim("uid", "78e98faa-b502-11ea-a146-0242ac190002")
+                .subject(USER_NAME)
+                .claim("uid", USER_ID)
                 .expirationTime(Date.from(Instant.now().plusSeconds(120)))
                 .build();
 

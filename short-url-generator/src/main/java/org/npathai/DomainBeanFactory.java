@@ -11,6 +11,7 @@ import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.config.ZookeeperConfiguration;
 import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.dao.RedirectionDao;
+import org.npathai.domain.RedirectionHistoryService;
 import org.npathai.domain.UrlShortener;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
 import org.npathai.zookeeper.ZkManager;
@@ -49,5 +50,10 @@ public class DomainBeanFactory {
                 beanContext.getBean(RedirectionDao.class),
                 beanContext.getBean(RedirectionCache.class),
                 Clock.systemDefaultZone());
+    }
+
+    @Singleton
+    public RedirectionHistoryService redirectionHistoryService() {
+        return new RedirectionHistoryService(beanContext.getBean(RedirectionDao.class));
     }
 }

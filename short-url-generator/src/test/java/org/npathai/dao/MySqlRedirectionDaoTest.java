@@ -10,6 +10,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +23,8 @@ class MySqlRedirectionDaoTest {
     private static final String ID = "AAAAA";
     private static final String LONG_URL = "www.google.com";
     private static final long CREATED_AT = System.currentTimeMillis();
+    private static final String USER_ID = UUID.randomUUID().toString();
+    private static final String USER_ID_2 = UUID.randomUUID().toString();
 
     @Container
     public MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:latest")
@@ -64,5 +67,24 @@ class MySqlRedirectionDaoTest {
 
         Optional<Redirection> foundRedirection = dao.getById(originalRedirection.id());
         assertThat(foundRedirection).isEmpty();
+    }
+
+    @Test
+    public void returnsAllRedirectionsCreatedByUserInDescendingOrderOfCreation() throws DataAccessException {
+        Redirection user1Redirection1 = new Redirection("AAAAA", LONG_URL, System.currentTimeMillis(),
+                System.currentTimeMillis() + 10000, USER_ID);
+        dao.save(user1Redirection1);
+
+        Redirection user1Redirection2 = new Redirection("AAAAB", LONG_URL + "/1", System.currentTimeMillis(),
+                System.currentTimeMillis() + 10000, USER_ID);
+        dao.save(user1Redirection2);
+
+        Redirection user2Redirection1 = new Redirection("AAAAC", LONG_URL + "/1", System.currentTimeMillis(),
+                System.currentTimeMillis() + 10000, USER_ID_2);
+        dao.save(user2Redirection1);
+
+        List<Redirection> actualRedirections = dao.getAllByUser(USER_ID);
+        assertThat(actualRedirections).hasSize(2);
+        ReflectionAssert.assertReflectionEquals(List.of(user1Redirection2, user1Redirection1), actualRedirections);
     }
 }
