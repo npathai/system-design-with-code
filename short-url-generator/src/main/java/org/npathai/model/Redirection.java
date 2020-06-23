@@ -1,5 +1,6 @@
 package org.npathai.model;
 
+import javax.annotation.Nullable;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Objects;
@@ -9,12 +10,18 @@ public class Redirection {
     private final String longUrl;
     private long createdAtMillis;
     private long expiryAtMillis;
+    private final String uid;
 
     public Redirection(String id, String longUrl, long createdAtMillis, long expiryAtMillis) {
+        this(id, longUrl, createdAtMillis, expiryAtMillis, null);
+    }
+
+    public Redirection(String id, String longUrl, long createdAtMillis, long expiryAtMillis, String uid) {
         this.id = id;
         this.longUrl = longUrl;
         this.createdAtMillis = createdAtMillis;
         this.expiryAtMillis = expiryAtMillis;
+        this.uid = uid;
     }
 
     public String id() {
@@ -27,6 +34,11 @@ public class Redirection {
 
     public long createdAtMillis() {
         return createdAtMillis;
+    }
+
+    @Nullable
+    public String uid() {
+        return uid;
     }
 
     @Override
@@ -55,8 +67,9 @@ public class Redirection {
         return "Redirection{" +
                 "id='" + id + '\'' +
                 ", longUrl='" + longUrl + '\'' +
-                ", createdAt=" + new Timestamp(createdAtMillis) +
-                ", expiresAt=" + new Timestamp(expiryAtMillis) +
+                ", createdAtMillis=" + createdAtMillis +
+                ", expiryAtMillis=" + expiryAtMillis +
+                ", uid='" + uid + '\'' +
                 '}';
     }
 }

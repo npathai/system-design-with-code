@@ -41,10 +41,26 @@ public class UrlShortener {
         // Remote call
         String id = idGenerationServiceClient.generateId();
         long creationTime = clock.millis();
-        long expiryTime = creationTime + lifetimeInMillis(shortenRequest.isAnonymous());
-        Redirection redirection = new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime);
+        Redirection redirection;
+        if (shortenRequest.isAnonymous()) {
+            redirection = createAnonymousRedirection(shortenRequest, id, creationTime);
+        } else {
+            redirection = createAuthenticatedRedirection(shortenRequest, id, creationTime);
+        }
         dao.save(redirection);
         LOG.info("Created new redirection. " + redirection);
+        return redirection;
+    }
+
+    private Redirection createAuthenticatedRedirection(ShortenRequest shortenRequest, String id, long creationTime) {
+        long expiryTime = creationTime + lifetimeInMillis(false);
+        return new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime, shortenRequest.getUserInfo()
+                .uid());
+    }
+
+    private Redirection createAnonymousRedirection(ShortenRequest shortenRequest, String id, long creationTime) {
+        long expiryTime = creationTime + lifetimeInMillis(true);
+        Redirection redirection = new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime);
         return redirection;
     }
 

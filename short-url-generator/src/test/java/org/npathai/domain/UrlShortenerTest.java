@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LONG;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -34,6 +35,7 @@ public class UrlShortenerTest {
     public static final String LONG_URL = "http://google.com";
     public static final String ID = "AAAAA";
     public static final String UNKNOWN_ID = "GFSFA";
+    public static final String AUTHENTICATED_USER_ID = UUID.randomUUID().toString();
 
     private UrlLifetimeConfiguration urlLifetimeConfiguration = new UrlLifetimeConfiguration();
 
@@ -52,6 +54,7 @@ public class UrlShortenerTest {
         when(redirectionCache.getById(anyString())).thenReturn(Optional.empty());
         inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
         urlLifetimeConfiguration.setAnonymous("60");
+        urlLifetimeConfiguration.setAuthenticated("120");
         shortener = new UrlShortener(urlLifetimeConfiguration, idGenerationServiceClient, inMemoryRedirectionDao,
                 redirectionCache, mutableClock);
         when(idGenerationServiceClient.generateId()).thenReturn(ID);
@@ -126,6 +129,12 @@ public class UrlShortenerTest {
 
     @Nested
     class AuthenticatedUser {
+
+        @Test
+        void validateRedirection() throws Exception {
+            Redirection actualRedirection = shortenAuthenticated(LONG_URL);
+            assertThat(actualRedirection.uid()).isEqualTo(AUTHENTICATED_USER_ID);
+        }
 
         @ParameterizedTest
         @CsvSource({
@@ -209,7 +218,7 @@ public class UrlShortenerTest {
     private Redirection shortenAuthenticated(String longUrl) throws Exception {
         ShortenRequest shortenRequest = new ShortenRequest();
         shortenRequest.setLongUrl(longUrl);
-        shortenRequest.setUserInfo(new UserInfo(UUID.randomUUID().toString(), "root"));
+        shortenRequest.setUserInfo(new UserInfo(AUTHENTICATED_USER_ID, "root"));
         return shortener.shorten(shortenRequest);
     }
 

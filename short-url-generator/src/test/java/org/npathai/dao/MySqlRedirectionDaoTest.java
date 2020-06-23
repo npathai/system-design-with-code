@@ -11,6 +11,7 @@ import org.unitils.reflectionassert.ReflectionAssert;
 
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +46,8 @@ class MySqlRedirectionDaoTest {
     @Test
     public void canGetSavedRedirectionFromDatabase() throws DataAccessException {
         Redirection originalRedirection = new Redirection(ID, LONG_URL, CREATED_AT,
-                CREATED_AT + 10000);
+                CREATED_AT + 10000,
+                UUID.randomUUID().toString());
         dao.save(originalRedirection);
 
         Optional<Redirection> foundRedirection = dao.getById(originalRedirection.id());

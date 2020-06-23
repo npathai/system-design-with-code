@@ -10,5 +10,6 @@ CREATE TABLE redirection(
     long_url VARCHAR(500) NOT NULL,
     created_at TIMESTAMP(3) NOT NULL,
     expiry_at TIMESTAMP(3) NOT NULL,
+    uid VARCHAR(50),
     PRIMARY KEY(id)
 );

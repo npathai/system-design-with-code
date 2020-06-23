@@ -11,7 +11,7 @@ import java.util.Optional;
 public class MySqlRedirectionDao implements RedirectionDao {
 
     private static final String SELECT_BY_ID_SQL = "select * from redirection where id = ?";
-    private static final String INSERT_SQL = "insert into redirection (id, long_url, created_at, expiry_at) values (?, ?, ?, ?)";
+    private static final String INSERT_SQL = "insert into redirection (id, long_url, created_at, expiry_at, uid) values (?, ?, ?, ?, ?)";
     private static final String DELETE_BY_ID_SQL = "delete from redirection where id = ?";
 
     private final MysqlDataSource dataSource;
@@ -37,6 +37,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
             preparedStatement.setString(2, redirection.longUrl());
             preparedStatement.setTimestamp(3, new Timestamp(redirection.createdAtMillis()));
             preparedStatement.setTimestamp(4, new Timestamp(redirection.expiryAtMillis()));
+            preparedStatement.setString(5, redirection.uid());
             int count = preparedStatement.executeUpdate();
             assert count == 1;
         } catch (SQLException ex) {
@@ -81,6 +82,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
     private Redirection createShortUrl(ResultSet resultSet) throws SQLException {
         return new Redirection(resultSet.getString("id"), resultSet.getString("long_url"),
                 resultSet.getTimestamp("created_at").getTime(),
-                resultSet.getTimestamp("expiry_at").getTime());
+                resultSet.getTimestamp("expiry_at").getTime(),
+                resultSet.getString("uid"));
     }
 }

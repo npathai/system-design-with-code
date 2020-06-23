@@ -18,6 +18,10 @@ public class UserInfo {
         return userInfo;
     }
 
+    public String uid() {
+        return uid;
+    }
+
     @Override
     public String toString() {
         return "UserInfo{" +
