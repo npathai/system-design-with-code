@@ -52,11 +52,16 @@ public class RedirectionByUserAPITest {
     SignedJWT accessToken;
     private Redirection olderRedirection;
     private Redirection newerRedirection;
+    private Redirection expiredRedirection;
 
     @BeforeEach
     public void setUp() throws JOSEException, DataAccessException {
         idGenerationServiceStub.setId(ANY_ID);
         accessToken = new JWTCreator(secretSignatureConfiguration.getSecret()).createJwtForRoot();
+
+        expiredRedirection = new Redirection("AAAAC", LONG_URL + "/1", System.currentTimeMillis(),
+                System.currentTimeMillis(), JWTCreator.USER_ID);
+        redirectionDao.save(expiredRedirection);
 
         olderRedirection = new Redirection("AAAAA", LONG_URL, System.currentTimeMillis(),
                 System.currentTimeMillis() + 10000, JWTCreator.USER_ID);
@@ -77,6 +82,18 @@ public class RedirectionByUserAPITest {
 
         HttpResponse<List<Redirection>> response = result.blockingFirst();
         assertThat(response.status().getCode()).isEqualTo(200);
+        ReflectionAssert.assertReflectionEquals(List.of(newerRedirection, olderRedirection), response.body());
+    }
+    
+    @Test
+    public void onlyReturnsActiveRedirectionsAndFiltersOutExpiredRedirections() {
+        Flowable<HttpResponse<List<Redirection>>> result = httpClient.exchange(
+                HttpRequest.create(HttpMethod.GET, "/user/redirection_history")
+                        .headers(Map.of("Authorization", "Bearer " + accessToken.serialize())),
+                Argument.listOf(Redirection.class)
+        );
+
+        HttpResponse<List<Redirection>> response = result.blockingFirst();
         ReflectionAssert.assertReflectionEquals(List.of(newerRedirection, olderRedirection), response.body());
     }
 
