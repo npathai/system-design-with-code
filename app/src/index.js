@@ -8,6 +8,7 @@ import NavBar from "./components/navbar/NavBar";
 
 import SignIn from "./components/login/SignIn";
 import UserProvider from "./context/AuthContext";
+import {Provider} from 'react-redux'
 
 class App extends React.Component {
 
