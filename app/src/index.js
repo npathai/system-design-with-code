@@ -7,28 +7,26 @@ import Home from "./components/home/Home";
 import NavBar from "./components/navbar/NavBar";
 
 import SignIn from "./components/login/SignIn";
-import UserProvider from "./context/AuthContext";
 import {Provider} from 'react-redux'
+import store from './store/store'
 
 class App extends React.Component {
 
     render() {
         return (
-            <UserProvider>
+            <div>
                 <div>
-                    <div>
-                        <Router>
-                            <NavBar/>
-                            <Route exact path="/" component={Home}/>
-                            <Route path="/signin" component={SignIn}/>
-                        </Router>
-                    </div>
+                    <Router>
+                        <NavBar/>
+                        <Route exact path="/" component={Home}/>
+                        <Route path="/signin" component={SignIn}/>
+                    </Router>
                 </div>
-            </UserProvider>
+            </div>
         );
     }
 }
 
 ReactDOM.render(
-    <App/>, document.getElementById('root')
+    <Provider store={store}><App/></Provider>, document.getElementById('root')
 );
