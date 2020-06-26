@@ -1,21 +1,13 @@
 import React from 'react'
 import {connect} from "react-redux";
-
 import {Redirect} from 'react-router-dom'
 import './SignIn.css'
-import {AuthContext} from "../../context/AuthContext";
 import * as actions from '../../actions/actions'
 
 class SignIn extends React.Component {
-    static contextType = AuthContext
 
     constructor(props) {
         super(props);
-        this.state = {
-            // username: "",
-            // password: "",
-            // loginAttemptFailure: false
-        }
         this.signIn = this.signIn.bind(this)
         this.handleUsernameChange = this.handleUsernameChange.bind(this)
         this.handlePasswordChange = this.handlePasswordChange.bind(this)
@@ -35,32 +27,6 @@ class SignIn extends React.Component {
             password: this.props.password
         }
         this.props.dispatch(actions.signIn(credentials));
-
-        // fetch("http://localhost:4000/login", {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     mode: 'cors',
-        //     body: JSON.stringify({
-        //         username: this.state.username,
-        //         password: this.state.password
-        //     })
-        // })
-        // .then(res => {
-        //     if (res.status !== 200) {
-        //         throw new Error("Invalid login attempt")
-        //     }
-        //     return res.json()
-        // })
-        // .then(data => setLoggedInUser(data))
-        // .catch(err => {
-        //     console.log(err)
-        //     this.setState({
-        //         loginAttemptFailure: true
-        //     })
-        // })
-
         e.preventDefault();
     }
 

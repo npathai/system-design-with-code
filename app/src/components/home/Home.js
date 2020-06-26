@@ -1,13 +1,11 @@
 import React from 'react'
+import {connect} from 'react-redux'
 import Shortener from "../short-url-generator/Shortener";
 import RedirectionHistory from "../redirection-history/RedirectionHistory";
-import {AuthContext} from "../../context/AuthContext";
 
 class Home extends React.Component {
-    static contextType = AuthContext
-
     render() {
-        const {isLoggedIn} = this.context
+        const isLoggedIn = this.props.isLoggedIn
         const redirectionHistoryComponent = isLoggedIn
             ? <RedirectionHistory></RedirectionHistory>
             : null
@@ -20,4 +18,8 @@ class Home extends React.Component {
     }
 }
 
-export default Home
+export default connect((state, props) => {
+    return {
+        isLoggedIn: state.auth.isLoggedIn
+    }
+})(Home)
