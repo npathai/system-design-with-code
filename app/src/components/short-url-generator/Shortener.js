@@ -1,25 +1,19 @@
 import React from 'react'
-import {AuthContext} from "../../context/AuthContext";
+import {connect} from 'react-redux'
+import * as actions from '../../actions/actions'
 
 class Shortener extends React.Component {
-    static contextType = AuthContext
 
     constructor(props) {
         super(props);
-        this.state = {
-            longUrl: "",
-            shortUrl: "Short Url will appear here!",
-            isCopied: false,
-            valid: false
-        };
         this.shortUrlText = React.createRef();
-        this.handleChange = this.handleChange.bind(this);
+        this.handleLongUrlChange = this.handleLongUrlChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.copyToClipboard = this.copyToClipboard.bind(this);
     }
 
-    handleChange(event) {
-        this.setState({longUrl: event.target.value});
+    handleLongUrlChange(event) {
+        this.props.dispatch(actions.changeLongUrl(event.target.value))
     }
 
     isValidHttpUrl(string) {
@@ -33,49 +27,19 @@ class Shortener extends React.Component {
     }
 
     handleSubmit(event) {
-        if (this.isValidHttpUrl(this.state.longUrl)) {
-            this.setState({valid: true})
-            this.setState({isCopied: false})
-            this.postLongUrl();
-        } else {
-            this.setState({valid: false})
+        const token = {
+            type: this.props.tokenType,
+            accessToken: this.props.accessToken
         }
+        this.props.dispatch(actions.createRedirection(token, this.props.longUrl))
         event.preventDefault();
-    }
-
-    postLongUrl() {
-        console.log(this.context)
-        const headers = {
-            'Content-Type': 'application/json'
-        }
-        const {addAuthorizationHeader} = this.context
-        addAuthorizationHeader(headers)
-
-        fetch("http://localhost:4000/shorten", {
-            method: 'POST',
-            headers: headers,
-            mode: 'cors',
-            body: JSON.stringify({
-                longUrl: this.state.longUrl,
-            })
-        })
-            .then(res => {
-                if (res.status !== 200) {
-                    throw new Error("Received response with status: " + res.status)
-                }
-                return res.json()
-            })
-            .then(data => this.setState({shortUrl: "http://localhost:4000/" + data.id}))
-            // We can do better error handling than this!
-            .catch(err => {
-                console.log(err)
-            });
     }
 
     copyToClipboard() {
         this.shortUrlText.current.select();
         document.execCommand("copy");
-        this.setState({isCopied: true})
+        this.props.dispatch(actions.changeCopied(true))
+        // this.setState({isCopied: true})
     }
 
     render() {
@@ -86,8 +50,8 @@ class Shortener extends React.Component {
                         <div className="form-group d-md-flex">
                             <input type="text"
                                    id="longUrl"
-                                   value={this.state.longUrl}
-                                   onChange={this.handleChange}
+                                   value={this.props.longUrl}
+                                   onChange={this.handleLongUrlChange}
                                    className="form-control px-4"
                                    placeholder="Enter URL..." required/>
                             <input type="submit" className="search-domain btn btn-primary px-5" value="Shorten" readOnly={true}/>
@@ -95,10 +59,10 @@ class Shortener extends React.Component {
                     </form>
 
                     <div className="form-group d-md-flex">
-                        <input type="text" id="shortUrl" value={this.state.shortUrl}
+                        <input type="text" id="shortUrl" value={this.props.shortUrl}
                                className="form-control px-4" ref={this.shortUrlText} readOnly={true}/>
                         <input type="button" className="search-domain btn btn-primary px-5" value={
-                            this.state.isCopied ? "Copied!" : "Copy"
+                            this.props.isCopied ? "Copied!" : "Copy"
                         } onClick={this.copyToClipboard}/>
                     </div>
 
@@ -108,4 +72,12 @@ class Shortener extends React.Component {
     }
 }
 
-export default Shortener
+export default connect((state, props) => {
+    return {
+        tokenType: state.auth.tokenType,
+        accessToken: state.auth.accessToken,
+        shortUrl: state.redirection.shortUrl,
+        longUrl: state.redirection.longUrl,
+        isCopied: state.redirection.isCopied
+    }
+})(Shortener)
