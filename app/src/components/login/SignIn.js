@@ -31,6 +31,11 @@ class SignIn extends React.Component {
     }
 
     render() {
+        let errorMsg = null
+        if (this.props.errorMessage) {
+            errorMsg = <div className="errorMsg">{this.props.errorMessage}</div>
+        }
+
         const isLoggedIn = this.props.isLoggedIn
         const loginAttemptFailure = this.props.isLoginAttemptFailure
 
@@ -41,6 +46,7 @@ class SignIn extends React.Component {
 
         return isLoggedIn ? <Redirect to="/"/> :
             <div>
+                {errorMsg}
                 <form className="form-signin">
                     <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
                     <label htmlFor="username" className="sr-only">Username</label>
@@ -65,12 +71,11 @@ class SignIn extends React.Component {
 }
 
 export default connect((state, props) => {
-    console.log('state', state)
-
     return {
         username: state.auth.username,
         password: state.auth.password,
         isLoggedIn: state.auth.isLoggedIn,
-        isLoginAttemptFailure: state.auth.isLoginAttemptFailure
+        isLoginAttemptFailure: state.auth.isLoginAttemptFailure,
+        errorMessage: state.error.errorMessage
     }
 })(SignIn);

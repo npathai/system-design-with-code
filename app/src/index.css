@@ -62,3 +62,10 @@ body {
 .domain-price span small {
   color: #24bdc9
 }
+
+.errorMsg {
+  background-color: #a20000;
+  color: #fff;
+  margin-bottom: 15px;
+  padding: 10px;
+}

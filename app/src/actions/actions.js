@@ -37,9 +37,19 @@ export function createRedirection(token, longUrl) {
             // We can do better error handling than this!
             .catch(err => {
                 console.log(err)
-                dispatch({type: types.RECEIVED_SHORTEN_REDIRECTION_FAILURE, data: err})
+                dispatch({type: types.RECEIVED_SHORTEN_REDIRECTION_FAILURE, data: {errorMessage: getErrorMessage(err)}})
             });
     }
+}
+
+function getErrorMessage(resp) {
+    var msg = 'Error. Please try again later.'
+
+    if (resp && resp.request && resp.request.status === 0) {
+        msg = 'Oh no! App appears to be offline.'
+    }
+
+    return msg
 }
 
 export function changeLongUrl(newValue) {
@@ -76,7 +86,7 @@ export function fetchRedirectionHistory(token) {
             })
             .catch(err => {
                 console.log(err)
-                dispatch({type: types.RECEIVED_REDIRECTION_HISTORY_FAILURE, data: {}})
+                dispatch({type: types.RECEIVED_REDIRECTION_HISTORY_FAILURE, data: {errorMessage: getErrorMessage(err)}})
             })
     };
 }
@@ -110,19 +120,23 @@ export function signIn(credentials) {
                 username: credentials.username,
                 password: credentials.password
             })
-        })
-            .then(res => {
-                if (res.status !== 200) {
-                    throw new Error("Invalid login attempt")
+        }).then(res => {
+                if (res.status === 200) {
+                    return res.json()
                 }
-                return res.json()
+
+                throw new Error("" + res.status)
             })
             .then(res => {
-                dispatch({type: types.RECEIVED_SIGN_IN_SUCCESS, data: res})
+                dispatch({type: types.RECEIVED_SIGN_IN_SUCCESS, data: res.json()})
             })
             .catch(err => {
                 console.log(err)
-                dispatch({type: types.RECEIVED_SIGN_IN_FAILURE, data: {}})
+                if (err.message === '401') {
+                    dispatch({type: types.RECEIVED_SIGN_IN_INVALID_ATTEMPT_FAILURE, data: {}})
+                } else {
+                dispatch({type: types.RECEIVED_SIGN_IN_FAILURE, data: {errorMessage: getErrorMessage(err)}})
+                }
             })
     }
 }

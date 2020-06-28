@@ -5,10 +5,6 @@ import * as actions from '../../actions/actions'
 
 class RedirectionHistory extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         const token = {
             type: this.props.tokenType,

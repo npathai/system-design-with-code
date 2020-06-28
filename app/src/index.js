@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Route} from 'react-router-dom'
+import {connect} from 'react-redux'
 
 import './index.css';
 import Home from "./components/home/Home";
@@ -11,7 +12,6 @@ import {Provider} from 'react-redux'
 import store from './store/store'
 
 class App extends React.Component {
-
     render() {
         return (
             <div>
