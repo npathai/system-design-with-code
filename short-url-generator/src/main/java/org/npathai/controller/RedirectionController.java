@@ -30,6 +30,7 @@ public class RedirectionController {
             if (redirection.isEmpty()) {
                 return HttpResponse.notFound();
             }
+            LOG.info("Returning redirect response");
             return HttpResponse.redirect(URI.create(redirection.get()));
         } catch (Exception ex) {
             LOG.error(ex);

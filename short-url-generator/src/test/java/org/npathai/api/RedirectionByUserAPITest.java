@@ -14,6 +14,7 @@ import io.micronaut.test.annotation.MockBean;
 import io.reactivex.Flowable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.npathai.IdGenerationServiceStub;
 import org.npathai.cache.InMemoryRedirectionCache;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.dao.DataAccessException;
@@ -37,9 +38,6 @@ public class RedirectionByUserAPITest {
     private static final String LONG_URL = "www.google.com";
 
     @Inject
-    IdGenerationServiceStub idGenerationServiceStub;
-
-    @Inject
     @Client("/")
     RxHttpClient httpClient;
 
@@ -56,7 +54,6 @@ public class RedirectionByUserAPITest {
 
     @BeforeEach
     public void setUp() throws JOSEException, DataAccessException {
-        idGenerationServiceStub.setId(ANY_ID);
         accessToken = new JWTCreator(secretSignatureConfiguration.getSecret()).createJwtForRoot();
 
         expiredRedirection = new Redirection("AAAAC", LONG_URL + "/1", System.currentTimeMillis(),

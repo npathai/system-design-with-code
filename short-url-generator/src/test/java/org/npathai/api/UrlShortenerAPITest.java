@@ -14,6 +14,7 @@ import io.reactivex.Flowable;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.npathai.IdGenerationServiceStub;
 import org.npathai.cache.InMemoryRedirectionCache;
 import org.npathai.cache.RedirectionCache;
 import org.npathai.config.UrlLifetimeConfiguration;

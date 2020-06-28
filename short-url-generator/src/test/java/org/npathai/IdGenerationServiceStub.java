@@ -1,4 +1,4 @@
-package org.npathai.api;
+package org.npathai;
 
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
