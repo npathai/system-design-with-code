@@ -128,7 +128,7 @@ export function signIn(credentials) {
                 throw new Error("" + res.status)
             })
             .then(res => {
-                dispatch({type: types.RECEIVED_SIGN_IN_SUCCESS, data: res.json()})
+                dispatch({type: types.RECEIVED_SIGN_IN_SUCCESS, data: res})
             })
             .catch(err => {
                 console.log(err)
