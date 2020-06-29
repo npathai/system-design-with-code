@@ -9,6 +9,8 @@ import org.npathai.config.MySqlDatasourceConfiguration;
 import org.npathai.config.RedisConfiguration;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.config.ZookeeperConfiguration;
+import org.npathai.controller.LoggingRedirectionListener;
+import org.npathai.controller.RedirectionListener;
 import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.domain.RedirectionHistoryService;
@@ -55,5 +57,10 @@ public class DomainBeanFactory {
     @Singleton
     public RedirectionHistoryService redirectionHistoryService() {
         return new RedirectionHistoryService(beanContext.getBean(RedirectionDao.class));
+    }
+
+    @Singleton
+    public RedirectionListener redirectionListener() {
+        return new LoggingRedirectionListener();
     }
 }

@@ -1,37 +1,38 @@
 package org.npathai.controller;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.nimbusds.jose.JOSEException;
 import io.micronaut.http.*;
 import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.http.client.annotation.Client;
-import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
 import io.reactivex.Flowable;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.npathai.IdGenerationServiceStub;
-import org.npathai.api.ShortenRequest;
 import org.npathai.cache.InMemoryRedirectionCache;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.dao.DataAccessException;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
-import org.npathai.util.JWTCreator;
+import org.npathai.model.Redirection;
 import org.npathai.zookeeper.TestingZkManager;
 import org.npathai.zookeeper.ZkManager;
 
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 @MicronautTest
 class RedirectionControllerTest {
 
-    private static final String ANY_ID = "AAAAA";
+    private static final String ID = "AAAAA";
     private static final String LONG_URL = "www.google.com";
+    public static final Redirection REDIRECTION = new Redirection(ID, LONG_URL, System.currentTimeMillis(),
+            System.currentTimeMillis() + 10000);
 
     @Inject
     IdGenerationServiceStub idGenerationServiceStub;
@@ -41,11 +42,45 @@ class RedirectionControllerTest {
     RxHttpClient httpClient;
 
     @Inject
-    SecretSignatureConfiguration secretSignatureConfiguration;
+    RedirectionDao redirectionDao;
+
+    @Inject
+    RedirectionListener redirectionListener;
 
     @BeforeEach
-    public void setUp() {
-        idGenerationServiceStub.setId(ANY_ID);
+    public void setUp() throws DataAccessException {
+        idGenerationServiceStub.setId(ID);
+        redirectionDao.save(REDIRECTION);
+    }
+
+    @Test
+    public void hasAnonymousAccess() {
+        Flowable<HttpResponse<String>> response =
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
+
+        HttpResponse<String> redirectedResponse = response.blockingFirst();
+        assertThat(redirectedResponse.status().getCode()).isNotEqualTo(HttpStatus.UNAUTHORIZED.getCode());
+    }
+
+    @Test
+    public void redirectsToLongUrl() {
+        Flowable<HttpResponse<String>> response =
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
+
+        HttpResponse<String> redirectedResponse = response.blockingFirst();
+        assertThat(redirectedResponse.status().getCode()).isEqualTo(HttpStatus.MOVED_PERMANENTLY.getCode());
+        assertThat(redirectedResponse.header(HttpHeaders.LOCATION)).isEqualTo(LONG_URL);
+    }
+
+    @Test
+    public void invokesRedirectionListenerOnSuccessfulRedirection() {
+        Flowable<HttpResponse<String>> response =
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
+
+        response.blockingFirst();
+
+        verify(redirectionListener).onSuccessfulRedirection(any(HttpRequest.class),
+                eq(ID), eq(REDIRECTION.longUrl()));
     }
 
     @MockBean(ZkManager.class)
@@ -63,31 +98,8 @@ class RedirectionControllerTest {
         return new InMemoryRedirectionDao();
     }
 
-    @Test
-    public void redirectsToLongUrl() {
-        Flowable<String> result = httpClient.retrieve(HttpRequest.create(HttpMethod.POST, "/shorten")
-                .body(shortenRequest()));
-
-        String shortenResponse = result.blockingFirst();
-        JsonObject parsedResponse = Json.parse(shortenResponse).asObject();
-        String id = parsedResponse.get("id").asString();
-
-        Flowable<HttpResponse<String>> response =
-                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + id), String.class);
-
-        HttpResponse<String> redirectedResponse = response.blockingFirst();
-        assertThat(redirectedResponse.status().getCode()).isEqualTo(HttpStatus.MOVED_PERMANENTLY.getCode());
-        assertThat(redirectedResponse.header(HttpHeaders.LOCATION)).isEqualTo(LONG_URL);
-    }
-
-    private ShortenRequest shortenRequest() {
-        ShortenRequest shortenRequest = new ShortenRequest();
-        shortenRequest.setLongUrl(LONG_URL);
-        return shortenRequest;
-    }
-
-    private String createJwtToken() throws JOSEException {
-        return new JWTCreator(secretSignatureConfiguration.getSecret())
-                .createJwtForRoot().serialize();
+    @MockBean(RedirectionListener.class)
+    public RedirectionListener createMockListener() {
+        return Mockito.mock(RedirectionListener.class);
     }
 }
