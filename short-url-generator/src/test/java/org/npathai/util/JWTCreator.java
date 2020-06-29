@@ -22,6 +22,10 @@ public class JWTCreator {
     }
 
     public SignedJWT createJwtForRoot() throws JOSEException {
+        return createJwtFor(USER_ID, USER_NAME);
+    }
+
+    public SignedJWT createJwtFor(String uid, String username) throws JOSEException {
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)
                 .type(JOSEObjectType.JWT)
                 .build();

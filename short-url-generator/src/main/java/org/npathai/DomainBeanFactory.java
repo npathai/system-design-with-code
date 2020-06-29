@@ -9,10 +9,13 @@ import org.npathai.config.MySqlDatasourceConfiguration;
 import org.npathai.config.RedisConfiguration;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.config.ZookeeperConfiguration;
-import org.npathai.controller.LoggingRedirectionListener;
+import org.npathai.controller.AnalyticsRedirectionListener;
 import org.npathai.controller.RedirectionListener;
+import org.npathai.dao.AnalyticsDao;
+import org.npathai.dao.InMemoryAnalyticsDao;
 import org.npathai.dao.MySqlRedirectionDao;
 import org.npathai.dao.RedirectionDao;
+import org.npathai.domain.AnalyticsService;
 import org.npathai.domain.RedirectionHistoryService;
 import org.npathai.domain.UrlShortener;
 import org.npathai.zookeeper.DefaultZkManagerFactory;
@@ -30,7 +33,7 @@ public class DomainBeanFactory {
     BeanContext beanContext;
 
     @Singleton
-     public ZkManager createZkManager() throws InterruptedException {
+    public ZkManager createZkManager() throws InterruptedException {
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
         return zkManagerFactory.createConnected(beanContext.getBean(ZookeeperConfiguration.class).getUrl());
     }
@@ -60,7 +63,18 @@ public class DomainBeanFactory {
     }
 
     @Singleton
+    public AnalyticsDao inMemoryAnalyticsDao() {
+        return new InMemoryAnalyticsDao();
+    }
+
+    @Singleton
+    public AnalyticsService analyticsService() {
+        return new AnalyticsService(beanContext.getBean(UrlShortener.class),
+                beanContext.getBean(AnalyticsDao.class));
+    }
+
+    @Singleton
     public RedirectionListener redirectionListener() {
-        return new LoggingRedirectionListener();
+        return new AnalyticsRedirectionListener(beanContext.getBean(AnalyticsService.class));
     }
 }

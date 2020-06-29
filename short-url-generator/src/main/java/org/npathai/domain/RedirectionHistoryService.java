@@ -23,6 +23,5 @@ public class RedirectionHistoryService {
                 .stream()
                 .filter(redirection -> !redirection.isExpired(Clock.systemDefaultZone()))
                 .collect(Collectors.toList());
-
     }
 }
