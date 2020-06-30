@@ -38,6 +38,6 @@ public class AnalyticsService {
             throw new UnauthorizedAccessException();
         }
 
-        return dao.getById(id);
+        return dao.getById(id).or(() -> Optional.of(new AnalyticsInfo()));
     }
 }
