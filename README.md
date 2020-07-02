@@ -55,3 +55,6 @@ For easy way to view the logs and login to containers use Docker dashboard on Wi
 6) Test Containers 
 7) React (frontend)
 8) Docker
+9) Zipkin
+10) Hystrix/Resilience4J
+11) Micrometer
