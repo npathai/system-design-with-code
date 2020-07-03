@@ -44,3 +44,17 @@ For easy way to view the logs and login to containers use Docker dashboard on Wi
     - Working on creating image for this as well, so can be part of docker compose stack
 3) Shorten the URLs at `http://localhost:3000` :scissors:
 4) Stop the application stack and react app when done
+
+### Technology Stack
+
+1) Micronaut Framework
+2) Zookeeper
+3) Consul Service Discovery
+4) MySQL
+5) Redis Cache
+6) Test Containers 
+7) React (frontend)
+8) Docker
+9) Zipkin
+10) Hystrix/Resilience4J
+11) Micrometer
