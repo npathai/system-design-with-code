@@ -9,6 +9,7 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
@@ -94,10 +95,10 @@ class AnalyticsAPITest {
     public void givesUnauthorizedAccessWhenAnonymousRequestIsReceived() {
         httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + REDIRECTION.id())).blockingFirst();
 
-        HttpResponse<AnalyticsInfo> response = httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/analytics/" + REDIRECTION.id())
-                ,AnalyticsInfo.class).blockingFirst();
-
-        assertThat(response.status().getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.getCode());
+        Assertions.assertThatThrownBy(() -> httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/analytics/" +
+                REDIRECTION.id()), AnalyticsInfo.class).blockingFirst())
+                .isInstanceOf(HttpClientException.class)
+                .hasMessage("Unauthorized");
     }
 
     @Test
