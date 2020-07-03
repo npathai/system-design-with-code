@@ -91,6 +91,16 @@ class AnalyticsAPITest {
     }
 
     @Test
+    public void givesUnauthorizedAccessWhenAnonymousRequestIsReceived() {
+        httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + REDIRECTION.id())).blockingFirst();
+
+        HttpResponse<AnalyticsInfo> response = httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/analytics/" + REDIRECTION.id())
+                ,AnalyticsInfo.class).blockingFirst();
+
+        assertThat(response.status().getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.getCode());
+    }
+
+    @Test
     public void incrementsClickCountByOneWhenRedirectionIsVisited() {
         HttpResponse<String> redirectionResponse = httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + REDIRECTION.id()), String.class).blockingFirst();
         assertThat(redirectionResponse.status().getCode()).isEqualTo(HttpStatus.MOVED_PERMANENTLY.getCode());
