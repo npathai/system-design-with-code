@@ -1,6 +1,7 @@
 package org.npathai;
 
 import io.micronaut.context.BeanContext;
+import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import org.npathai.config.ZookeeperConfiguration;
 import org.npathai.domain.IdGenerationService;
@@ -18,6 +19,7 @@ public class DomainBeanFactory {
     @Inject
     BeanContext beanContext;
 
+    @Context
     @Singleton
      public ZkManager createZkManager() throws InterruptedException {
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
@@ -25,6 +27,7 @@ public class DomainBeanFactory {
                 beanContext.getBean(ZookeeperConfiguration.class).getUrl());
     }
 
+    @Context
     @Singleton
     public IdGenerationService idGenerationService() throws Exception {
         return new IdGenerationService(beanContext.getBean(ZkManager.class),

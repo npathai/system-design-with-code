@@ -31,7 +31,7 @@ class Shortener extends React.Component {
             type: this.props.tokenType,
             accessToken: this.props.accessToken
         }
-        this.props.dispatch(actions.createRedirection(token, this.props.longUrl))
+        this.props.dispatch(actions.createRedirection(this.props.isLoggedIn, token, this.props.longUrl))
         event.preventDefault();
     }
 
@@ -74,6 +74,7 @@ class Shortener extends React.Component {
 
 export default connect((state, props) => {
     return {
+        isLoggedIn: state.auth.isLoggedIn,
         tokenType: state.auth.tokenType,
         accessToken: state.auth.accessToken,
         shortUrl: state.redirection.shortUrl,

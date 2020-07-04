@@ -7,7 +7,7 @@ export function changeCopied(isCopied) {
     }
 }
 
-export function createRedirection(token, longUrl) {
+export function createRedirection(isLoggedIn, token, longUrl) {
     return (dispatch) => {
         let headers = {
             'Content-Type': 'application/json',
@@ -32,7 +32,9 @@ export function createRedirection(token, longUrl) {
             })
             .then(data => {
                 dispatch({type: types.RECEIVED_SHORTEN_REDIRECTION_SUCCESS, data: data})
-                dispatch(fetchRedirectionHistory(token))
+                if (isLoggedIn) {
+                    dispatch(fetchRedirectionHistory(token))
+                }
             })
             // We can do better error handling than this!
             .catch(err => {
