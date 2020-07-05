@@ -19,7 +19,7 @@ public class AnalyticsService {
         this.dao = dao;
     }
 
-    public void onSuccessfulRedirection(String id) {
+    public void onRedirectionClicked(String id) {
         dao.incrementClick(id);
     }
 

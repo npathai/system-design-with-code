@@ -28,6 +28,12 @@ public class AnalyticsAPI {
         analyticsService.onRedirectionCreated(id);
     }
 
+    @Secured("isAuthenticated()")
+    @Post("/analytics/{id}/click")
+    public void redirectionClicked(String id) {
+        analyticsService.onRedirectionClicked(id);
+    }
+
     @Get("/analytics/{id}")
     @Secured("isAuthenticated()")
     public HttpResponse<AnalyticsInfo> get(Authentication authentication, String id) throws DataAccessException {
