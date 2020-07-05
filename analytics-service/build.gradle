@@ -1,0 +1,5 @@
+dependencies {
+    compile project(":common-goodies")
+
+    implementation "io.micronaut:micronaut-security-jwt"
+}
