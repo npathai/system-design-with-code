@@ -16,13 +16,11 @@ public class DomainBeanFactory {
     @Inject
     BeanContext beanContext;
 
-    @Context
     @Singleton
     public AnalyticsDao analyticsDao() {
         return new InMemoryAnalyticsDao();
     }
 
-    @Context
     @Singleton
     public AnalyticsService analyticsService() {
         return new AnalyticsService(beanContext.getBean(AnalyticsDao.class));

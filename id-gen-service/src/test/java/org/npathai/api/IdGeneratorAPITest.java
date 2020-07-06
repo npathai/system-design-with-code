@@ -3,7 +3,6 @@ package org.npathai.api;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.npathai.annotations.ApiTest;
 import org.npathai.domain.Id;
@@ -24,11 +23,6 @@ class IdGeneratorAPITest {
     @Inject
     IdGeneratorClient client;
 
-    @BeforeEach
-    public void setup() throws Exception {
-        testingZkManager.setData(NEXT_ID_ZNODE, Id.first().encode().getBytes());
-    }
-
     @Test
     public void returnsIdOfLengthFiveInTextPlainContentType() {
         String generatedId = client.generate();
@@ -38,7 +32,9 @@ class IdGeneratorAPITest {
     }
 
     @MockBean(ZkManager.class)
-    public ZkManager createTestingZkManager() {
-        return new TestingZkManager();
+    public ZkManager createTestingZkManager() throws Exception {
+        TestingZkManager testingZkManager = new TestingZkManager();
+        testingZkManager.setData(NEXT_ID_ZNODE, Id.first().encode().getBytes());
+        return testingZkManager;
     }
 }

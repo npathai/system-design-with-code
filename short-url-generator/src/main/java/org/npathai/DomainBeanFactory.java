@@ -33,7 +33,6 @@ public class DomainBeanFactory {
     @Inject
     BeanContext beanContext;
 
-    @Context
     @Singleton
     public ZkManager createZkManager() throws InterruptedException {
         DefaultZkManagerFactory zkManagerFactory = new DefaultZkManagerFactory();
@@ -45,7 +44,6 @@ public class DomainBeanFactory {
         return new RedisRedirectionCache(beanContext.getBean(RedisConfiguration.class));
     }
 
-    @Context
     @Singleton
     public RedirectionDao redirectionDao() throws SQLException {
         return new MySqlRedirectionDao(beanContext.getBean(MySqlDatasourceConfiguration.class));
