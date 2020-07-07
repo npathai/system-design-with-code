@@ -3,7 +3,6 @@ package org.npathai.zookeeper;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.data.Stat;
 import org.npathai.annotations.TestingUtil;
-import org.npathai.zookeeper.ZkManager;
 
 import java.util.HashMap;
 import java.util.Map;

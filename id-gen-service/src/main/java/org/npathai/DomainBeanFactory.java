@@ -1,7 +1,6 @@
 package org.npathai;
 
 import io.micronaut.context.BeanContext;
-import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import org.npathai.config.ZookeeperConfiguration;
 import org.npathai.domain.IdGenerationService;

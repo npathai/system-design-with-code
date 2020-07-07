@@ -8,6 +8,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.domain.UrlShortener;
 
 import java.net.URI;
@@ -18,11 +19,11 @@ public class RedirectionController {
     private static final Logger LOG = LogManager.getLogger(RedirectionController.class);
 
     private final UrlShortener urlShortener;
-    private final RedirectionListener redirectionListener;
+    private final AnalyticsServiceClient analyticsServiceClient;
 
-    public RedirectionController(UrlShortener urlShortener, RedirectionListener redirectionListener) {
+    public RedirectionController(UrlShortener urlShortener, AnalyticsServiceClient analyticsServiceClient) {
         this.urlShortener = urlShortener;
-        this.redirectionListener = redirectionListener;
+        this.analyticsServiceClient = analyticsServiceClient;
     }
 
     @Secured("isAnonymous()")
@@ -34,8 +35,10 @@ public class RedirectionController {
             if (redirection.isEmpty()) {
                 return HttpResponse.notFound();
             }
+
+            analyticsServiceClient.redirectionClicked(id);
             LOG.info("Returning redirect response");
-            redirectionListener.onSuccessfulRedirection(httpRequest, id, redirection.get());
+
 
             return prepareRedirectResponse(redirection);
         } catch (Exception ex) {

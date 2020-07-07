@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.npathai.IdGenerationServiceStub;
 import org.npathai.cache.InMemoryRedirectionCache;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.dao.DataAccessException;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
@@ -22,8 +23,6 @@ import org.npathai.zookeeper.ZkManager;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 @MicronautTest
@@ -45,7 +44,7 @@ class RedirectionControllerTest {
     RedirectionDao redirectionDao;
 
     @Inject
-    RedirectionListener redirectionListener;
+    AnalyticsServiceClient analyticsServiceClient;
 
     @BeforeEach
     public void setUp() throws DataAccessException {
@@ -73,14 +72,13 @@ class RedirectionControllerTest {
     }
 
     @Test
-    public void invokesRedirectionListenerOnSuccessfulRedirection() {
+    public void invokesAnalyticsAPIForIncrementingClickCountOnSuccessfulRedirection() {
         Flowable<HttpResponse<String>> response =
                 httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
 
         response.blockingFirst();
 
-        verify(redirectionListener).onSuccessfulRedirection(any(HttpRequest.class),
-                eq(ID), eq(REDIRECTION.longUrl()));
+        verify(analyticsServiceClient).redirectionClicked(ID);
     }
 
     @MockBean(ZkManager.class)
@@ -98,8 +96,8 @@ class RedirectionControllerTest {
         return new InMemoryRedirectionDao();
     }
 
-    @MockBean(RedirectionListener.class)
-    public RedirectionListener createMockListener() {
-        return Mockito.mock(RedirectionListener.class);
+    @MockBean(AnalyticsServiceClient.class)
+    public AnalyticsServiceClient createMockListener() {
+        return Mockito.mock(AnalyticsServiceClient.class);
     }
 }

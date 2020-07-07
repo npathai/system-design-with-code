@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.DataAccessException;
@@ -26,7 +27,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LONG;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -41,6 +41,8 @@ public class UrlShortenerTest {
 
     @Mock
     private IdGenerationServiceClient idGenerationServiceClient;
+    @Mock
+    private AnalyticsServiceClient analyticsServiceClient;
     private MutableClock mutableClock = new MutableClock();
 
     private UrlShortener shortener;
@@ -55,8 +57,8 @@ public class UrlShortenerTest {
         inMemoryRedirectionDao = spy(new InMemoryRedirectionDao());
         urlLifetimeConfiguration.setAnonymous("60");
         urlLifetimeConfiguration.setAuthenticated("120");
-        shortener = new UrlShortener(urlLifetimeConfiguration, idGenerationServiceClient, inMemoryRedirectionDao,
-                redirectionCache, mutableClock);
+        shortener = new UrlShortener(urlLifetimeConfiguration, idGenerationServiceClient, analyticsServiceClient,
+                inMemoryRedirectionDao, redirectionCache, mutableClock);
         when(idGenerationServiceClient.generateId()).thenReturn(ID);
     }
 

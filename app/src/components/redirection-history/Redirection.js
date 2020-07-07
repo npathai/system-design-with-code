@@ -1,5 +1,4 @@
 import React from 'react'
-import {ActionTypes as types} from "../../constants";
 import {connect} from 'react-redux'
 
 class Redirection extends React.Component {

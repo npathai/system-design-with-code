@@ -14,9 +14,11 @@ import io.reactivex.Flowable;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.npathai.IdGenerationServiceStub;
 import org.npathai.cache.InMemoryRedirectionCache;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
@@ -29,11 +31,12 @@ import java.time.Duration;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 @MicronautTest
 class UrlShortenerAPITest {
 
-    public static final String ANY_ID = "AAAAA";
+    public static final String GENERATED_ID = "AAAAA";
     public static final String LONG_URL = "www.google.com";
 
     @Inject
@@ -41,6 +44,9 @@ class UrlShortenerAPITest {
 
     @Inject
     IdGenerationServiceStub idGenerationServiceStub;
+
+    @Inject
+    AnalyticsServiceClient analyticsServiceClient;
 
     @Inject
     @Client("/")
@@ -51,7 +57,7 @@ class UrlShortenerAPITest {
 
     @BeforeEach
     public void setUp() {
-        idGenerationServiceStub.setId(ANY_ID);
+        idGenerationServiceStub.setId(GENERATED_ID);
     }
 
     @Test
@@ -79,6 +85,18 @@ class UrlShortenerAPITest {
         ));
     }
 
+    @Test
+    public void notifiesAnalyticsServiceOfCreatedRedirection() throws JOSEException {
+        String accessToken = createJwtToken();
+
+        httpClient.retrieve(HttpRequest.create(HttpMethod.POST, "/shorten")
+                .headers(Map.of("Authorization", "Bearer " + accessToken))
+                .body(shortenRequest()))
+                .blockingFirst();
+
+        verify(analyticsServiceClient).redirectionCreated(GENERATED_ID);
+    }
+
     private String createJwtToken() throws JOSEException {
         return new JWTCreator(secretSignatureConfiguration.getSecret())
                 .createJwtForRoot().serialize();
@@ -86,7 +104,7 @@ class UrlShortenerAPITest {
 
     private static void assertCreatedResponse(String response, Duration expectedLifetime) {
         JsonObject parsedResponse = Json.parse(response).asObject();
-        assertThat(parsedResponse.get("id").asString()).isEqualTo(ANY_ID);
+        assertThat(parsedResponse.get("id").asString()).isEqualTo(GENERATED_ID);
         assertThat(parsedResponse.get("longUrl").asString()).isEqualTo(LONG_URL);
         long createdAtMillis = parsedResponse.get("createdAt").asLong();
         assertThat(createdAtMillis).isCloseTo(System.currentTimeMillis(),
@@ -118,5 +136,8 @@ class UrlShortenerAPITest {
         return new InMemoryRedirectionDao();
     }
 
-
+    @MockBean(AnalyticsServiceClient.class)
+    public AnalyticsServiceClient createAnalyticsServiceClient() {
+        return Mockito.mock(AnalyticsServiceClient.class);
+    }
 }

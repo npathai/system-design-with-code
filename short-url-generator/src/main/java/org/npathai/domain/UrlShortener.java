@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.api.ShortenRequest;
 import org.npathai.cache.RedirectionCache;
+import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.DataAccessException;
@@ -19,6 +20,7 @@ public class UrlShortener {
     private static final Logger LOG = LogManager.getLogger(UrlShortener.class);
 
     private final IdGenerationServiceClient idGenerationServiceClient;
+    private final AnalyticsServiceClient analyticsServiceClient;
     private final Clock clock;
     private final UrlLifetimeConfiguration urlLifetimeConfiguration;
     private RedirectionDao dao;
@@ -27,17 +29,26 @@ public class UrlShortener {
     public UrlShortener(
             UrlLifetimeConfiguration urlLifetimeConfiguration,
             IdGenerationServiceClient idGenerationServiceClient,
+            AnalyticsServiceClient analyticsServiceClient,
             RedirectionDao dao,
             RedirectionCache redirectionCache,
             Clock clock) {
         this.urlLifetimeConfiguration = urlLifetimeConfiguration;
         this.idGenerationServiceClient = idGenerationServiceClient;
+        this.analyticsServiceClient = analyticsServiceClient;
         this.dao = dao;
         this.redirectionCache = redirectionCache;
         this.clock = clock;
     }
 
     public Redirection shorten(ShortenRequest shortenRequest) throws Exception {
+        Redirection redirection = createRedirection(shortenRequest);
+        analyticsServiceClient.redirectionCreated(redirection.id());
+        LOG.info("Created new redirection. " + redirection);
+        return redirection;
+    }
+
+    private Redirection createRedirection(ShortenRequest shortenRequest) throws DataAccessException {
         // Remote call
         String id = idGenerationServiceClient.generateId();
         long creationTime = clock.millis();
@@ -48,7 +59,6 @@ public class UrlShortener {
             redirection = createAuthenticatedRedirection(shortenRequest, id, creationTime);
         }
         dao.save(redirection);
-        LOG.info("Created new redirection. " + redirection);
         return redirection;
     }
 

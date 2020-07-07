@@ -1,9 +1,11 @@
 package org.npathai.auth;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import io.micronaut.security.authentication.*;
+import io.micronaut.security.authentication.AuthenticationFailed;
+import io.micronaut.security.authentication.AuthenticationProvider;
+import io.micronaut.security.authentication.AuthenticationRequest;
+import io.micronaut.security.authentication.AuthenticationResponse;
 import io.reactivex.Flowable;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.dao.DataAccessException;
 import org.npathai.dao.UserDao;

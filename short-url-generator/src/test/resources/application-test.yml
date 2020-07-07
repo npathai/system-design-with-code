@@ -3,7 +3,6 @@ micronaut:
     port: -1
 
 ---
-
 consul:
   client:
     registration:
