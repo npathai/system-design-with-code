@@ -36,9 +36,11 @@ public class RedirectionController {
                 return HttpResponse.notFound();
             }
 
+            // FIXME we should only be invoking analytics service for non-anonymous redirections.
+            //  Need to find way to detect that info. Cannot use URLShortener.expand as we are not storing full
+            // information like UserId in redis cache
             analyticsServiceClient.redirectionClicked(id);
             LOG.info("Returning redirect response");
-
 
             return prepareRedirectResponse(redirection);
         } catch (Exception ex) {

@@ -43,7 +43,9 @@ public class UrlShortener {
 
     public Redirection shorten(ShortenRequest shortenRequest) throws Exception {
         Redirection redirection = createRedirection(shortenRequest);
-        analyticsServiceClient.redirectionCreated(redirection.id());
+        if (!shortenRequest.isAnonymous()) {
+            analyticsServiceClient.redirectionCreated(redirection.id());
+        }
         LOG.info("Created new redirection. " + redirection);
         return redirection;
     }

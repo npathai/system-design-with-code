@@ -20,6 +20,10 @@ micronaut:
       oauth:
         enabled: false
     token:
+      propagation:
+        enabled: true
+        service-id-regex: "analytics-service"
+        uri-regex: ".*"
       jwt:
         enabled: true
         signatures:

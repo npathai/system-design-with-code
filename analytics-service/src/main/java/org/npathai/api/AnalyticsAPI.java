@@ -13,6 +13,8 @@ import org.npathai.model.UserInfo;
 
 import java.util.Optional;
 
+// FIXME converting APIs to anonymous, as we need service-service token between short-url-generator and this service.
+// Need to find out how to achieve it using micronaut.
 @Controller
 public class AnalyticsAPI {
 
@@ -22,24 +24,23 @@ public class AnalyticsAPI {
         this.analyticsService = analyticsService;
     }
 
-    @Secured("isAuthenticated()")
+    @Secured("isAnonymous()")
     @Post("/analytics/{id}")
     public void post(String id) {
         analyticsService.onRedirectionCreated(id);
     }
 
-    @Secured("isAuthenticated()")
+    @Secured("isAnonymous()")
     @Post("/analytics/{id}/click")
     public void redirectionClicked(String id) {
         analyticsService.onRedirectionClicked(id);
     }
 
     @Get("/analytics/{id}")
-    @Secured("isAuthenticated()")
-    public HttpResponse<AnalyticsInfo> get(Authentication authentication, String id) throws DataAccessException {
-        UserInfo userInfo = UserInfo.fromAuthentication(authentication);
+    @Secured("isAnonymous()")
+    public HttpResponse<AnalyticsInfo> get(String id) throws DataAccessException {
         Optional<AnalyticsInfo> info;
-        info = analyticsService.getById(userInfo, id);
+        info = analyticsService.getById(null, id);
 
         if (info.isEmpty()) {
             return HttpResponse.notFound();

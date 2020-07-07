@@ -127,6 +127,12 @@ public class UrlShortenerTest {
 
             assertThat(expiryTime - redirection.createdAtMillis()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
         }
+
+        @Test
+        public void doesNotNofityAnalyticsServiceAsAnalyticsIsNotAvailableForAnonymousUser() throws Exception {
+            shortenAnonymously(LONG_URL);
+            verifyZeroInteractions(analyticsServiceClient);
+        }
     }
 
     @Nested
@@ -152,6 +158,13 @@ public class UrlShortenerTest {
             long expiryTime = redirection.expiryAtMillis();
 
             assertThat(expiryTime - redirection.createdAtMillis()).isEqualTo(Duration.ofSeconds(expiryInSeconds).toMillis());
+        }
+
+        @Test
+        public void notifiesAnalyticsService() throws Exception {
+            shortenAuthenticated(LONG_URL);
+
+            verify(analyticsServiceClient).redirectionCreated(ID);
         }
     }
 
