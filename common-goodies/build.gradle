@@ -1,6 +1,9 @@
 apply plugin: 'java'
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt
+    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.2'
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.0")
 

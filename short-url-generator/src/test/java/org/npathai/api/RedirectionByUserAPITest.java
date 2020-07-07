@@ -21,7 +21,7 @@ import org.npathai.dao.DataAccessException;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
 import org.npathai.model.Redirection;
-import org.npathai.util.JWTCreator;
+import org.npathai.util.jwt.JWTCreator;
 import org.npathai.zookeeper.TestingZkManager;
 import org.npathai.zookeeper.ZkManager;
 import org.unitils.reflectionassert.ReflectionAssert;

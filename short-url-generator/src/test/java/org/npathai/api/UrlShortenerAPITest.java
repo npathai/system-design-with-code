@@ -20,7 +20,7 @@ import org.npathai.cache.RedirectionCache;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.InMemoryRedirectionDao;
 import org.npathai.dao.RedirectionDao;
-import org.npathai.util.JWTCreator;
+import org.npathai.util.jwt.JWTCreator;
 import org.npathai.zookeeper.TestingZkManager;
 import org.npathai.zookeeper.ZkManager;
 

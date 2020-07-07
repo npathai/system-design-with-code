@@ -7,8 +7,6 @@ import org.npathai.dao.DataAccessException;
 import org.npathai.model.AnalyticsInfo;
 import org.npathai.model.UserInfo;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class AnalyticsService {
@@ -21,6 +19,7 @@ public class AnalyticsService {
 
     public void onRedirectionClicked(String id) {
         dao.incrementClick(id);
+        LOG.debug("Incremented click count for id:{}", id);
     }
 
     public Optional<AnalyticsInfo> getById(UserInfo userInfo, String id) throws DataAccessException {
@@ -33,6 +32,7 @@ public class AnalyticsService {
     }
 
     public void onRedirectionCreated(String id) {
+        LOG.debug("Creating analytics info for id:{}", id);
         dao.save(new AnalyticsInfo(id));
     }
 }

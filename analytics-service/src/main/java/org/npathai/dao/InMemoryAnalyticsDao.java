@@ -12,7 +12,6 @@ public class InMemoryAnalyticsDao implements AnalyticsDao {
 
     @Override
     public void incrementClick(String id) {
-        clickCount.putIfAbsent(id, new AnalyticsInfo(id));
         clickCount.computeIfPresent(id, (key, oldVal) -> oldVal.incrementClick());
     }
 

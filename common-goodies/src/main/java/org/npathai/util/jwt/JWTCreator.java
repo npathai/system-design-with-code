@@ -1,4 +1,4 @@
-package org.npathai.util;
+package org.npathai.util.jwt;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
