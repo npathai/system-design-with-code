@@ -33,7 +33,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
-public class RedirectionByUserAPITest {
+public class RedirectionHistoryAPITest {
     private static final String ANY_ID = "AAABB";
     private static final String LONG_URL = "www.google.com";
 
