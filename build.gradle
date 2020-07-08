@@ -123,6 +123,12 @@ configure(microserviceProjects()) {
 
 // https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
         compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.31'
+
+        compile "io.micronaut.configuration:micronaut-micrometer-core"
+        // micrometer-registry-statsd also pulls in micrometer-core so included above to verbose example
+        compile "io.micronaut.configuration:micronaut-micrometer-registry-graphite"
+        // Also required to enable endpoint
+        compile "io.micronaut:micronaut-management"
     }
 
     shadowJar {

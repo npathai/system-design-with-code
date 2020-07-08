@@ -67,6 +67,8 @@ class AnalyticsAPITest {
         assertThat(response.status().getCode()).isEqualTo(HttpStatus.OK.getCode());
     }
 
+    // Disabled because authentication has been removed temporarily
+    @Disabled
     @Test
     public void givesUnauthorizedAccessWhenAnonymousRequestIsReceived() {
         Assertions.assertThatThrownBy(() -> httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/analytics/" +

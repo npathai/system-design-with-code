@@ -3,6 +3,10 @@ micronaut:
     port: -1
 
 ---
+micronaut:
+  metrics:
+    enabled: false
+---
 consul:
   client:
     registration:
