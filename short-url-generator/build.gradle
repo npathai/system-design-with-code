@@ -12,4 +12,6 @@ dependencies {
     testCompile "org.testcontainers:testcontainers"
     testCompile "org.testcontainers:mysql"
     testCompile "org.testcontainers:junit-jupiter"
+
+    compile "io.micronaut.configuration:micronaut-micrometer-core"
 }

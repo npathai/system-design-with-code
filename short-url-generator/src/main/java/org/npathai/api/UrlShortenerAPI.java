@@ -1,6 +1,7 @@
 package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -22,9 +23,11 @@ public class UrlShortenerAPI {
     private static final Logger LOG = LogManager.getLogger(UrlShortenerAPI.class);
 
     private final UrlShortener shortener;
+    private final MeterRegistry metricRegistry;
 
-    public UrlShortenerAPI(UrlShortener shortener) {
+    public UrlShortenerAPI(UrlShortener shortener, MeterRegistry metricRegistry) {
         this.shortener = shortener;
+        this.metricRegistry = metricRegistry;
     }
 
     @Secured("isAnonymous()")
@@ -32,11 +35,14 @@ public class UrlShortenerAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public String shorten(@Nullable Authentication principal,
                           @Body ShortenRequest shortenRequest) throws Exception {
+
+        metricRegistry.counter("web.access.controller.url.shorten.request").increment();
         if (principal != null) {
             UserInfo userInfo = UserInfo.fromAuthentication(principal);
             shortenRequest.setUserInfo(userInfo);
         }
         Redirection redirection = shortener.shorten(shortenRequest);
+
         return jsonFor(redirection);
     }
 

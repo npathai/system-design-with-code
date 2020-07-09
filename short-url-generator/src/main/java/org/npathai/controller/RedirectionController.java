@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.domain.UrlShortener;
+import io.micrometer.core.instrument.MeterRegistry;
 
 import java.net.URI;
 import java.util.Optional;
@@ -20,19 +21,25 @@ public class RedirectionController {
 
     private final UrlShortener urlShortener;
     private final AnalyticsServiceClient analyticsServiceClient;
+    private final MeterRegistry metricRegistry;
 
-    public RedirectionController(UrlShortener urlShortener, AnalyticsServiceClient analyticsServiceClient) {
+    public RedirectionController(UrlShortener urlShortener, AnalyticsServiceClient analyticsServiceClient,
+                                 MeterRegistry metricRegistry) {
         this.urlShortener = urlShortener;
         this.analyticsServiceClient = analyticsServiceClient;
+        this.metricRegistry = metricRegistry;
     }
 
     @Secured("isAnonymous()")
     @Get("/{id}")
     public HttpResponse<String> handle(HttpRequest<?> httpRequest, String id) throws Exception {
         try {
+            metricRegistry.counter("web.access.controller.url.redirect.received").increment();
             LOG.info("Request received for expanding id: " + id);
+
             Optional<String> redirection = urlShortener.expand(id);
             if (redirection.isEmpty()) {
+                metricRegistry.counter("web.access.controller.url.redirect.notfound").increment();
                 return HttpResponse.notFound();
             }
 
@@ -41,9 +48,10 @@ public class RedirectionController {
             // information like UserId in redis cache
             analyticsServiceClient.redirectionClicked(id);
             LOG.info("Returning redirect response");
-
+            metricRegistry.counter("web.access.controller.url.redirect.successful").increment();
             return prepareRedirectResponse(redirection);
         } catch (Exception ex) {
+            metricRegistry.counter("web.access.controller.url.redirect.error").increment();
             LOG.error(ex);
             throw ex;
         }
