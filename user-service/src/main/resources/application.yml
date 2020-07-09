@@ -28,6 +28,15 @@ micronaut:
               secret: "${JWT_GENERATOR_SIGNATURE_SECRET:ThisIsHighlySensitiveInformation}"
 ---
 
+micronaut:
+  metrics:
+    enabled: true
+    export:
+      graphite:
+        enabled: true
+        host: graphite
+---
+
 mysql:
   url: jdbc:mysql://userdb:3306/user_db
   user: root

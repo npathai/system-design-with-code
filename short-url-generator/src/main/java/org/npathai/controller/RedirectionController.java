@@ -34,12 +34,12 @@ public class RedirectionController {
     @Get("/{id}")
     public HttpResponse<String> handle(HttpRequest<?> httpRequest, String id) throws Exception {
         try {
-            metricRegistry.counter("web.access.controller.url.redirect.received").increment();
+            metricRegistry.counter("web.access.controller.shorturl.gen.redirection.request").increment();
             LOG.info("Request received for expanding id: " + id);
 
             Optional<String> redirection = urlShortener.expand(id);
             if (redirection.isEmpty()) {
-                metricRegistry.counter("web.access.controller.url.redirect.notfound").increment();
+                metricRegistry.counter("web.access.controller.shorturl.gen.redirection.request").increment();
                 return HttpResponse.notFound();
             }
 
@@ -60,7 +60,7 @@ public class RedirectionController {
     private MutableHttpResponse<String> prepareRedirectResponse(Optional<String> redirection) {
         MutableHttpResponse<String> response = HttpResponse.redirect(URI.create(redirection.get()));
         // We want to avoid caching due to statistics, we wan't request to be served from server every time
-        response.header("Cache-Control", "no-store");
+        response.header("Cache-Control.no-store");
         return response;
     }
 }

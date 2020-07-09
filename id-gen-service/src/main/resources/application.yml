@@ -8,7 +8,14 @@ micronaut:
     netty:
       log-level: ERROR
 
-
+---
+micronaut:
+  metrics:
+    enabled: true
+    export:
+      graphite:
+        enabled: true
+        host: graphite
 ---
 zookeeper:
   url: zookeeper:2181

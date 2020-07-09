@@ -99,3 +99,8 @@ services:
       - short-url-generator
     ports:
       - "4000:4000"
+
+  graphite:
+    image: graphiteapp/graphite-statsd:latest
+    ports:
+      - "80:80"
