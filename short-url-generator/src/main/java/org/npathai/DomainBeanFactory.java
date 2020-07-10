@@ -1,5 +1,6 @@
 package org.npathai;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.Factory;
 import org.npathai.cache.RedirectionCache;
@@ -41,7 +42,8 @@ public class DomainBeanFactory {
 
     @Singleton
     public RedirectionDao redirectionDao() throws SQLException {
-        return new MySqlRedirectionDao(beanContext.getBean(MySqlDatasourceConfiguration.class));
+        return new MySqlRedirectionDao(beanContext.getBean(MySqlDatasourceConfiguration.class),
+                beanContext.getBean(MeterRegistry.class));
     }
 
     @Singleton

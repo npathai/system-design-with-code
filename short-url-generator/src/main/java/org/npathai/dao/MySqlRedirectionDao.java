@@ -1,6 +1,7 @@
 package org.npathai.dao;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.npathai.config.MySqlDatasourceConfiguration;
 import org.npathai.model.Redirection;
 
@@ -18,10 +19,14 @@ public class MySqlRedirectionDao implements RedirectionDao {
     private static final String SELECT_BY_USER_ID_SQL = "select * from redirection where uid = ? order by created_at desc";
 
     private final MysqlDataSource dataSource;
+    private final MySqlDatasourceConfiguration mySqlDatasourceConfiguration;
+    private final MeterRegistry meterRegistry;
 
     // FIXME constructor is doing real work
     // FIXME use connection pooling
-    public MySqlRedirectionDao(MySqlDatasourceConfiguration mySqlDatasourceConfiguration) {
+    public MySqlRedirectionDao(MySqlDatasourceConfiguration mySqlDatasourceConfiguration, MeterRegistry meterRegistry) {
+        this.mySqlDatasourceConfiguration = mySqlDatasourceConfiguration;
+        this.meterRegistry = meterRegistry;
         dataSource = new MysqlDataSource();
         dataSource.setUser(mySqlDatasourceConfiguration.getUser());
         dataSource.setPassword(mySqlDatasourceConfiguration.getPassword());
@@ -33,6 +38,7 @@ public class MySqlRedirectionDao implements RedirectionDao {
 
     @Override
     public void save(Redirection redirection) throws DataAccessException {
+        meterRegistry.counter("db.access.shorturl.gen.redirection.save.request").increment();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
 
@@ -43,13 +49,16 @@ public class MySqlRedirectionDao implements RedirectionDao {
             preparedStatement.setString(5, redirection.uid());
             int count = preparedStatement.executeUpdate();
             assert count == 1;
+            meterRegistry.counter("db.access.shorturl.gen.redirection.save.success").increment();
         } catch (SQLException ex) {
+            meterRegistry.counter("db.access.shorturl.gen.redirection.save.failed").increment();
             throw new DataAccessException(ex);
         }
     }
 
     @Override
     public Optional<Redirection> getById(@Nonnull String id) throws DataAccessException {
+        meterRegistry.counter("db.access.shorturl.gen.redirection.getById.request").increment();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = createSelectByIdStatement(connection, id);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -58,26 +67,32 @@ public class MySqlRedirectionDao implements RedirectionDao {
                 return Optional.empty();
             }
 
+            meterRegistry.counter("db.access.shorturl.gen.redirection.getById.success").increment();
             return Optional.of(createRedirection(resultSet));
         } catch (SQLException ex) {
+            meterRegistry.counter("db.access.shorturl.gen.redirection.getById.failed").increment();
             throw new DataAccessException(ex);
         }
     }
 
     @Override
     public void deleteById(String id) throws DataAccessException {
+        meterRegistry.counter("db.access.shorturl.gen.redirection.deleteById.request").increment();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
 
             preparedStatement.setString(1, id);
             preparedStatement.executeUpdate();
+            meterRegistry.counter("db.access.shorturl.gen.redirection.deleteById.success").increment();
         } catch (SQLException ex) {
+            meterRegistry.counter("db.access.shorturl.gen.redirection.deleteById.failed").increment();
             throw new DataAccessException(ex);
         }
     }
 
     @Override
     public List<Redirection> getAllByUser(String uid) throws DataAccessException {
+        meterRegistry.counter("db.access.shorturl.gen.redirection.getAllByUser.request").increment();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = createSelectByUserIdStatement(connection, uid);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -86,8 +101,10 @@ public class MySqlRedirectionDao implements RedirectionDao {
             while (resultSet.next()) {
                 redirectionsByUser.add(createRedirection(resultSet));
             }
+            meterRegistry.counter("db.access.shorturl.gen.redirection.getAllByUser.success").increment();
             return redirectionsByUser;
         } catch (SQLException ex) {
+            meterRegistry.counter("db.access.shorturl.gen.redirection.getAllByUser.failed").increment();
             throw new DataAccessException(ex);
         }
     }

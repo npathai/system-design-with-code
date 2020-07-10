@@ -1,5 +1,7 @@
 package org.npathai.dao;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.npathai.config.MySqlDatasourceConfiguration;
@@ -9,6 +11,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.unitils.reflectionassert.ReflectionAssert;
 
+import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @Testcontainers
+@MicronautTest
 class MySqlRedirectionDaoTest {
 
     private static final String ID = "AAAAA";
@@ -25,6 +29,9 @@ class MySqlRedirectionDaoTest {
     private static final long CREATED_AT = System.currentTimeMillis();
     private static final String USER_ID = UUID.randomUUID().toString();
     private static final String USER_ID_2 = UUID.randomUUID().toString();
+
+    @Inject
+    MeterRegistry meterRegistry;
 
     @Container
     public MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:latest")
@@ -43,7 +50,7 @@ class MySqlRedirectionDaoTest {
         configuration.setPassword("unsecured");
         configuration.setUrl(String.format("jdbc:mysql://%s:%d/short_url_generator",
                 mysqlContainer.getContainerIpAddress(), mysqlContainer.getMappedPort(3306)));
-        dao = new MySqlRedirectionDao(configuration);
+        dao = new MySqlRedirectionDao(configuration, meterRegistry);
     }
 
     @Test
