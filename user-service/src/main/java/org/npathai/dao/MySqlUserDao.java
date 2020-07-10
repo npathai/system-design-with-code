@@ -1,6 +1,7 @@
 package org.npathai.dao;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.npathai.config.MySqlDatasourceConfiguration;
 import org.npathai.model.User;
 
@@ -15,8 +16,10 @@ public class MySqlUserDao implements UserDao {
             + "from users where username=?";
 
     private final MysqlDataSource dataSource;
+    private final MeterRegistry meterRegistry;
 
-    public MySqlUserDao(MySqlDatasourceConfiguration datasourceConfiguration) {
+    public MySqlUserDao(MySqlDatasourceConfiguration datasourceConfiguration, MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
         dataSource = new MysqlDataSource();
         dataSource.setUser(datasourceConfiguration.getUser());
         dataSource.setPassword(datasourceConfiguration.getPassword());
@@ -25,6 +28,7 @@ public class MySqlUserDao implements UserDao {
 
     @Override
     public Optional<User> getUserByName(String username) throws DataAccessException {
+        meterRegistry.counter("db.access.user.service.user.getByUserName.request").increment();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = prepareGetByUsernameStatement(connection, username);
              ResultSet resultSet = ps.executeQuery();
@@ -32,8 +36,10 @@ public class MySqlUserDao implements UserDao {
             if (!resultSet.next()) {
                 return Optional.empty();
             }
+            meterRegistry.counter("db.access.user.service.user.getByUserName.success").increment();
             return Optional.of(toUser(resultSet));
         } catch (SQLException ex) {
+            meterRegistry.counter("db.access.user.service.user.getByUserName.failed").increment();
             throw new DataAccessException(ex);
         }
     }

@@ -1,5 +1,7 @@
 package org.npathai.dao;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.npathai.config.MySqlDatasourceConfiguration;
@@ -9,12 +11,17 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.unitils.reflectionassert.ReflectionAssert;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
+@MicronautTest
 class MySqlUserDaoTest {
+
+    @Inject
+    MeterRegistry meterRegistry;
 
     @Container
     public MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:latest")
@@ -33,7 +40,7 @@ class MySqlUserDaoTest {
         configuration.setPassword("unsecured");
         configuration.setUrl(String.format("jdbc:mysql://%s:%d/user_db",
                 mysqlContainer.getContainerIpAddress(), mysqlContainer.getMappedPort(3306)));
-        dao = new MySqlUserDao(configuration);
+        dao = new MySqlUserDao(configuration, meterRegistry);
     }
 
     @Test
