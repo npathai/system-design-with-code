@@ -126,7 +126,7 @@ configure(microserviceProjects()) {
 
         compile "io.micronaut.configuration:micronaut-micrometer-core"
         // micrometer-registry-statsd also pulls in micrometer-core so included above to verbose example
-        compile "io.micronaut.configuration:micronaut-micrometer-registry-graphite"
+        compile "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus"
         // Also required to enable endpoint
         compile "io.micronaut:micronaut-management"
     }

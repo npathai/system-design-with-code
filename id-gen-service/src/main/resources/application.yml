@@ -9,13 +9,18 @@ micronaut:
       log-level: ERROR
 
 ---
+endpoints:
+  prometheus:
+    sensitive: false
+---
 micronaut:
   metrics:
     enabled: true
     export:
-      graphite:
+      prometheus:
         enabled: true
-        host: graphite
+        step: PT1M
+        descriptions: true
 ---
 zookeeper:
   url: zookeeper:2181
