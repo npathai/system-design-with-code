@@ -100,7 +100,11 @@ services:
     ports:
       - "4000:4000"
 
-  graphite:
-    image: graphiteapp/graphite-statsd:latest
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus-micronaut.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "80:80"
+      - "9090:9090"
+    depends_on:
+      - consul
