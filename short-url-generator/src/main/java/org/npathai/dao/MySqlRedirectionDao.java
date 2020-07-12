@@ -2,7 +2,10 @@ package org.npathai.dao;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micronaut.http.HttpMethod;
 import org.npathai.config.MySqlDatasourceConfiguration;
+import org.npathai.metrics.ServiceTags;
 import org.npathai.model.Redirection;
 
 import javax.annotation.Nonnull;
@@ -10,6 +13,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.npathai.metrics.ServiceTags.DatabaseTags.*;
 
 public class MySqlRedirectionDao implements RedirectionDao {
 
@@ -38,7 +43,8 @@ public class MySqlRedirectionDao implements RedirectionDao {
 
     @Override
     public void save(Redirection redirection) throws DataAccessException {
-        meterRegistry.counter("db.access.shorturl.gen.redirection.save.request").increment();
+        Tags commonTags = incrementDatabaseRequestsMetric("save");
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
 
@@ -49,16 +55,17 @@ public class MySqlRedirectionDao implements RedirectionDao {
             preparedStatement.setString(5, redirection.uid());
             int count = preparedStatement.executeUpdate();
             assert count == 1;
-            meterRegistry.counter("db.access.shorturl.gen.redirection.save.success").increment();
+            meterRegistry.counter("database.responses.total", databaseSuccessTags(commonTags));
         } catch (SQLException ex) {
-            meterRegistry.counter("db.access.shorturl.gen.redirection.save.failed").increment();
+            meterRegistry.counter("database.responses.total", databaseErrorTags(commonTags)).increment();
             throw new DataAccessException(ex);
         }
     }
 
     @Override
     public Optional<Redirection> getById(@Nonnull String id) throws DataAccessException {
-        meterRegistry.counter("db.access.shorturl.gen.redirection.getById.request").increment();
+        Tags commonTags = incrementDatabaseRequestsMetric("getById");
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = createSelectByIdStatement(connection, id);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -67,32 +74,34 @@ public class MySqlRedirectionDao implements RedirectionDao {
                 return Optional.empty();
             }
 
-            meterRegistry.counter("db.access.shorturl.gen.redirection.getById.success").increment();
+            meterRegistry.counter("database.responses.total", databaseSuccessTags(commonTags)).increment();
             return Optional.of(createRedirection(resultSet));
         } catch (SQLException ex) {
-            meterRegistry.counter("db.access.shorturl.gen.redirection.getById.failed").increment();
+            meterRegistry.counter("database.responses.total", databaseErrorTags(commonTags)).increment();
             throw new DataAccessException(ex);
         }
     }
 
     @Override
     public void deleteById(String id) throws DataAccessException {
-        meterRegistry.counter("db.access.shorturl.gen.redirection.deleteById.request").increment();
+        Tags commonTags = incrementDatabaseRequestsMetric("deleteById");
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
 
             preparedStatement.setString(1, id);
             preparedStatement.executeUpdate();
-            meterRegistry.counter("db.access.shorturl.gen.redirection.deleteById.success").increment();
+            meterRegistry.counter("database.responses.total", databaseSuccessTags(commonTags)).increment();
         } catch (SQLException ex) {
-            meterRegistry.counter("db.access.shorturl.gen.redirection.deleteById.failed").increment();
+            meterRegistry.counter("database.responses.total", databaseErrorTags(commonTags)).increment();
             throw new DataAccessException(ex);
         }
     }
 
     @Override
     public List<Redirection> getAllByUser(String uid) throws DataAccessException {
-        meterRegistry.counter("db.access.shorturl.gen.redirection.getAllByUser.request").increment();
+        Tags commonTags = incrementDatabaseRequestsMetric("getAllByUser");
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = createSelectByUserIdStatement(connection, uid);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -101,10 +110,10 @@ public class MySqlRedirectionDao implements RedirectionDao {
             while (resultSet.next()) {
                 redirectionsByUser.add(createRedirection(resultSet));
             }
-            meterRegistry.counter("db.access.shorturl.gen.redirection.getAllByUser.success").increment();
+            meterRegistry.counter("database.responses.total", databaseSuccessTags(commonTags)).increment();
             return redirectionsByUser;
         } catch (SQLException ex) {
-            meterRegistry.counter("db.access.shorturl.gen.redirection.getAllByUser.failed").increment();
+            meterRegistry.counter("database.responses.total", databaseErrorTags(commonTags)).increment();
             throw new DataAccessException(ex);
         }
     }
@@ -126,5 +135,11 @@ public class MySqlRedirectionDao implements RedirectionDao {
                 resultSet.getTimestamp("created_at").getTime(),
                 resultSet.getTimestamp("expiry_at").getTime(),
                 resultSet.getString("uid"));
+    }
+
+    private Tags incrementDatabaseRequestsMetric(String operation) {
+        Tags commonTags = databaseTags("short.url.generator", "redirection", operation);
+        meterRegistry.counter("database.requests.total", commonTags);
+        return commonTags;
     }
 }

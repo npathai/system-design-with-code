@@ -53,7 +53,8 @@ public class DomainBeanFactory {
                 beanContext.getBean(AnalyticsServiceClient.class),
                 beanContext.getBean(RedirectionDao.class),
                 beanContext.getBean(RedirectionCache.class),
-                Clock.systemDefaultZone());
+                Clock.systemDefaultZone(),
+                beanContext.getBean(MeterRegistry.class));
     }
 
     @Singleton

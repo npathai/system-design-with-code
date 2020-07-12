@@ -1,5 +1,7 @@
 package org.npathai.domain;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.npathai.model.Redirection;
 import org.npathai.model.UserInfo;
 import org.npathai.util.time.MutableClock;
 
+import javax.inject.Inject;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+@MicronautTest
 public class UrlShortenerTest {
 
     public static final String LONG_URL = "http://google.com";
@@ -44,6 +48,8 @@ public class UrlShortenerTest {
     @Mock
     private AnalyticsServiceClient analyticsServiceClient;
     private MutableClock mutableClock = new MutableClock();
+    @Inject
+    MeterRegistry meterRegistry;
 
     private UrlShortener shortener;
     private RedirectionCache redirectionCache;
@@ -58,7 +64,7 @@ public class UrlShortenerTest {
         urlLifetimeConfiguration.setAnonymous("60");
         urlLifetimeConfiguration.setAuthenticated("120");
         shortener = new UrlShortener(urlLifetimeConfiguration, idGenerationServiceClient, analyticsServiceClient,
-                inMemoryRedirectionDao, redirectionCache, mutableClock);
+                inMemoryRedirectionDao, redirectionCache, mutableClock, meterRegistry);
         when(idGenerationServiceClient.generateId()).thenReturn(ID);
     }
 

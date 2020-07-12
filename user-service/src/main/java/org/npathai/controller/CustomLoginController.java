@@ -1,17 +1,19 @@
 package org.npathai.controller;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authenticator;
 import io.micronaut.security.authentication.UsernamePasswordCredentials;
 import io.micronaut.security.endpoints.LoginController;
 import io.micronaut.security.handlers.LoginHandler;
 import io.reactivex.Single;
+import org.npathai.metrics.ServiceTags;
 
 import javax.validation.Valid;
 
@@ -19,6 +21,7 @@ import javax.validation.Valid;
 @Replaces(LoginController.class)
 public class CustomLoginController extends LoginController {
 
+    private static final String LOGIN_ENDPOINT = "/login";
     private final MeterRegistry meterRegistry;
 
     /**
@@ -34,14 +37,14 @@ public class CustomLoginController extends LoginController {
 
     @Override
     public Single<HttpResponse> login(@Valid UsernamePasswordCredentials usernamePasswordCredentials, HttpRequest<?> request) {
-        meterRegistry.counter("web.access.controller.user.service.login.request").increment();
+        Tags commonTags = ServiceTags.httpApiTags("user.service",  "authentication",
+                LOGIN_ENDPOINT, HttpMethod.POST);
+
+        meterRegistry.counter("http.requests.total", commonTags).increment();
         return super.login(usernamePasswordCredentials, request)
                 .map(loginResponse -> {
-                    if (loginResponse.status() != HttpStatus.UNAUTHORIZED) {
-                        meterRegistry.counter("web.access.controller.user.service.login.successful").increment();
-                    } else {
-                        meterRegistry.counter("web.access.controller.user.service.login.failed").increment();
-                    }
+                    meterRegistry.counter("http.responses.total",
+                            ServiceTags.httpStatusTags(commonTags, loginResponse.getStatus())).increment();
                     return loginResponse;
                 });
     }

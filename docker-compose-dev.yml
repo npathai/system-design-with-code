@@ -108,3 +108,10 @@ services:
       - "9090:9090"
     depends_on:
       - consul
+
+#  grafana:
+#    image: grafana/grafana:latest
+#    ports:
+#      - "8081:3000"
+#    depends_on:
+#      - prometheus

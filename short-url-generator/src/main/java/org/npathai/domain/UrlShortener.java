@@ -1,5 +1,8 @@
 package org.npathai.domain;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.api.ShortenRequest;
@@ -9,6 +12,7 @@ import org.npathai.client.IdGenerationServiceClient;
 import org.npathai.config.UrlLifetimeConfiguration;
 import org.npathai.dao.DataAccessException;
 import org.npathai.dao.RedirectionDao;
+import org.npathai.metrics.ServiceTags;
 import org.npathai.model.Redirection;
 
 import java.sql.Timestamp;
@@ -22,6 +26,7 @@ public class UrlShortener {
     private final IdGenerationServiceClient idGenerationServiceClient;
     private final AnalyticsServiceClient analyticsServiceClient;
     private final Clock clock;
+    private final MeterRegistry meterRegistry;
     private final UrlLifetimeConfiguration urlLifetimeConfiguration;
     private RedirectionDao dao;
     private final RedirectionCache redirectionCache;
@@ -32,13 +37,15 @@ public class UrlShortener {
             AnalyticsServiceClient analyticsServiceClient,
             RedirectionDao dao,
             RedirectionCache redirectionCache,
-            Clock clock) {
+            Clock clock,
+            MeterRegistry meterRegistry) {
         this.urlLifetimeConfiguration = urlLifetimeConfiguration;
         this.idGenerationServiceClient = idGenerationServiceClient;
         this.analyticsServiceClient = analyticsServiceClient;
         this.dao = dao;
         this.redirectionCache = redirectionCache;
         this.clock = clock;
+        this.meterRegistry = meterRegistry;
     }
 
     public Redirection shorten(ShortenRequest shortenRequest) throws Exception {
@@ -91,12 +98,22 @@ public class UrlShortener {
      * Should be used to get redirection url
      */
     public Optional<String> expand(String id) throws Exception {
+        Tags tags = ServiceTags.serviceTags("short.url.generator", "url.shortener",
+                "expand");
+
+        meterRegistry.counter("url.redirection.requests.total", tags).increment();
+
         Optional<Redirection> cachedRedirection = redirectionCache.getById(id);
         if (cachedRedirection.isPresent()) {
+            tags = tags.and("cache.hit", "true");
+
             if (!cachedRedirection.get().isExpired(clock)) {
                 LOG.info("Redirection with id: " + id + " found in cache and is not expired.");
+                tags = tags.and("redirection.status", "active");
+                meterRegistry.counter("url.redirection.responses.total", tags).increment();
                 return cachedRedirection.map(Redirection::longUrl);
             }
+
 
             LOG.info(String.format("Expiry Time: %s <= %s",
                     new Timestamp(cachedRedirection.get().expiryAtMillis()),
@@ -105,8 +122,12 @@ public class UrlShortener {
 
             redirectionCache.deleteById(id);
             dao.deleteById(id);
+            tags = tags.and("redirection.status", "active");
+            meterRegistry.counter("url.redirection.responses.total", tags).increment();
             return Optional.empty();
         }
+
+        tags = tags.and("cache.hit", "false");
 
         // This is first time url is being accessed
         LOG.info("Redirection with id: " + id + " accessed for first time");
@@ -121,13 +142,17 @@ public class UrlShortener {
             LOG.info(String.format("Expiry Time: %s <= %s",
                     new Timestamp(redirection.expiryAtMillis()),
                     new Timestamp(clock.millis())));
-            LOG.info("Redirection with id: " + id + " is expired.");
             dao.deleteById(id);
+            LOG.info("Redirection with id: " + id + " is expired.");
+            tags = tags.and("redirection.status", "expired");
+            meterRegistry.counter("url.redirection.responses.total", tags).increment();
             return Optional.empty();
         }
 
-        LOG.info("Saving redirection with id: " + id + " in cache");
         redirectionCache.put(redirection);
+        LOG.info("Saved redirection with id: " + id + " in cache");
+        tags = tags.and("redirection.status", "active");
+        meterRegistry.counter("url.redirection.responses.total", tags).increment();
         return optionalRedirection.map(Redirection::longUrl);
     }
 }

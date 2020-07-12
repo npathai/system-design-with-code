@@ -2,8 +2,10 @@ package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micronaut.context.annotation.ConfigurationProperties;
-import io.micronaut.context.annotation.Property;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -14,23 +16,24 @@ import io.micronaut.security.authentication.Authentication;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.npathai.domain.UrlShortener;
+import org.npathai.metrics.ServiceTags;
 import org.npathai.model.Redirection;
 import org.npathai.model.UserInfo;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 
-@Controller("/shorten")
+@Controller(UrlShortenerAPI.SHORTEN_API_ENDPOINT)
 public class UrlShortenerAPI {
     private static final Logger LOG = LogManager.getLogger(UrlShortenerAPI.class);
+    public static final String SHORTEN_API_ENDPOINT = "/shorten";
 
     private final UrlShortener shortener;
-    private final MeterRegistry metricRegistry;
+    private final MeterRegistry meterRegistry;
 
     public UrlShortenerAPI(UrlShortener shortener, MeterRegistry metricRegistry) {
         this.shortener = shortener;
-        this.metricRegistry = metricRegistry;
+        this.meterRegistry = metricRegistry;
     }
 
     @Secured("isAnonymous()")
@@ -39,14 +42,20 @@ public class UrlShortenerAPI {
     public String shorten(@Nullable Authentication principal,
                           @Body ShortenRequest shortenRequest) throws Exception {
 
-        metricRegistry.counter("web.access.controller.shorturl.gen.shorten.request").increment();
+        Tags commonTags = ServiceTags.httpApiTags("short.url.generator",  "shortening",
+                SHORTEN_API_ENDPOINT, HttpMethod.POST);
+
         if (principal != null) {
             UserInfo userInfo = UserInfo.fromAuthentication(principal);
             shortenRequest.setUserInfo(userInfo);
-            metricRegistry.counter("web.access.controller.shorturl.gen.shorten.request.authenticated").increment();
         }
+
+        meterRegistry.counter("http.requests.total", commonTags).increment();
+
         Redirection redirection = shortener.shorten(shortenRequest);
-        metricRegistry.counter("web.access.controller.shorturl.gen.shorten.success").increment();
+
+        meterRegistry.counter("http.responses.total", ServiceTags.httpOkStatusTags(commonTags)).increment();
+
         return jsonFor(redirection);
     }
 
