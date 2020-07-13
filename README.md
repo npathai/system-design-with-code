@@ -51,7 +51,7 @@ For easy way to view the logs and login to containers use Docker dashboard on Wi
  2) Nginx loadbalancer - `http://localhost:4000`
  3) Consul - `http://localhost:8500`
  4) Prometheus - `http://localhost:9090`
- 5 Grafana - `http://localhost:8081`
+ 5) Grafana - `http://localhost:8081`
 
 
 ### Technology Stack
