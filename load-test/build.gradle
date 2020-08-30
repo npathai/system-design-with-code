@@ -1,0 +1,23 @@
+plugins {
+    id 'scala'
+    id 'com.github.lkishalmi.gatling' version "3.3.4"
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+sourceSets {
+    gatling {
+        scala.srcDir "src/loadTest"
+    }
+}
+
+task loadTest() {
+    // A mechanism to ensure running of the test
+    // Ref: https://stackoverflow.com/a/52484259
+    inputs.property "test.date", LocalDateTime.now()
+//    dependsOn rootProject.getTasksByName("composeUp", true)
+    dependsOn gatlingRun
+}

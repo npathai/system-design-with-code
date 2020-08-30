@@ -1,1 +1,2 @@
-include 'short-url-generator', 'id-gen-service', 'common-goodies','user-service', 'analytics-service'
+include 'short-url-generator', 'id-gen-service', 'common-goodies','user-service',
+        'analytics-service', 'load-test'
