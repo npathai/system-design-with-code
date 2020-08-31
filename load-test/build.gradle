@@ -18,7 +18,6 @@ task loadTest() {
     outputs.upToDateWhen { false }
     // A mechanism to ensure running of the test
     // Ref: https://stackoverflow.com/a/52484259
-    inputs.property "test.date", LocalDateTime.now()
 //    dependsOn rootProject.getTasksByName("composeUp", true)
     dependsOn gatlingRun
 }

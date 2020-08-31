@@ -97,6 +97,8 @@ public class UrlShortener {
     /**
      * Should be used to get redirection url
      */
+    // FIXME there is race condition here. Let's say two concurrent requests find a url is expired, and both try to
+    // delete it from cache. Then one will succeed and other will fail
     public Optional<String> expand(String id) throws Exception {
         Tags tags = ServiceTags.serviceTags("short.url.generator", "url.shortener",
                 "expand");

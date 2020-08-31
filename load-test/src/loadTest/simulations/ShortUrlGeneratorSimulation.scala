@@ -24,22 +24,24 @@ class ShortUrlGeneratorSimulation extends Simulation {
         .check(jmesPath("id").saveAs("id"))
     )
 
-    .exec(
+    .repeat(10, "n") {
+      exec(
 
-      http("Visit shortened url")
-        .get({session => s"""http://localhost:4000/${session("id").as[String]}"""})
-        .disableFollowRedirect
-        .check(status.is(301))
-        .check(header("Location").saveAs("expandedUrl"))
-    )
-
-    .exec { session =>
-      println(">>>>>> " + session("expandedUrl").as[String] + " <<<<<<<<")
-      session
+        http("Visit shortened url")
+          .get({ session => s"""http://localhost:4000/${session("id").as[String]}""" })
+          .disableFollowRedirect
+          .check(status.is(301))
+          .check(header("Location").saveAs("expandedUrl"))
+      )
+        .exec { session =>
+          println(">>>>>> " + session("expandedUrl").as[String] + " <<<<<<<<")
+          session
+        }
+        .pause(1 seconds)
     }
 
 
   setUp(
-    scn.inject(atOnceUsers(1))
+    scn.inject(rampUsers(10) during (5 seconds))
   )
 }

@@ -51,8 +51,8 @@ redis:
   url: redis://redis-cache:6379
 ---
 url-lifetime-in-secs:
-  anonymous: 60
-  authenticated: 120
+  anonymous: 1000
+  authenticated: 1000
 ---
 
 mysql:
