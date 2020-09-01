@@ -24,7 +24,7 @@ class ShortUrlGeneratorSimulation extends Simulation {
         .check(jmesPath("id").saveAs("id"))
     )
 
-    .repeat(30, "n") {
+    .repeat(100, "n") {
       exec(
 
         http("Visit shortened url")
@@ -42,6 +42,6 @@ class ShortUrlGeneratorSimulation extends Simulation {
 
 
   setUp(
-    scn.inject(rampUsers(100) during (100 seconds))
+    scn.inject(rampUsers(100) during (50 seconds))
   )
 }
