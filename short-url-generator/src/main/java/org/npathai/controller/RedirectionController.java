@@ -1,5 +1,6 @@
 package org.npathai.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micronaut.http.*;
@@ -32,6 +33,7 @@ public class RedirectionController {
         this.meterRegistry = meterRegistry;
     }
 
+    @Timed(value = "http.response.time", extraTags = {"short.url.generator", "redirect"})
     @Secured("isAnonymous()")
     @Get(REDIRECTION_API_ENDPOINT)
     public HttpResponse<String> handle(HttpRequest<?> httpRequest, String id) throws Exception {

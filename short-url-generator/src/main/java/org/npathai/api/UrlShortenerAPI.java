@@ -1,6 +1,7 @@
 package org.npathai.api;
 
 import com.eclipsesource.json.JsonObject;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
@@ -36,6 +37,7 @@ public class UrlShortenerAPI {
         this.meterRegistry = metricRegistry;
     }
 
+    @Timed(value = "http.response.time", extraTags = {"short.url.generator", "shortening"})
     @Secured("isAnonymous()")
     @Post
     @Produces(MediaType.APPLICATION_JSON)
