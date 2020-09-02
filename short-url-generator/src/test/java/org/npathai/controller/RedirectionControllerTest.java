@@ -23,15 +23,20 @@ import org.npathai.zookeeper.ZkManager;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @MicronautTest
 class RedirectionControllerTest {
 
-    private static final String ID = "AAAAA";
+    private static final String ANONYMOUS_URL_ID = "AAAAA";
+    private static final String NON_ANONYMOUS_URL_ID = "AAAAB";
     private static final String LONG_URL = "www.google.com";
-    public static final Redirection REDIRECTION = new Redirection(ID, LONG_URL, System.currentTimeMillis(),
+    public static final Redirection ANONYMOUS_REDIRECTION = new Redirection(ANONYMOUS_URL_ID, LONG_URL, System.currentTimeMillis(),
             System.currentTimeMillis() + 10000);
+    public static final Redirection NON_ANONYMOUS_REDIRECTION = new Redirection(NON_ANONYMOUS_URL_ID, LONG_URL, System.currentTimeMillis(),
+            System.currentTimeMillis() + 10000, "test");
+
 
     @Inject
     IdGenerationServiceStub idGenerationServiceStub;
@@ -48,14 +53,14 @@ class RedirectionControllerTest {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        idGenerationServiceStub.setId(ID);
-        redirectionDao.save(REDIRECTION);
+        idGenerationServiceStub.setId(ANONYMOUS_URL_ID);
+        redirectionDao.save(ANONYMOUS_REDIRECTION);
     }
 
     @Test
     public void hasAnonymousAccess() {
         Flowable<HttpResponse<String>> response =
-                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ANONYMOUS_URL_ID), String.class);
 
         HttpResponse<String> redirectedResponse = response.blockingFirst();
         assertThat(redirectedResponse.status().getCode()).isNotEqualTo(HttpStatus.UNAUTHORIZED.getCode());
@@ -64,7 +69,7 @@ class RedirectionControllerTest {
     @Test
     public void redirectsToLongUrl() {
         Flowable<HttpResponse<String>> response =
-                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ANONYMOUS_URL_ID), String.class);
 
         HttpResponse<String> redirectedResponse = response.blockingFirst();
         assertThat(redirectedResponse.status().getCode()).isEqualTo(HttpStatus.MOVED_PERMANENTLY.getCode());
@@ -72,13 +77,26 @@ class RedirectionControllerTest {
     }
 
     @Test
-    public void invokesAnalyticsAPIForIncrementingClickCountOnSuccessfulRedirection() {
+    public void doesNotInvokeAnalyticsAPIForIncrementingClickCountOnSuccessfulRedirectionOfAnonymousUrl() {
         Flowable<HttpResponse<String>> response =
-                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ID), String.class);
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + ANONYMOUS_URL_ID), String.class);
 
         response.blockingFirst();
 
-        verify(analyticsServiceClient).redirectionClicked(ID);
+        verify(analyticsServiceClient, never()).redirectionClicked(ANONYMOUS_URL_ID);
+    }
+
+    @Test
+    public void invokesAnalyticsAPIForIncrementingClickCountOnSuccessfulRedirectionOfNonAnonymousUrl() throws DataAccessException {
+        idGenerationServiceStub.setId(NON_ANONYMOUS_URL_ID);
+        redirectionDao.save(NON_ANONYMOUS_REDIRECTION);
+
+        Flowable<HttpResponse<String>> response =
+                httpClient.exchange(HttpRequest.create(HttpMethod.GET, "/" + NON_ANONYMOUS_URL_ID), String.class);
+
+        response.blockingFirst();
+
+        verify(analyticsServiceClient).redirectionClicked(NON_ANONYMOUS_URL_ID);
     }
 
     @MockBean(ZkManager.class)
