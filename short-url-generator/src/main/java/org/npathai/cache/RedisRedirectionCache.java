@@ -3,66 +3,47 @@ package org.npathai.cache;
 import com.google.common.base.Preconditions;
 import org.npathai.config.RedisConfiguration;
 import org.npathai.model.Redirection;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import org.redisson.Redisson;
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 
 import java.io.Closeable;
-import java.net.URI;
-import java.time.Duration;
-import java.util.Objects;
 import java.util.Optional;
 
 public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
-    // TODO Use Reddisson client library because it makes it easy to store custom objects in cache
-    final JedisPoolConfig poolConfig = buildPoolConfig();
-    JedisPool jedisPool;
+    final RedissonClient redissonClient;
+    private final RMap<String, String> cache;
 
     public RedisRedirectionCache(RedisConfiguration redisConfiguration) {
-        jedisPool = new JedisPool(URI.create(redisConfiguration.getUrl()));
-    }
-
-    private JedisPoolConfig buildPoolConfig() {
-        final JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(128);
-        poolConfig.setMaxIdle(128);
-        poolConfig.setMinIdle(16);
-        poolConfig.setTestOnBorrow(true);
-        poolConfig.setTestOnReturn(true);
-        poolConfig.setTestWhileIdle(true);
-        poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(60).toMillis());
-        poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(30).toMillis());
-        poolConfig.setNumTestsPerEvictionRun(3);
-        poolConfig.setBlockWhenExhausted(true);
-        return poolConfig;
+        Config config = new Config();
+        config.useSingleServer().setAddress(redisConfiguration.getUrl());
+        redissonClient = Redisson.create(config);
+        cache = redissonClient.getMap("urlCache");
     }
 
     @Override
     public Optional<Redirection> getById(String id) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            String longUrl = jedis.get(redirectionIdKey(id));
-            if (longUrl == null) {
-                return Optional.empty();
-            }
-            String createdAt = jedis.get(createdAtKey(id));
-            Preconditions.checkState(createdAt != null,
-                    "createdAt must be present in cache if long url is present");
-            String expiryAtMillis = jedis.get(expiryAtKey(id));
-            Preconditions.checkState(expiryAtMillis != null,
-                    "expiryAtMillis must be present in cache if long url is present");
-
-            return Optional.of(new Redirection(id, longUrl, Long.parseLong(createdAt), Long.parseLong(expiryAtMillis)));
+        String longUrl = cache.get(redirectionIdKey(id));
+        if (longUrl == null) {
+            return Optional.empty();
         }
+        String createdAt = cache.get(createdAtKey(id));
+        Preconditions.checkState(createdAt != null,
+                "createdAt must be present in cache if long url is present");
+        String expiryAtMillis = cache.get(expiryAtKey(id));
+        Preconditions.checkState(expiryAtMillis != null,
+                "expiryAtMillis must be present in cache if long url is present");
+
+        return Optional.of(new Redirection(id, longUrl, Long.parseLong(createdAt), Long.parseLong(expiryAtMillis)));
     }
 
     @Override
     public void put(Redirection redirection) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            jedis.set(redirectionIdKey(redirection.id()), redirection.longUrl());
-            jedis.set(createdAtKey(redirection.id()), String.valueOf(redirection.createdAtMillis()));
-            jedis.set(expiryAtKey(redirection.id()), String.valueOf(redirection.expiryAtMillis()));
-        }
+        cache.put(redirectionIdKey(redirection.id()), redirection.longUrl());
+        cache.put(createdAtKey(redirection.id()), String.valueOf(redirection.createdAtMillis()));
+        cache.put(expiryAtKey(redirection.id()), String.valueOf(redirection.expiryAtMillis()));
     }
 
     private String createdAtKey(String id) {
@@ -80,15 +61,13 @@ public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
     @Override
     public void deleteById(String id) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            jedis.del(redirectionIdKey(id));
-            jedis.del(createdAtKey(id));
-            jedis.del(expiryAtKey(id));
-        }
+        cache.remove(redirectionIdKey(id));
+        cache.remove(createdAtKey(id));
+        cache.remove(expiryAtKey(id));
     }
 
     @Override
     public void close() {
-        jedisPool.close();
+        redissonClient.shutdown();
     }
 }
