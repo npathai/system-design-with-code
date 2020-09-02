@@ -73,14 +73,13 @@ public class UrlShortener {
 
     private Redirection createAuthenticatedRedirection(ShortenRequest shortenRequest, String id, long creationTime) {
         long expiryTime = creationTime + lifetimeInMillis(false);
-        return new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime, shortenRequest.getUserInfo()
-                .uid());
+        return new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime,
+                shortenRequest.getUserInfo().uid());
     }
 
     private Redirection createAnonymousRedirection(ShortenRequest shortenRequest, String id, long creationTime) {
         long expiryTime = creationTime + lifetimeInMillis(true);
-        Redirection redirection = new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime);
-        return redirection;
+        return new Redirection(id, shortenRequest.getLongUrl(), creationTime, expiryTime);
     }
 
     private long lifetimeInMillis(boolean isAnonymous) {
@@ -90,11 +89,6 @@ public class UrlShortener {
         return Duration.ofSeconds(lifetimeInSeconds).toMillis();
     }
 
-    /**
-     * Should be used to get redirection url
-     */
-    // FIXME there is race condition here. Let's say two concurrent requests find a url is expired, and both try to
-    // delete it from cache. Then one will succeed and other will fail
     public Optional<Redirection> expand(String id) throws Exception {
         Tags tags = ServiceTags.serviceTags("short.url.generator", "url.shortener",
                 "expand");
