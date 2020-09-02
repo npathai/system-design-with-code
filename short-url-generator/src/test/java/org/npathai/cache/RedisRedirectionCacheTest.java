@@ -20,13 +20,15 @@ class RedisRedirectionCacheTest {
     public static final String LONG_URL = "www.google.com";
     private static final String ID = "AAAAA";
     private static final String UNKNOWN_ID = "UNKNOWN_ID";
+    private static final String USER_ID = "test";
+
+    public static final Redirection ORIGINAL_REDIRECTION = new Redirection(ID, LONG_URL, CREATION_TIME,
+            CREATION_TIME + 1000, USER_ID);
 
     @Container
     public GenericContainer<?> redis = new GenericContainer<>("redis:latest")
             .withExposedPorts(6379);
     private RedisRedirectionCache redisRedirectionCache;
-    public static final Redirection ORIGINAL_REDIRECTION = new Redirection(ID, LONG_URL, CREATION_TIME,
-            CREATION_TIME + 1000);
 
     @BeforeEach
     public void setUp() {
