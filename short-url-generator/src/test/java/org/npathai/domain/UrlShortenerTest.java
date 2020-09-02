@@ -83,7 +83,7 @@ public class UrlShortenerTest {
     @ParameterizedTest
     public void returnsOriginalUrlForAShortenedUrl(String originalLongUrl) throws Exception {
         Redirection redirection = shortenAnonymously(originalLongUrl);
-        assertThat(shortener.expand(redirection.id()).get()).isEqualTo(originalLongUrl);
+        assertThat(shortener.expand(redirection.id()).get()).isEqualTo(redirection);
     }
 
     @SuppressWarnings("unused")
@@ -105,14 +105,14 @@ public class UrlShortenerTest {
 
     @Test
     public void returnsValueFromFastCacheOnSubsequentCalls() throws Exception {
-        Redirection redirection = shortenAnonymously(LONG_URL);
+        Redirection expectedRedirection = shortenAnonymously(LONG_URL);
         reset(inMemoryRedirectionDao);
-        when(redirectionCache.getById(redirection.id())).thenReturn(Optional.of(redirection));
+        when(redirectionCache.getById(expectedRedirection.id())).thenReturn(Optional.of(expectedRedirection));
 
-        Optional<String> longUrl = shortener.expand(redirection.id());
+        Optional<Redirection> actualRedirection = shortener.expand(expectedRedirection.id());
 
-        assertThat(longUrl).hasValue(LONG_URL);
-        verify(redirectionCache).getById(redirection.id());
+        assertThat(actualRedirection).hasValue(expectedRedirection);
+        verify(redirectionCache).getById(expectedRedirection.id());
         verifyZeroInteractions(inMemoryRedirectionDao);
     }
 
@@ -223,11 +223,6 @@ public class UrlShortenerTest {
     @Test
     public void returnsEmptyRedirectionForUnknownId() throws Exception {
         assertThat(shortener.expand(UNKNOWN_ID)).isEmpty();
-    }
-
-    @Test
-    public void returnsEmptyRedirectionWhenGettingById() throws DataAccessException {
-        assertThat(shortener.getById(UNKNOWN_ID)).isEmpty();
     }
 
     private Redirection shortenAnonymously(String longUrl) throws Exception {

@@ -13,6 +13,7 @@ import org.npathai.client.AnalyticsServiceClient;
 import org.npathai.domain.UrlShortener;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.npathai.metrics.ServiceTags;
+import org.npathai.model.Redirection;
 
 import java.net.URI;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class RedirectionController {
 
             LOG.info("Request received for expanding id: " + id);
 
-            Optional<String> redirection = urlShortener.expand(id);
+            Optional<Redirection> redirection = urlShortener.expand(id);
             if (redirection.isEmpty()) {
                 meterRegistry.counter("http.responses.total",
                         ServiceTags.httpNotFoundStatusTags(commonTags)).increment();
@@ -68,8 +69,8 @@ public class RedirectionController {
         }
     }
 
-    private MutableHttpResponse<String> prepareRedirectResponse(Optional<String> redirection) {
-        MutableHttpResponse<String> response = HttpResponse.redirect(URI.create(redirection.get()));
+    private MutableHttpResponse<String> prepareRedirectResponse(Optional<Redirection> redirection) {
+        MutableHttpResponse<String> response = HttpResponse.redirect(URI.create(redirection.get().longUrl()));
         // We want to avoid caching due to statistics, we wan't request to be served from server every time
         response.header("Cache-Control.no-store");
         return response;

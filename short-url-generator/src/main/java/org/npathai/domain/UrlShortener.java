@@ -90,16 +90,12 @@ public class UrlShortener {
         return Duration.ofSeconds(lifetimeInSeconds).toMillis();
     }
 
-    public Optional<Redirection> getById(String id) throws DataAccessException {
-        return dao.getById(id);
-    }
-
     /**
      * Should be used to get redirection url
      */
     // FIXME there is race condition here. Let's say two concurrent requests find a url is expired, and both try to
     // delete it from cache. Then one will succeed and other will fail
-    public Optional<String> expand(String id) throws Exception {
+    public Optional<Redirection> expand(String id) throws Exception {
         Tags tags = ServiceTags.serviceTags("short.url.generator", "url.shortener",
                 "expand");
 
@@ -113,7 +109,7 @@ public class UrlShortener {
                 LOG.info("Redirection with id: " + id + " found in cache and is not expired.");
                 tags = tags.and("redirection.status", "active");
                 meterRegistry.counter("url.redirection.responses.total", tags).increment();
-                return cachedRedirection.map(Redirection::longUrl);
+                return cachedRedirection;
             }
 
 
@@ -155,6 +151,6 @@ public class UrlShortener {
         LOG.info("Saved redirection with id: " + id + " in cache");
         tags = tags.and("redirection.status", "active");
         meterRegistry.counter("url.redirection.responses.total", tags).increment();
-        return optionalRedirection.map(Redirection::longUrl);
+        return optionalRedirection;
     }
 }
