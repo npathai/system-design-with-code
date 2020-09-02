@@ -45,7 +45,7 @@ class RedisRedirectionCacheTest {
 
         Optional<Redirection> foundRedirection = redisRedirectionCache.getById(ID);
         assertThat(foundRedirection).isNotEmpty();
-        ReflectionAssert.assertLenientEquals(ORIGINAL_REDIRECTION, foundRedirection.get());
+        ReflectionAssert.assertReflectionEquals(ORIGINAL_REDIRECTION, foundRedirection.get());
     }
 
     @Test
