@@ -78,4 +78,8 @@ public class Redirection {
                 ", uid='" + uid + '\'' +
                 '}';
     }
+
+    public boolean isAnonymous() {
+        return uid == null;
+    }
 }
