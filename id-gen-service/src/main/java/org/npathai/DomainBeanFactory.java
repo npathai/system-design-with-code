@@ -27,8 +27,10 @@ public class DomainBeanFactory {
 
     @Singleton
     public IdGenerationService idGenerationService() throws Exception {
-        return new IdGenerationService(beanContext.getBean(ZkManager.class),
+        IdGenerationService idGenerationService = new IdGenerationService(beanContext.getBean(ZkManager.class),
                 beanContext.getBean(ScheduledJobService.class));
+        idGenerationService.init();
+        return idGenerationService;
     }
 
     @Singleton

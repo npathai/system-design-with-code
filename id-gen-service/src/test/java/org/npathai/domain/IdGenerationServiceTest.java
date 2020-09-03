@@ -28,6 +28,7 @@ class IdGenerationServiceTest {
         testingZkManager = new TestingZkManager();
         testingZkManager.setData(NEXT_ID_ZNODE, Id.first().encode().getBytes());
         this.idGenerationService = new IdGenerationService(testingZkManager, directExecutorJobService);
+        idGenerationService.init();
     }
 
     @Test

@@ -11,18 +11,15 @@ import java.util.concurrent.Future;
 
 public class IdGenerationService {
     private static final Logger LOG = LogManager.getLogger(IdGenerationService.class);
-
     public static final String NEXT_ID_ZNODE_NAME = "/next-id";
+
     private final ZkManager manager;
     private final ScheduledJobService scheduledJobService;
-    private ConcurrentLinkedQueue<String> cachedIds = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<String> cachedIds = new ConcurrentLinkedQueue<>();
 
-    // FIXME constructor is doing real work. Options?
-    public IdGenerationService(ZkManager manager, ScheduledJobService scheduledJobService) throws Exception {
+    public IdGenerationService(ZkManager manager, ScheduledJobService scheduledJobService) {
         this.manager = manager;
         this.scheduledJobService = scheduledJobService;
-        manager.createIfAbsent(NEXT_ID_ZNODE_NAME);
-        triggerHydrationAsync().get();
     }
 
     public String nextId() {
@@ -35,6 +32,12 @@ public class IdGenerationService {
 
     private Future<?> triggerHydrationAsync() {
         return scheduledJobService.submit(new BatchGenerationProcess(manager));
+    }
+
+    // FIXME We should not be throwing generic exception
+    public void init() throws Exception {
+        manager.createIfAbsent(NEXT_ID_ZNODE_NAME);
+        triggerHydrationAsync().get();
     }
 
     private class BatchGenerationProcess implements Callable<Void> {
