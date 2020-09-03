@@ -4,6 +4,25 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * An Id is stored in encoded form of array of integers having length = N, N being the length of id.
+ * Each encoded index of Id maps to a character set used to represent valid characters in id.
+ * 0 - A
+ * 1 - B
+ * ...
+ * 25 - Z
+ * 26 - a
+ * 27 - b
+ * ...
+ * 51 - z
+ *
+ * This has been done to made to find next incremented Id easier.
+ * For instance: Id "AAAAZ" will be encoded as 0,0,0,0,25, it is easy to increment
+ * 0,0,0,0,25 -> 0,0,0,0,26 and next id becomes "AAAAa".
+ *
+ * Read the tests for better understanding of how the encoding and decoding logic works.
+ *
+ */
 public class Id {
     private static Map<Integer, Character> charSet = new HashMap<>();
     private static Map<Character, Integer> reverseCharSet = new HashMap<>();

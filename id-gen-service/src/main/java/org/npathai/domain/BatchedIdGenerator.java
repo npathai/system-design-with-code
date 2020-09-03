@@ -23,8 +23,7 @@ public class BatchedIdGenerator {
                 e.printStackTrace();
             }
         }
-        Batch batch = new Batch(ids, current);
-        return batch;
+        return new Batch(ids);
     }
 
     private String getAndIncrementCurrentId() throws IdExhaustedException {

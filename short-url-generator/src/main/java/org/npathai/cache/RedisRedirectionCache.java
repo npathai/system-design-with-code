@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class RedisRedirectionCache implements RedirectionCache, Closeable {
 
-    final RedissonClient redissonClient;
+    private final RedissonClient redissonClient;
     private final RMap<String, Redirection> cache;
 
     public RedisRedirectionCache(RedisConfiguration redisConfiguration) {

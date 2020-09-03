@@ -42,6 +42,6 @@ class ShortUrlGeneratorSimulation extends Simulation {
 
 
   setUp(
-    scn.inject(atOnceUsers(1))
+    scn.inject(rampUsers(100) during (50 seconds))
   )
 }
