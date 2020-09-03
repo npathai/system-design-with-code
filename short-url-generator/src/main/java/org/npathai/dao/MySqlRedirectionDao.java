@@ -1,11 +1,9 @@
 package org.npathai.dao;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
-import io.micronaut.http.HttpMethod;
 import org.npathai.config.MySqlDatasourceConfiguration;
-import org.npathai.metrics.ServiceTags;
 import org.npathai.model.Redirection;
 
 import javax.annotation.Nonnull;
@@ -23,19 +21,15 @@ public class MySqlRedirectionDao implements RedirectionDao {
     private static final String DELETE_BY_ID_SQL = "delete from redirection where id = ?";
     private static final String SELECT_BY_USER_ID_SQL = "select * from redirection where uid = ? order by created_at desc";
 
-    private final MysqlDataSource dataSource;
-    private final MySqlDatasourceConfiguration mySqlDatasourceConfiguration;
+    private final HikariDataSource dataSource;
     private final MeterRegistry meterRegistry;
 
-    // FIXME constructor is doing real work
-    // FIXME use connection pooling
     public MySqlRedirectionDao(MySqlDatasourceConfiguration mySqlDatasourceConfiguration, MeterRegistry meterRegistry) {
-        this.mySqlDatasourceConfiguration = mySqlDatasourceConfiguration;
         this.meterRegistry = meterRegistry;
-        dataSource = new MysqlDataSource();
-        dataSource.setUser(mySqlDatasourceConfiguration.getUser());
+        dataSource = new HikariDataSource();
+        dataSource.setUsername(mySqlDatasourceConfiguration.getUser());
         dataSource.setPassword(mySqlDatasourceConfiguration.getPassword());
-        dataSource.setUrl(mySqlDatasourceConfiguration.getUrl());
+        dataSource.setJdbcUrl(mySqlDatasourceConfiguration.getUrl());
     }
 
     @Override

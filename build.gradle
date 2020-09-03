@@ -129,6 +129,10 @@ configure(microserviceProjects()) {
         compile "io.micronaut.configuration:micronaut-micrometer-registry-prometheus"
         // Also required to enable endpoint
         compile "io.micronaut:micronaut-management"
+
+        // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+        compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.5'
+
     }
 
     shadowJar {
