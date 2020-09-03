@@ -23,7 +23,7 @@ public class AnalyticsService {
     }
 
     public Optional<AnalyticsInfo> getById(UserInfo userInfo, String id) throws DataAccessException {
-        // FIXME handle this scenario
+        // FIXME handle this scenario, should we call short-url-generation service to ask for this detail?
 //        if (!redirection.get().uid().equals(userInfo.uid())) {
 //            throw new UnauthorizedAccessException();
 //        }

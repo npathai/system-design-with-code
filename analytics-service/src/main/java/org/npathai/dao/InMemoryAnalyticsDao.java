@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO contemplate using time series database for providing day wise, month wise etc statistics
 public class InMemoryAnalyticsDao implements AnalyticsDao {
 
     private Map<String, AnalyticsInfo> clickCount = new ConcurrentHashMap<>();

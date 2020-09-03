@@ -36,9 +36,6 @@ public class MySqlRedirectionDao implements RedirectionDao {
         dataSource.setUser(mySqlDatasourceConfiguration.getUser());
         dataSource.setPassword(mySqlDatasourceConfiguration.getPassword());
         dataSource.setUrl(mySqlDatasourceConfiguration.getUrl());
-        // FIXME how to ensure DB availability when services are starting dynamically and don't have control over when
-        // DB will start. Commenting this check because causes intermittent failures in docker compose
-        // dataSource.getConnection().close();
     }
 
     @Override

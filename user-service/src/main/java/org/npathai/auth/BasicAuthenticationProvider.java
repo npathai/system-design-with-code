@@ -36,7 +36,6 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
         try {
             optionalUser = userDao.getUserByName(String.valueOf(authenticationRequest.getIdentity()));
         } catch (DataAccessException ex) {
-            // FIXME can we handle this gracefully?
             LOG.trace(ex);
             return Flowable.just(new AuthenticationFailed());
         }
