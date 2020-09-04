@@ -1,10 +1,9 @@
 package org.npathai.dao;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import org.npathai.config.MySqlDatasourceConfiguration;
-import org.npathai.metrics.ServiceTags;
 import org.npathai.model.User;
 
 import java.sql.Connection;
@@ -19,15 +18,15 @@ public class MySqlUserDao implements UserDao {
     private static final String SELECT_BY_NAME_SQL = "select username, password, email, BIN_TO_UUID(id, true) as uid "
             + "from users where username=?";
 
-    private final MysqlDataSource dataSource;
+    private final HikariDataSource dataSource;
     private final MeterRegistry meterRegistry;
 
     public MySqlUserDao(MySqlDatasourceConfiguration datasourceConfiguration, MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
-        dataSource = new MysqlDataSource();
-        dataSource.setUser(datasourceConfiguration.getUser());
+        dataSource = new HikariDataSource();
+        dataSource.setUsername(datasourceConfiguration.getUser());
         dataSource.setPassword(datasourceConfiguration.getPassword());
-        dataSource.setUrl(datasourceConfiguration.getUrl());
+        dataSource.setJdbcUrl(datasourceConfiguration.getUrl());
     }
 
     @Override
