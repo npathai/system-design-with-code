@@ -9,14 +9,13 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.RxHttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientException;
 import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken;
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
 import io.reactivex.Flowable;
-import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.npathai.dao.DataAccessException;
@@ -28,6 +27,7 @@ import java.text.ParseException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @MicronautTest
@@ -45,25 +45,25 @@ public class LoginEndpointTest {
 
     @Test
     public void returnsStatus200() throws DataAccessException {
-        HttpResponse<BearerAccessRefreshToken> authenticationResponse = attemptLogin();
+        HttpResponse<BearerAccessRefreshToken> authenticationResponse = attemptLogin("root");
 
         assertThat(authenticationResponse.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
     }
 
-    private HttpResponse<BearerAccessRefreshToken> attemptLogin() throws DataAccessException {
+    private HttpResponse<BearerAccessRefreshToken> attemptLogin(String password) throws DataAccessException {
         User user = createRootUser();
         when(userDao.getUserByName("root")).thenReturn(java.util.Optional.of(user));
 
         Flowable<HttpResponse<BearerAccessRefreshToken>> response = httpClient.exchange(
                 HttpRequest.create(HttpMethod.POST, "/login")
-                        .body(new LoginRequest("root", "root")),
+                        .body(new LoginRequest("root", password)),
                 BearerAccessRefreshToken.class);
         return response.blockingFirst();
     }
 
     @Test
     public void accessTokenContainsUID() throws ParseException, DataAccessException {
-        HttpResponse<BearerAccessRefreshToken> authenticationResponse = attemptLogin();
+        HttpResponse<BearerAccessRefreshToken> authenticationResponse = attemptLogin("root");
 
         BearerAccessRefreshToken token = authenticationResponse.body();
         assertThat(token).isNotNull();
@@ -72,6 +72,23 @@ public class LoginEndpointTest {
         assertThat(jwt).isNotNull();
         JWTClaimsSet jwtClaimsSet = jwt.getJWTClaimsSet();
         assertThat(jwtClaimsSet.getClaim("uid").toString()).isNotBlank();
+    }
+
+    @Test
+    public void returnsStatus401WhenUserCredentialsAreInvalid() {
+        // TODO Can we improve this to check the HTTP status?
+        assertThatThrownBy(() -> attemptInvalidLogin("root"))
+                .isInstanceOf(HttpClientException.class);
+    }
+
+    private HttpResponse<Void> attemptInvalidLogin(String password) throws DataAccessException {
+        when(userDao.getUserByName("root")).thenReturn(java.util.Optional.empty());
+
+        Flowable<HttpResponse<Void>> response = httpClient.exchange(
+                HttpRequest.create(HttpMethod.POST, "/login")
+                        .body(new LoginRequest("root", password)),
+                Void.class);
+        return response.blockingSingle();
     }
 
     @NotNull
@@ -90,6 +107,7 @@ public class LoginEndpointTest {
         return Mockito.mock(UserDao.class);
     }
 
+    @SuppressWarnings("unused")
     public static class LoginRequest {
         private String username;
         private String password;
