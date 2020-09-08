@@ -1,5 +1,6 @@
 package org.npathai.api;
 
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micronaut.http.HttpMethod;
@@ -22,6 +23,7 @@ public class IdGeneratorAPI {
         this.meterRegistry = meterRegistry;
     }
 
+    @Timed(value = "http.response.time", extraTags = {"id.generation", "generation"})
     @Get
     @Produces(MediaType.TEXT_PLAIN)
     public String generateId() {
