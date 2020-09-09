@@ -1,0 +1,147 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "com.avast.gradle:gradle-docker-compose-plugin:0.12.1"
+    }
+}
+
+plugins {
+    id "net.ltgt.apt-eclipse" version "0.21" apply false
+    id "com.github.johnrengelman.shadow" version "5.2.0" apply false
+}
+
+version "0.1"
+group "org.npathai"
+
+apply plugin: 'com.avast.gradle.docker-compose'
+
+def microserviceProjects() {
+    return subprojects.findAll {
+        it.name != 'common-goodies'
+    }
+}
+
+subprojects {
+
+    apply plugin: "java"
+
+    sourceCompatibility = 11
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    configurations {
+        all*.exclude group: 'log4j', module: 'log4j'
+
+        // for dependencies that are needed for development only
+        developmentOnly
+    }
+
+    dependencies {
+
+        implementation "org.apache.logging.log4j:log4j-api:2.12.1"
+        implementation "org.apache.logging.log4j:log4j-core:2.12.1"
+
+        // For distributed locking, consensus
+        // https://mvnrepository.com/artifact/org.apache.curator/curator-recipes
+        compile ('org.apache.curator:curator-recipes:5.0.0') {
+            exclude group: 'io.netty'
+        }
+
+        // https://mvnrepository.com/artifact/org.apache.curator/curator-framework
+        compile ('org.apache.curator:curator-framework:5.0.0') {
+            exclude group: 'io.netty'
+        }
+
+        // https://mvnrepository.com/artifact/org.apache.curator/curator-x-discovery
+        compile ('org.apache.curator:curator-x-discovery:5.0.0') {
+            exclude group: 'io.netty'
+        }
+
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+        testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+    test.classpath += configurations.developmentOnly
+
+    tasks.withType(JavaCompile){
+        options.encoding = "UTF-8"
+        options.compilerArgs.add('-parameters')
+    }
+
+    tasks.withType(JavaExec) {
+        classpath += configurations.developmentOnly
+        jvmArgs('-noverify', '-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
+    }
+}
+
+configure(microserviceProjects()) {
+
+    apply plugin: 'application'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    mainClassName = "org.npathai.Application"
+
+    dependencies {
+        annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+        annotationProcessor "io.micronaut:micronaut-inject-java"
+        annotationProcessor "io.micronaut:micronaut-validation"
+        implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+        implementation "io.micronaut:micronaut-inject"
+        implementation "io.micronaut:micronaut-validation"
+        implementation "io.micronaut:micronaut-runtime"
+        implementation "javax.annotation:javax.annotation-api"
+        implementation "io.micronaut:micronaut-http-server-netty"
+        implementation "io.micronaut:micronaut-http-client"
+        runtimeOnly "org.apache.logging.log4j:log4j-api:2.12.1"
+        runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:2.12.1"
+        testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+        testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+        testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+        testImplementation "io.micronaut.test:micronaut-test-junit5"
+        testImplementation "org.junit.jupiter:junit-jupiter-api"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+        testImplementation("org.junit.jupiter:junit-jupiter-params")
+        implementation "io.micronaut:micronaut-discovery-client"
+        // https://mvnrepository.com/artifact/org.unitils/unitils-core
+        testCompile group: 'org.unitils', name: 'unitils-core', version: '3.4.6'
+
+
+        compile group: 'com.eclipsesource.minimal-json', name: 'minimal-json', version: '0.9.5'
+        // https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-client
+        compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.31'
+        // https://mvnrepository.com/artifact/org.glassfish.jersey.inject/jersey-hk2
+        compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.31'
+
+// https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
+        compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.31'
+
+        compile "io.micronaut.configuration:micronaut-micrometer-core"
+        // micrometer-registry-statsd also pulls in micrometer-core so included above to verbose example
+        compile "io.micronaut.configuration:micronaut-micrometer-registry-prometheus"
+        // Also required to enable endpoint
+        compile "io.micronaut:micronaut-management"
+
+        // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+        compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.5'
+
+    }
+
+    shadowJar {
+        mergeServiceFiles()
+    }
+
+    composeUp.dependsOn(shadowJar)
+}
+
+dockerCompose {
+    useComposeFiles = ['docker-compose-dev.yml']
+}
