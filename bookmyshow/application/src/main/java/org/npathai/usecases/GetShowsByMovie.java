@@ -20,23 +20,23 @@ public class GetShowsByMovie {
         this.showDao = showDao;
     }
 
-    public CinemaHallShows execute(MovieId movieId, CityId cityId) {
+    public Shows execute(MovieId movieId, CityId cityId) {
         List<CinemaHall> cinemaHallList = cinemaHallDao.getCinemaHalls(cityId);
         if (cinemaHallList.isEmpty()) {
-            return CinemaHallShows.empty();
+            return Shows.empty();
         }
 
-        CinemaHallShows cinemaHallShows = new CinemaHallShows();
+        Shows shows = new Shows();
         for (CinemaHall cinemaHall : cinemaHallList) {
             for (Auditorium auditorium : cinemaHall.getAudis()) {
-                List<Show> shows = showDao.getShows(auditorium.getId(), movieId);
-                if (shows.isEmpty()) {
+                List<Show> audiShows = showDao.getShows(auditorium.getId(), movieId);
+                if (audiShows.isEmpty()) {
                     continue;
                 }
-                cinemaHallShows.add(cinemaHall, shows);
+                shows.add(cinemaHall, audiShows);
             }
         }
 
-        return cinemaHallShows;
+        return shows;
     }
 }

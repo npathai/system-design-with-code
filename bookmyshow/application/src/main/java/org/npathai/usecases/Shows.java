@@ -5,10 +5,10 @@ import org.npathai.cinemahall.show.Show;
 
 import java.util.List;
 
-public class CinemaHallShows {
+public class Shows {
 
-    public static CinemaHallShows empty() {
-        return new CinemaHallShows();
+    public static Shows empty() {
+        return new Shows();
     }
 
 
