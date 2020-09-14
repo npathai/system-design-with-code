@@ -2,10 +2,16 @@ package org.npathai.cinemahall.auditorium;
 
 public class Auditorium {
     private long id;
-    private long name;
+    private String name;
     private int seatCount;
 
+    public Auditorium(long id, String name, int seatCount) {
+        this.id = id;
+        this.name = name;
+        this.seatCount = seatCount;
+    }
+
     public AuditoriumId getId() {
-        throw new UnsupportedOperationException();
+        return new AuditoriumId(id);
     }
 }

@@ -3,6 +3,7 @@ package org.npathai.usecases;
 import org.npathai.cinemahall.CinemaHall;
 import org.npathai.cinemahall.show.Show;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,6 @@ public class Shows {
     }
 
     public Map<CinemaHall, List<Show>> getAll() {
-        return null;
+        return new HashMap<>();
     }
 }
