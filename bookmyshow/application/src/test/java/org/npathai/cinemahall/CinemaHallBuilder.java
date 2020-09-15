@@ -1,11 +1,7 @@
-package org.npathai.usecases;
+package org.npathai.cinemahall;
 
-import org.npathai.cinemahall.Address;
-import org.npathai.cinemahall.CinemaHall;
-import org.npathai.cinemahall.Rating;
 import org.npathai.cinemahall.auditorium.Auditorium;
 
-import java.security.cert.CertPathBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

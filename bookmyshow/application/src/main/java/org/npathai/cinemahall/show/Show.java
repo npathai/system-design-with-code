@@ -14,5 +14,11 @@ public class Show {
     private MovieId movieId;
     private ZonedDateTime startTime;
 
-
+    public Show(long id, AuditoriumId auditoriumId, List<Seat> seats, MovieId movieId, ZonedDateTime startTime) {
+        this.id = id;
+        this.auditoriumId = auditoriumId;
+        this.seats = seats;
+        this.movieId = movieId;
+        this.startTime = startTime;
+    }
 }
