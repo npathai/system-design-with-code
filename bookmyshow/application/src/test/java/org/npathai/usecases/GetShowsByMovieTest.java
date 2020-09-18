@@ -6,7 +6,6 @@ import org.mockito.*;
 import org.npathai.cinemahall.CinemaHall;
 import org.npathai.cinemahall.CinemaHallBuilder;
 import org.npathai.cinemahall.CinemaHallDao;
-import org.npathai.cinemahall.auditorium.Auditorium;
 import org.npathai.cinemahall.auditorium.AuditoriumId;
 import org.npathai.cinemahall.show.Show;
 import org.npathai.cinemahall.show.ShowBuilder;

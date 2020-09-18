@@ -14,4 +14,8 @@ public class Seat {
         this.price = price;
         this.seatNo = seatNo;
     }
+
+    public SeatId getId() {
+        return new SeatId(id);
+    }
 }
