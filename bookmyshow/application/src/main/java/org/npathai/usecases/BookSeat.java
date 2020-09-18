@@ -1,19 +1,20 @@
 package org.npathai.usecases;
 
-import org.npathai.cinemahall.seat.SeatDao;
+import org.npathai.cinemahall.show.ShowingSeatDao;
 import org.npathai.cinemahall.seat.SeatId;
 
 import java.util.concurrent.CompletableFuture;
 
 public class BookSeat {
 
-    private SeatDao seatDao;
+    private ShowingSeatDao showingSeatDao;
 
-    public BookSeat(SeatDao seatDao) {
-        this.seatDao = seatDao;
+    public BookSeat(ShowingSeatDao showingSeatDao) {
+        this.showingSeatDao = showingSeatDao;
     }
 
     public CompletableFuture<Booking> execute(SeatId seatId) {
+        showingSeatDao.reserveSeat(seatId);
         // Reserve seat if available
         // Make payment
         // Mark as confirmed if payment succeeds
