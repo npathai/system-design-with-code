@@ -1,0 +1,11 @@
+/.idea/
+*/build/
+/.gradle/
+build
+*/out/
+
+# Data directory
+*/data
+
+# React
+**/node_modules
