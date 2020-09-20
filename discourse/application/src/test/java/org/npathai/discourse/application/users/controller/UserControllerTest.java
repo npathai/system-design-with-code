@@ -18,8 +18,7 @@ import org.npathai.discourse.application.domain.users.UsernameAlreadyExistsExcep
 
 import javax.inject.Inject;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -78,10 +77,9 @@ public class UserControllerTest {
     public void informsUsernameIsDuplicate() {
         when(userService.create(any(RegistrationData.class))).thenThrow(new UsernameAlreadyExistsException());
 
-        Throwable exception = catchThrowable(() -> userClient.create(registrationData));
-
-        assertThat(exception).isInstanceOf(HttpClientResponseException.class);
-        assertThat(((HttpClientResponseException) exception).getStatus().getCode()).isEqualTo(400);
+        HttpClientResponseException exception = catchThrowableOfType(() -> userClient.create(registrationData),
+                HttpClientResponseException.class);
+        assertThat(exception.getStatus().getCode()).isEqualTo(400);
     }
 
     private RegistrationData createRegistrationData() {
