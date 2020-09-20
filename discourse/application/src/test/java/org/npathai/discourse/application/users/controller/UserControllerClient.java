@@ -6,7 +6,7 @@ import io.micronaut.http.client.annotation.Client;
 import org.npathai.discourse.application.domain.users.RegistrationData;
 import org.npathai.discourse.application.domain.users.User;
 
-@Client("/users")
+@Client(value = "/users")
 public interface UserControllerClient {
 
     @Post

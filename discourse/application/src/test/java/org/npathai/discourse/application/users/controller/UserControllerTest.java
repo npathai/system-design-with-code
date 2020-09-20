@@ -2,9 +2,9 @@ package org.npathai.discourse.application.users.controller;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -14,11 +14,12 @@ import org.mockito.MockitoAnnotations;
 import org.npathai.discourse.application.domain.users.RegistrationData;
 import org.npathai.discourse.application.domain.users.User;
 import org.npathai.discourse.application.domain.users.UserService;
+import org.npathai.discourse.application.domain.users.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,6 +72,16 @@ public class UserControllerTest {
         HttpResponse<User> response = userClient.create(registrationData);
 
         assertReflectionEquals(user, response.body());
+    }
+
+    @Test
+    public void informsUsernameIsDuplicate() {
+        when(userService.create(any(RegistrationData.class))).thenThrow(new UsernameAlreadyExistsException());
+
+        Throwable exception = catchThrowable(() -> userClient.create(registrationData));
+
+        assertThat(exception).isInstanceOf(HttpClientResponseException.class);
+        assertThat(((HttpClientResponseException) exception).getStatus().getCode()).isEqualTo(400);
     }
 
     private RegistrationData createRegistrationData() {
