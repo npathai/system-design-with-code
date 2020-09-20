@@ -1,9 +1,9 @@
 package org.npathai.discourse.application.controllers.users;
 
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import org.npathai.discourse.application.domain.users.RegistrationData;
+import org.npathai.discourse.application.domain.users.User;
 import org.npathai.discourse.application.domain.users.UserService;
 
 @Controller("/users")
@@ -16,7 +16,8 @@ public class UserController {
     }
 
     @Post
-    public void create(RegistrationData registrationData) {
-        userService.create(registrationData);
+    public User create(RegistrationData registrationData) {
+        User user = userService.create(registrationData);
+        return user;
     }
 }
