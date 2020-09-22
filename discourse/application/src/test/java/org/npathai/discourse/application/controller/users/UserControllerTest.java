@@ -1,4 +1,4 @@
-package org.npathai.discourse.application.users.controller;
+package org.npathai.discourse.application.controller.users;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
