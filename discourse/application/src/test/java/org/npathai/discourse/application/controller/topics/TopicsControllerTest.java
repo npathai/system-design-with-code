@@ -2,7 +2,7 @@ package org.npathai.discourse.application.controller.topics;
 
 import io.micronaut.test.annotation.MicronautTest;
 import io.micronaut.test.annotation.MockBean;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.npathai.discourse.application.domain.topics.TopicService;
@@ -18,9 +18,14 @@ public class TopicsControllerTest {
     @Inject
     TopicControllerClient topicControllerClient;
 
+    @BeforeEach
+    public void setUp() {
+
+    }
+
     @Test
     public void returnsTopicsForUser() {
-        Assertions.assertThat(1).isEqualTo(2);
+
     }
 
     @MockBean(TopicService.class)
