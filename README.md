@@ -27,7 +27,7 @@ All systems built in this repository should be
 ### Discourse (QnA)
 
 
-### Technology Stack
+## Technology Stack
 
 1) Micronaut Framework
 2) Zookeeper
