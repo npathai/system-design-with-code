@@ -11,6 +11,7 @@ public class Topic {
     private long categoryId;
     private List<Long> tagIds = new ArrayList<>();
     private ZonedDateTime creationTime;
+    private long lastPostUserId;
 
     public long getId() {
         return id;
