@@ -13,10 +13,12 @@ func main() {
 	api.NewServer()
 	api.InitApi()
 
+	api.StartServer()
+
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	// Block on channel read
+	// Block on channel read till there is interrupt/terminate signal
 	<- ch
 	api.StopServer()
 }
