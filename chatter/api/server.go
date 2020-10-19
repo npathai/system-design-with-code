@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -27,9 +28,15 @@ func StartServer() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-
+	if err := Srv.Server.ListenAndServe(); err != nil {
+		panic("Couldn't start web server")
+	}
 }
 
 func StopServer() {
-	fmt.Println("Server stopped")
+	if err := Srv.Server.Shutdown(context.Background()); err != nil {
+		fmt.Printf("Error in stopping server: %v\n", err)
+	} else {
+		fmt.Println("Server stopped")
+	}
 }
