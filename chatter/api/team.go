@@ -28,6 +28,13 @@ func createTeamFromSignUp(w http.ResponseWriter, r *http.Request) {
 	teamSignup.Team.Email = props["email"]
 	teamSignup.User.Email = props["email"]
 
+	teamSignup.Team.PreSave()
+
+	if err := teamSignup.Team.IsValid(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
 

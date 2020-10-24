@@ -7,3 +7,11 @@ type Team struct {
 	Email string `json:"email"`
 	CompanyName string `json:"company_name"`
 }
+
+func (team *Team) PreSave() {
+
+}
+
+func (team *Team) IsValid() error {
+	return nil
+}
