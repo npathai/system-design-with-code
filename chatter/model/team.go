@@ -9,7 +9,9 @@ type Team struct {
 }
 
 func (team *Team) PreSave() {
-
+	if team.Id == "" {
+		team.Id = NewId()
+	}
 }
 
 func (team *Team) IsValid() error {
