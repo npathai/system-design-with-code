@@ -14,6 +14,35 @@ func (team *Team) PreSave() {
 	}
 }
 
-func (team *Team) IsValid() error {
+func (team *Team) IsValid() *AppError {
+	if len(team.Id) != 26 {
+		return NewAppError("Invalid Id")
+	}
+
+	if len(team.Email) > 128 {
+		return NewAppError("Invalid email")
+	}
+
+	if !IsValidEmail(team.Email) {
+		return NewAppError("Invalid email")
+	}
+
+	if len(team.Name) > 64 {
+		return NewAppError("Invalid name")
+	}
+
+	if len(team.Domain) > 64 {
+		return NewAppError("Invalid domain")
+	}
+
+	if !IsValidDomain(team.Domain) {
+		return NewAppError("Invalid domain")
+	}
+
+	if len(team.CompanyName) > 64 {
+		return NewAppError("Invalid company name")
+	}
+
 	return nil
 }
+
