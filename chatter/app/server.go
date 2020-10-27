@@ -13,6 +13,8 @@ type Server struct {
 	Server *http.Server
 }
 
+var Srv *Server
+
 func NewServer() {
 	Srv = &Server{}
 	Srv.Router = mux.NewRouter()
