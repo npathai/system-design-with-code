@@ -13,14 +13,13 @@ type Server struct {
 	Server *http.Server
 }
 
-var Srv *Server
-
-func NewServer() {
-	Srv = &Server{}
+func NewServer() (*Server, error) {
+	Srv := &Server{}
 	Srv.Router = mux.NewRouter()
+	return Srv, nil
 }
 
-func StartServer() {
+func (Srv *Server) Start() {
 	fmt.Println("Starting server")
 	Srv.Server = &http.Server{
 		Addr: "127.0.0.1:8080",
@@ -33,7 +32,7 @@ func StartServer() {
 	}
 }
 
-func StopServer() {
+func (Srv *Server) Stop() {
 	if err := Srv.Server.Shutdown(context.Background()); err != nil {
 		fmt.Printf("Error in stopping server: %v\n", err)
 	} else {
