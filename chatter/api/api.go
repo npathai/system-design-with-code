@@ -1,17 +1,25 @@
 package api
 
 import (
-	"fmt"
-	"net/http"
+	"github.com/gorilla/mux"
 )
 
-func InitApi() {
-	Srv.Router.HandleFunc("/hello", HandleHello)
+type Routes struct {
+	Root *mux.Router
+	Users *mux.Router
 }
 
-func HandleHello(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	if _, err := w.Write([]byte("Hello world!")); err != nil {
-		fmt.Printf("Error in writing response: %v", err)
+type API struct {
+	BaseRoutes *Routes
+}
+
+func Init(root *mux.Router) *API {
+	api := &API{
+		BaseRoutes: &Routes{},
 	}
+	api.BaseRoutes.Root = root
+	api.BaseRoutes.Users = api.BaseRoutes.Root.PathPrefix("/users").Subrouter()
+
+	api.InitUser()
+	return api
 }

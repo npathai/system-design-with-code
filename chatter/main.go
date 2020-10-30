@@ -16,7 +16,7 @@ func main() {
 		panic("couldn't start server")
 	}
 
-	api.InitApi()
+	api.Init(s.Router)
 	s.Start()
 
 	ch := make(chan os.Signal)
