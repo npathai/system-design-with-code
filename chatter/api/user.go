@@ -3,12 +3,13 @@ package api
 import (
 	"fmt"
 	"github.com/npathai/chatter/model"
+	"github.com/npathai/chatter/web"
 	"net/http"
 )
 
 func (api *API) InitUser() {
 	api.BaseRoutes.Users.HandleFunc("", GetUsers).Methods("GET")
-	api.BaseRoutes.Users.HandleFunc("", CreateUser).Methods("POST")
+	api.BaseRoutes.Users.Handle("", api.ApiHandler(createUser)).Methods("POST")
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +19,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func createUser(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 	user := model.UserFromJson(r.Body)
 	if user == nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -27,5 +28,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Sanitize the input
 	// Ask the app layer to create the user from signup
+	ctx.App.CreateUser(user)
 	w.WriteHeader(http.StatusCreated)
 }
