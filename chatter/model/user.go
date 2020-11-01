@@ -21,3 +21,8 @@ func UserFromJson(data io.Reader) *User {
 	json.NewDecoder(data).Decode(&user)
 	return user
 }
+
+func (user *User) ToJson() string {
+	bytes, _ := json.Marshal(user)
+	return string(bytes)
+}

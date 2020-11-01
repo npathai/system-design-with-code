@@ -36,6 +36,13 @@ func NewAppError(message string) *AppError {
 	}
 }
 
+func NewAppErrorWithStatus(message string, statusCode int) *AppError {
+	return &AppError{
+		StatusCode: statusCode,
+		Message: message,
+	}
+}
+
 func IsValidEmail(email string) bool {
 	if !IsLower(email) {
 		return false

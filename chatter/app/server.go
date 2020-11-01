@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/npathai/chatter/store"
 	"net/http"
 	"time"
 )
@@ -11,6 +12,7 @@ import (
 type Server struct {
 	Router *mux.Router
 	Server *http.Server
+	Store store.Store
 }
 
 func NewServer() (*Server, error) {

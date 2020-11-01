@@ -28,6 +28,13 @@ func createUser(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 
 	// Sanitize the input
 	// Ask the app layer to create the user from signup
-	ctx.App.CreateUser(user)
+	user, err := ctx.App.CreateUser(user)
+
+	if err != nil {
+		ctx.Err = err
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(user.ToJson()))
 }
