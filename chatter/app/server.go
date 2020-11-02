@@ -12,12 +12,13 @@ import (
 type Server struct {
 	Router *mux.Router
 	Server *http.Server
-	Store store.Store
+	Store *store.LocalStore
 }
 
 func NewServer() (*Server, error) {
 	Srv := &Server{}
 	Srv.Router = mux.NewRouter()
+	Srv.Store = store.NewStore()
 	return Srv, nil
 }
 

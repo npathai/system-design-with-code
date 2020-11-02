@@ -6,6 +6,10 @@ type MemoryUserStore struct {
 	users []*model.User
 }
 
+func (store *MemoryUserStore) GetAllUsers() ([]*model.User, error) {
+	return store.users, nil
+}
+
 func (store *MemoryUserStore) Save(user *model.User) (*model.User, error) {
 	store.users = append(store.users, user)
 	return user, nil

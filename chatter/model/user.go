@@ -22,6 +22,11 @@ func UserFromJson(data io.Reader) *User {
 	return user
 }
 
+func UserListToJson(users []*User) string {
+	b, _ := json.Marshal(users)
+	return string(b)
+}
+
 func (user *User) ToJson() string {
 	bytes, _ := json.Marshal(user)
 	return string(bytes)

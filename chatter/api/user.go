@@ -1,22 +1,24 @@
 package api
 
 import (
-	"fmt"
 	"github.com/npathai/chatter/model"
 	"github.com/npathai/chatter/web"
 	"net/http"
 )
 
 func (api *API) InitUser() {
-	api.BaseRoutes.Users.HandleFunc("", GetUsers).Methods("GET")
+	api.BaseRoutes.Users.Handle("", api.ApiHandler(getUsers)).Methods("GET")
 	api.BaseRoutes.Users.Handle("", api.ApiHandler(createUser)).Methods("POST")
 }
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	if _, err := w.Write([]byte("Hello world!")); err != nil {
-		fmt.Printf("Error in writing response: %v", err)
+func getUsers(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
+
+	users, err := ctx.App.GetAllUsers()
+	if err != nil {
+		ctx.Err = err
 	}
+	w.Write([]byte(model.UserListToJson(users)))
+	w.WriteHeader(http.StatusOK)
 }
 
 func createUser(ctx *web.Context, w http.ResponseWriter, r *http.Request) {

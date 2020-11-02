@@ -18,6 +18,14 @@ func (app *App) CreateUser(user *model.User) (*model.User, *model.AppError) {
 	return rUser, nil
 }
 
+func (app *App) GetAllUsers() ([]*model.User, *model.AppError) {
+	users, err := app.Srv().Store.User().GetAllUsers()
+	if err != nil {
+		return nil, model.NewAppError("Cannot retrieve users")
+	}
+	return users, nil
+}
+
 func (app *App) validateUser(user *model.User) error {
 	return nil
 }
