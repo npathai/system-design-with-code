@@ -9,5 +9,11 @@ func (app *App) Srv() *Server {
 }
 
 func New() *App {
-	return &App{}
+	app := &App{}
+	srv, err  := NewServer()
+	if err != nil {
+		panic("error in creating server")
+	}
+	app.srv = srv
+	return app
 }

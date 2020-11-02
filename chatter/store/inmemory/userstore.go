@@ -7,6 +7,9 @@ type MemoryUserStore struct {
 }
 
 func (store *MemoryUserStore) GetAllUsers() ([]*model.User, error) {
+	if store.users == nil {
+		return []*model.User{}, nil
+	}
 	return store.users, nil
 }
 
