@@ -18,7 +18,6 @@ func getUsers(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 		ctx.Err = err
 	}
 	w.Write([]byte(model.UserListToJson(users)))
-	w.WriteHeader(http.StatusOK)
 }
 
 func createUser(ctx *web.Context, w http.ResponseWriter, r *http.Request) {

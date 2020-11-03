@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/npathai/chatter/app"
 )
 
 type Routes struct {
@@ -10,11 +11,13 @@ type Routes struct {
 }
 
 type API struct {
+	GetGlobalAppOptions app.AppOptionCreator
 	BaseRoutes *Routes
 }
 
-func Init(root *mux.Router) *API {
+func Init(globalOptionsFunc app.AppOptionCreator, root *mux.Router) *API {
 	api := &API{
+		GetGlobalAppOptions: globalOptionsFunc,
 		BaseRoutes: &Routes{},
 	}
 	api.BaseRoutes.Root = root

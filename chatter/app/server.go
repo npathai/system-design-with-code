@@ -42,3 +42,9 @@ func (Srv *Server) Stop() {
 		fmt.Println("Server stopped")
 	}
 }
+
+func (s *Server) AppOptions() []AppOption {
+	return []AppOption{
+		ServerConnector(s),
+	}
+}

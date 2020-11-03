@@ -8,12 +8,10 @@ func (app *App) Srv() *Server {
 	return app.srv
 }
 
-func New() *App {
+func New(options...AppOption) *App {
 	app := &App{}
-	srv, err  := NewServer()
-	if err != nil {
-		panic("error in creating server")
+	for _, option := range options {
+		option(app)
 	}
-	app.srv = srv
 	return app
 }
