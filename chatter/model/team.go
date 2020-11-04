@@ -1,11 +1,27 @@
 package model
 
+import (
+	"encoding/json"
+	"io"
+)
+
 type Team struct {
 	Id	string `json:"id"`
 	Name string `json:"name"`
 	Domain string `json:"domain"`
 	Email string `json:"email"`
 	CompanyName string `json:"company_name"`
+}
+
+func TeamFromJson(data io.Reader) *Team {
+	var o *Team
+	json.NewDecoder(data).Decode(&o)
+	return o
+}
+
+func (o *Team) ToJson() string {
+	b, _ := json.Marshal(o)
+	return string(b)
 }
 
 func (team *Team) PreSave() {

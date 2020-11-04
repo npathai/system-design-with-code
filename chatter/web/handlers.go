@@ -8,6 +8,7 @@ import (
 type Handler struct {
 	GetGlobalAppOptions app.AppOptionCreator
 	HandlerFunc func(*Context, http.ResponseWriter, *http.Request)
+	RequireSession bool
 }
 
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
