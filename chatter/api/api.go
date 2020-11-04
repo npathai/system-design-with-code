@@ -8,6 +8,7 @@ import (
 type Routes struct {
 	Root *mux.Router
 	Users *mux.Router
+	Teams *mux.Router
 }
 
 type API struct {
@@ -22,7 +23,9 @@ func Init(globalOptionsFunc app.AppOptionCreator, root *mux.Router) *API {
 	}
 	api.BaseRoutes.Root = root
 	api.BaseRoutes.Users = api.BaseRoutes.Root.PathPrefix("/users").Subrouter()
+	api.BaseRoutes.Teams = api.BaseRoutes.Root.PathPrefix("/teams").Subrouter()
 
 	api.InitUser()
+	api.InitTeam()
 	return api
 }
