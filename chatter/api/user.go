@@ -9,6 +9,7 @@ import (
 func (api *API) InitUser() {
 	api.BaseRoutes.Users.Handle("", api.ApiHandler(getUsers)).Methods("GET")
 	api.BaseRoutes.Users.Handle("", api.ApiHandler(createUser)).Methods("POST")
+	api.BaseRoutes.Users.Handle("/login", api.ApiHandler(login)).Methods("POST")
 }
 
 func getUsers(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
@@ -38,4 +39,8 @@ func createUser(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(user.ToJson()))
+}
+
+func login(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
+	// TODO add the login process
 }

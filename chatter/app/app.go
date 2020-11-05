@@ -2,6 +2,7 @@ package app
 
 type App struct {
 	srv *Server
+	session model.Session
 }
 
 func (app *App) Srv() *Server {
