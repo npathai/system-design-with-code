@@ -17,3 +17,7 @@ func (store *MemoryUserStore) Save(user *model.User) (*model.User, error) {
 	store.users = append(store.users, user)
 	return user, nil
 }
+
+func (store *MemoryUserStore) Get(userId string) (*model.User, error) {
+	return nil, nil
+}

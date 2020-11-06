@@ -42,5 +42,12 @@ func createUser(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 }
 
 func login(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
-	// TODO add the login process
+	props := model.MapFromJson(r.Body)
+	userId := props["id"]
+	loginId := props["loginId"]
+	password := props["password"]
+
+	user, err := ctx.App.AuthenticateUserForLogin(userId, loginId, password)
+
+
 }

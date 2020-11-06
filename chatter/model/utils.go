@@ -3,6 +3,8 @@ package model
 import (
 	"bytes"
 	"encoding/base32"
+	"encoding/json"
+	"io"
 	"net/mail"
 	"regexp"
 	"strings"
@@ -72,4 +74,13 @@ func IsValidDomain(domain string) bool {
 var validAlphaNum = regexp.MustCompile(`^[a-z0-9]+([a-z\-0-9]+|(__)?)[a-z0-9]+$`)
 func IsValidAlphaNum(str string) bool {
 	return validAlphaNum.MatchString(str)
+}
+
+func MapFromJson(data io.Reader) map[string]string {
+	decoder := json.NewDecoder(data)
+	var decoded map[string]string
+	if err := decoder.Decode(&decoded); err != nil {
+		return make(map[string]string)
+	}
+	return decoded
 }

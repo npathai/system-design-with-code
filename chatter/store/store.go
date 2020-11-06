@@ -12,6 +12,7 @@ type Store interface {
 type UserStore interface {
 	Save(user *model.User) (*model.User, error)
 	GetAllUsers() ([]*model.User, error)
+	Get(userId string) (*model.User, error)
 }
 
 type LocalStore struct {

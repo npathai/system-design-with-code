@@ -29,3 +29,11 @@ func (app *App) GetAllUsers() ([]*model.User, *model.AppError) {
 func (app *App) validateUser(user *model.User) error {
 	return nil
 }
+
+func (app *App) GetUser(userId string) (*model.User, *model.AppError) {
+	user, err := app.Srv().Store.User().Get(userId)
+	if err != nil {
+
+	}
+	return user, nil
+}
