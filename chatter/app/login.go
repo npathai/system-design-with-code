@@ -11,20 +11,28 @@ func (app *App) AuthenticateUserForLogin(userId, loginId, password string) (user
 		return nil, model.NewAppErrorWithStatus("Password blank", http.StatusBadRequest)
 	}
 
-	if user, err := app.GetUserForLogin(userId, loginId); err != nil {
+	if user, err = app.GetUserForLogin(userId, loginId); err != nil {
 		return nil, err
 	}
 
+	if user, err = app.authenticateUser(user, password); err != nil {
+		return nil, err
+	}
 
+	return user, nil
 }
 
 func (app *App) GetUserForLogin(userId, loginId string) (*model.User, *model.AppError){
 
 	// Find user by id and fail if we can't find
 	if len(userId) != 0 {
-		user, err := app.getUser(userId)
+		user, err := app.GetUser(userId)
 		if err != nil {
 
 		}
+		return user, nil
 	}
+
+	// TODO get user by email
+	return nil, nil
 }
