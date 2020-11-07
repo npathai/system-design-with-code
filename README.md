@@ -24,6 +24,7 @@ All systems built in this repository should be
  
 ## Projects
 ### URL Shortening Service
+### Chatter (Slack) - Inspired from Mattermost
 ### Discourse (QnA)
 
 
