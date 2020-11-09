@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (app *App) AuthenticateUserForLogin(userId, loginId, password string) (user *model.User, err error) {
+func (app *App) AuthenticateUserForLogin(userId, loginId, password string) (user *model.User, err *model.AppError) {
 
 	if len(password) == 0 {
 		return nil, model.NewAppErrorWithStatus("Password blank", http.StatusBadRequest)
@@ -28,11 +28,29 @@ func (app *App) GetUserForLogin(userId, loginId string) (*model.User, *model.App
 	if len(userId) != 0 {
 		user, err := app.GetUser(userId)
 		if err != nil {
-
+			err.StatusCode = http.StatusBadRequest
+			return nil, err
 		}
 		return user, nil
 	}
 
 	// TODO get user by email
 	return nil, nil
+}
+
+func (app *App) DoLogin(w http.ResponseWriter, r *http.Request, user *model.User) *model.AppError {
+	session := &model.Session{
+		UserId: user.Id,
+	}
+
+	// TODO add session expiry
+
+	var err *model.AppError
+	if session, err = app.CreateSession(session); err != nil {
+		err.StatusCode = http.StatusInternalServerError
+		return err
+	}
+
+	app.SetSession(session)
+	return nil
 }

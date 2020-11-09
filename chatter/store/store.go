@@ -7,6 +7,7 @@ import (
 
 type Store interface {
 	User() UserStore
+	Session() SessionStore
 }
 
 type UserStore interface {
@@ -15,16 +16,26 @@ type UserStore interface {
 	Get(userId string) (*model.User, error)
 }
 
+type SessionStore interface {
+	Save(session *model.Session) (*model.Session, error)
+}
+
 type LocalStore struct {
 	uStore inmemory.MemoryUserStore
+	sStore inmemory.MemorySessionStore
 }
 
 func (store *LocalStore) User() UserStore {
 	return &store.uStore
 }
 
+func (store *LocalStore) Session() SessionStore {
+	return &store.sStore
+}
+
 func NewStore() *LocalStore {
 	store := &LocalStore{}
 	store.uStore = inmemory.MemoryUserStore{}
+	store.sStore = inmemory.MemorySessionStore{}
 	return store
 }

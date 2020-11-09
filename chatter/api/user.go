@@ -48,6 +48,10 @@ func login(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 	password := props["password"]
 
 	user, err := ctx.App.AuthenticateUserForLogin(userId, loginId, password)
+	if err != nil {
+		ctx.Err = err
+		return
+	}
 
-
+	err = ctx.App.DoLogin(w, r, user)
 }

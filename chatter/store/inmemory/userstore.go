@@ -14,10 +14,12 @@ func (store *MemoryUserStore) GetAllUsers() ([]*model.User, error) {
 }
 
 func (store *MemoryUserStore) Save(user *model.User) (*model.User, error) {
+	// TODO assign ID to user
 	store.users = append(store.users, user)
 	return user, nil
 }
 
 func (store *MemoryUserStore) Get(userId string) (*model.User, error) {
+	// TODO add code to get user by id
 	return nil, nil
 }

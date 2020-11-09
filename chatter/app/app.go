@@ -1,5 +1,7 @@
 package app
 
+import "github.com/npathai/chatter/model"
+
 type App struct {
 	srv *Server
 	session model.Session
@@ -15,4 +17,8 @@ func New(options...AppOption) *App {
 		option(app)
 	}
 	return app
+}
+
+func (app *App) SetSession(session *model.Session) {
+	app.session = *session
 }

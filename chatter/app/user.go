@@ -27,13 +27,15 @@ func (app *App) GetAllUsers() ([]*model.User, *model.AppError) {
 }
 
 func (app *App) validateUser(user *model.User) error {
+	// TODO add validation for user
 	return nil
 }
 
 func (app *App) GetUser(userId string) (*model.User, *model.AppError) {
 	user, err := app.Srv().Store.User().Get(userId)
 	if err != nil {
-
+		// TODO if error is missing account then return NOT FOUND else return INTERNAL ERROR
+		return nil, model.NewAppErrorWithStatus("Account not found", http.StatusNotFound)
 	}
 	return user, nil
 }
