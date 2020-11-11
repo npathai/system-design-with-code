@@ -54,4 +54,11 @@ func login(ctx *web.Context, w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = ctx.App.DoLogin(w, r, user)
+	if err != nil {
+		ctx.Err = err;
+		return
+	}
+
+	// Sanitize user information to remove sensitive information
+	w.Write([]byte(user.ToJson()))
 }
