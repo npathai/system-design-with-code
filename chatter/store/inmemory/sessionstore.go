@@ -10,7 +10,7 @@ type MemorySessionStore struct {
 }
 
 func (msStore *MemorySessionStore) Save(session *model.Session) (*model.Session, error) {
-	session.Id = model.NewId()
+	session.PreSave()
 	msStore.sessions = append(msStore.sessions, session)
 	return session, nil
 }

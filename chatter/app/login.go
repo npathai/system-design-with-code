@@ -42,7 +42,7 @@ func (app *App) DoLogin(w http.ResponseWriter, r *http.Request, user *model.User
 	session := &model.Session{
 		UserId: user.Id,
 	}
-
+	session.GenerateCSRF()
 	// TODO add session expiry
 
 	var err *model.AppError
@@ -50,6 +50,8 @@ func (app *App) DoLogin(w http.ResponseWriter, r *http.Request, user *model.User
 		err.StatusCode = http.StatusInternalServerError
 		return err
 	}
+
+	w.Header().Set(model.HeaderToken, session.Token)
 
 	app.SetSession(session)
 	return nil
