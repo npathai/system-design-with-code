@@ -19,3 +19,13 @@ func (app *App) authenticateUser(user *model.User, password string) (*model.User
 func (a *App) CheckPasswordAndCriteria(user *model.User, password string) *model.AppError {
 	return nil
 }
+
+func ParseAuthTokenFromRequest(r *http.Request) string {
+	authHeader := r.Header.Get(model.HeaderAuth)
+
+	if len(authHeader) <= 6 {
+		return ""
+	}
+
+	return authHeader[6:]
+}
