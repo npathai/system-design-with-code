@@ -24,3 +24,12 @@ func (msStore *MemorySessionStore) GetSessionById(sessionId string) (*model.Sess
 	}
 	return nil, store.NewErrNotFound("Session", sessionId)
 }
+
+func (msStore *MemorySessionStore) GetSessionByToken(token string) (*model.Session, error) {
+	for _, s := range msStore.sessions {
+		if s.Token == token {
+			return s, nil;
+		}
+	}
+	return nil, store.NewErrNotFound("Session", token)
+}

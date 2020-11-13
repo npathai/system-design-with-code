@@ -18,6 +18,8 @@ type UserStore interface {
 
 type SessionStore interface {
 	Save(session *model.Session) (*model.Session, error)
+	GetSessionById(sessionId string) (*model.Session, error)
+	GetSessionByToken(token string) (*model.Session, error)
 }
 
 type LocalStore struct {
