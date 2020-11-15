@@ -19,9 +19,12 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	token := app.ParseAuthTokenFromRequest(r)
-	if len(token) > 0 {
+	if len(token) != 0 {
 		session, err := ctx.App.GetSessionByToken(token)
-
+		if err != nil {
+			ctx.Err = err
+		}
+		ctx.App.SetSession(session)
 	} else {
 		// Not allowed
 	}
