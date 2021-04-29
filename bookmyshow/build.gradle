@@ -63,7 +63,8 @@ subprojects {
             exclude group: 'io.netty'
         }
 
-        testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
+        testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
         testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
     }
 
