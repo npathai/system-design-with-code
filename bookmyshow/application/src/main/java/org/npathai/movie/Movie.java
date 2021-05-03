@@ -9,14 +9,38 @@ import java.util.Collections;
 import java.util.List;
 
 public class Movie {
-    long id;
+    MovieId movieId;
     LocalDate releaseDate;
     String name;
     Genre genre;
     String language;
-    Duration duration;
+    private Duration runDuration;
 
     public List<Show> getShows(CityId cityId) {
         return Collections.emptyList();
+    }
+
+    public MovieId getMovieId() {
+        return movieId;
+    }
+
+    public void setId(MovieId movieId) {
+        this.movieId = movieId;
+    }
+
+    public Duration getRunDuration() {
+        return runDuration;
+    }
+
+    public void setDuration(Duration runDuration) {
+        this.runDuration = runDuration;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
